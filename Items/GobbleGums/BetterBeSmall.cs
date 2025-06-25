@@ -40,7 +40,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             {
                 Vector3 currentSize = ev.Player.Scale;
 
-                float minScale = 0.2f;
+                float minScale = 0.4f;
 
                 Vector3 newScale = new Vector3(
                     Mathf.Max(currentSize.x - 0.2f, minScale),

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Text;
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.CustomItems;
 using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API;
+using Exiled.CustomRoles.Events;
 using GockelsAIO_exiled.Features;
+using GockelsAIO_exiled.Handlers;
 using GockelsAIO_exiled.Roles.ClassD;
 using GockelsAIO_exiled.Roles.NTF;
 using HarmonyLib;
+using System;
+using System.Text;
 
 namespace GockelsAIO_exiled
 {
@@ -17,10 +19,19 @@ namespace GockelsAIO_exiled
         public override string Author => "Gockel";
         public static GockelsAIO Instance;
         public EventHandlers EventHandlers;
+        public PlayerHandler PlayerHandler;
+        public ServerHandler ServerHandler;
+        public PMERHandler PMERHandler;
+        public CustomRoleHandler CustomRoleHandler;
 
         public override void OnEnabled()
         {
             EventHandlers = new EventHandlers();
+            PlayerHandler = new PlayerHandler();
+            ServerHandler = new ServerHandler();
+            PMERHandler = new PMERHandler();
+            CustomRoleHandler = new CustomRoleHandler();
+
             Instance = this;
             
             RegisterMERHandlers();
@@ -28,10 +39,7 @@ namespace GockelsAIO_exiled
             RegisterServerHandlers();
             RegisterCustomRoles();
 
-            Exiled.Events.Handlers.Map.ExplodingGrenade += EventHandlers.DEBUGGrenadeThrow;
-
             CustomWeapon.RegisterItems();
-
 
             LoadAudioClips();
 
@@ -45,12 +53,16 @@ namespace GockelsAIO_exiled
             UnregisterServerHandlers();
             UnregisterCustomRoles();
 
-            Exiled.Events.Handlers.Map.ExplodingGrenade -= EventHandlers.DEBUGGrenadeThrow;
-
             CustomWeapon.UnregisterItems();
 
             EventHandlers = null;
+            PlayerHandler = null;
+            ServerHandler = null;
+            PMERHandler = null;
+            CustomRoleHandler = null;
+
             Instance = null;
+
             base.OnDisabled();
         }
 
@@ -73,89 +85,62 @@ namespace GockelsAIO_exiled
 
         public void RegisterCustomRoles()
         {
-            new RiotOperator().Register();
-            new KamikazeZombie().Register();
-            new Lockpicker().Register();
+            CustomRoleHandler.RegisterRoles();
         }
 
         public void UnregisterCustomRoles()
         {
-            new RiotOperator().Unregister();
-            new KamikazeZombie().Unregister();
-            new Lockpicker().Unregister();
+            CustomRoleHandler.UnregisterRoles();
         }
 
         public void RegisterMERHandlers()
         {
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += EventHandlers.OnButtonInteract; // Mystery Box Button Handler
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += EventHandlers.OnButtonInteractGobblegum;
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += EventHandlers.OnButtonInteractCoin;
-            //ProjectMER.Events.Handlers.Schematic.SchematicSpawned += EventHandlers.OnSchematicSpawn; NUR DEBUG
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteract; // Mystery Box Button Handler
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteractGobblegum;
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteractCoin;
         }
 
         public void UnregisterMERHandlers()
         {
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= EventHandlers.OnButtonInteract; // Mystery Box Button Handler
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= EventHandlers.OnButtonInteractGobblegum;
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= EventHandlers.OnButtonInteractCoin;
-            //ProjectMER.Events.Handlers.Schematic.SchematicSpawned -= EventHandlers.OnSchematicSpawn; NUR DEBUG
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteract; // Mystery Box Button Handler
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteractGobblegum;
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteractCoin;
         }
 
         public void RegisterServerHandlers()
         {
-            Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnStart; // Used for spawning Mystery Boxes.
-            Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.OnSpawningGuards;
-            Exiled.Events.Handlers.Server.RoundEnded += EventHandlers.OnRoundEnd;
+            Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnStart; // Used for spawning Mystery Boxes.
+            Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnSpawningGuards;
+            Exiled.Events.Handlers.Server.RoundEnded += ServerHandler.OnRoundEnd;
         }
 
         public void UnregisterServerHandlers()
         {
-            Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnStart;
-            Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.OnSpawningGuards;
-            Exiled.Events.Handlers.Server.RoundEnded -= EventHandlers.OnRoundEnd;
+            Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnStart;
+            Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnSpawningGuards;
+            Exiled.Events.Handlers.Server.RoundEnded -= ServerHandler.OnRoundEnd;
         }
 
         public void RegisterPlayerHandlers()
         {
-            Exiled.Events.Handlers.Player.Spawned += EventHandlers.SpawnSetPoints; // Handler to give players points on spawn
-            Exiled.Events.Handlers.Player.Left += EventHandlers.OnLeft; // Handler to remove the player from the points dict
-            Exiled.Events.Handlers.Player.PickingUpItem += EventHandlers.OnPickingUp; // Test point giver
-            Exiled.Events.Handlers.Player.ChangingRole += EventHandlers.OnChangingRolePoints;
-            Exiled.Events.Handlers.Player.ChangingItem += EventHandlers.OnChangingItem;
-            Exiled.Events.Handlers.Player.Dying += EventHandlers.OnKillGivePoints;
-            Exiled.Events.Handlers.Player.Hurting += EventHandlers.OnSCPVoidJump;
-            //Exiled.Events.Handlers.Player.Dying += EventHandlers.OnPlayerDied;
+            Exiled.Events.Handlers.Player.Spawned += PlayerHandler.SpawnSetPoints; // Handler to give players points on spawn
+            Exiled.Events.Handlers.Player.Left += PlayerHandler.OnLeft; // Handler to remove the player from the points dict
+            Exiled.Events.Handlers.Player.ChangingRole += PlayerHandler.OnChangingRolePoints;
+            Exiled.Events.Handlers.Player.ChangingItem += PlayerHandler.OnChangingItem;
+            Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
+            Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
+            Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
         }
 
         public void UnregisterPlayerHandlers()
         {
-            Exiled.Events.Handlers.Player.Spawned -= EventHandlers.SpawnSetPoints;
-            Exiled.Events.Handlers.Player.Left -= EventHandlers.OnLeft;
-            Exiled.Events.Handlers.Player.PickingUpItem -= EventHandlers.OnPickingUp;
-            Exiled.Events.Handlers.Player.ChangingRole -= EventHandlers.OnChangingRolePoints;
-            Exiled.Events.Handlers.Player.ChangingItem -= EventHandlers.OnChangingItem;
-            Exiled.Events.Handlers.Player.Dying -= EventHandlers.OnKillGivePoints;
-            Exiled.Events.Handlers.Player.Hurting -= EventHandlers.OnSCPVoidJump;
-            //Exiled.Events.Handlers.Player.Dying -= EventHandlers.OnPlayerDied;
-        }
-
-        public static string GetContent(Player player)
-        {
-            if (!EventHandlers.PlayerPoints.ContainsKey(player))
-                return $"💰: -";
-
-            return $"💰: {EventHandlers.GetPoints(player)}";
-        }
-
-        public static string GetContentBAK(Player player)
-        {
-            //Player player = Player.Get(hub);
-
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append("💰: ");
-            stringBuilder.Append(1000);
-
-            return stringBuilder.ToString();
+            Exiled.Events.Handlers.Player.Spawned -= PlayerHandler.SpawnSetPoints;
+            Exiled.Events.Handlers.Player.Left -= PlayerHandler.OnLeft;
+            Exiled.Events.Handlers.Player.ChangingRole -= PlayerHandler.OnChangingRolePoints;
+            Exiled.Events.Handlers.Player.ChangingItem -= PlayerHandler.OnChangingItem;
+            Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
+            Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
+            Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
         }
     }
 }

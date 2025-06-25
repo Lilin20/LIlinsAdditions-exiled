@@ -15,7 +15,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     [CustomItem(ItemType.AntiSCP207)]
     public class ShrinkAndRun : CustomItem
     {
-        public override uint Id { get; set; } = 818;
+        public override uint Id { get; set; } = 816;
         public override string Name { get; set; } = "Shrink and Run";
         public override string Description { get; set; } = "Für kurze Zeit ganz klein!";
         public override float Weight { get; set; } = 0.5f;

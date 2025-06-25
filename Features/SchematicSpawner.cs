@@ -3,6 +3,7 @@ using System.Linq;
 using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using GockelsAIO_exiled.Handlers;
 using MEC;
 using ProjectMER.Features;
 using UnityEngine;
@@ -88,7 +89,7 @@ namespace GockelsAIO_exiled
 
                 ObjectSpawner.TrySpawnSchematic("Coin", globalPosition, globalRotation, out var schematic);
 
-                EventHandlers.TrackedCoins.Add(schematic);
+                PMERHandler.TrackedCoins.Add(schematic);
 
                 spawnData.Remove(selectedType);
             }
@@ -134,7 +135,7 @@ namespace GockelsAIO_exiled
 
                 if (ObjectSpawner.TrySpawnSchematic("MysteryBox", globalPosition, globalRotation, out var schematic))
                 {
-                    EventHandlers.TrackedSchematics.Add(schematic);
+                    PMERHandler.TrackedSchematics.Add(schematic);
                 }
 
                 // Benutzten RoomType entfernen
@@ -195,7 +196,7 @@ namespace GockelsAIO_exiled
                 if (ObjectSpawner.TrySpawnSchematic("GobblegumMachine", globalPosition, globalRotation, out var schematic))
                 {
                     spawned++;
-                    EventHandlers.TrackedGobblegumMachines.Add(schematic);
+                    PMERHandler.TrackedGobblegumMachines.Add(schematic);
 
                     foreach (var block in schematic.AttachedBlocks)
                     {

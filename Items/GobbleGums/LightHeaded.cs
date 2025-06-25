@@ -13,7 +13,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     [CustomItem(ItemType.AntiSCP207)]
     public class LightHeaded : CustomItem
     {
-        public override uint Id { get; set; } = 817;
+        public override uint Id { get; set; } = 815;
         public override string Name { get; set; } = "Light Headed";
         public override string Description { get; set; } = "Alles fühlt sich so leicht an?";
         public override float Weight { get; set; } = 0.5f;
