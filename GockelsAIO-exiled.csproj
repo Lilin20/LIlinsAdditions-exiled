@@ -112,7 +112,6 @@
     <Compile Include="Components\AnimComponent .cs" />
     <Compile Include="Components\DeathComponent.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="EventHandlers.cs" />
     <Compile Include="Features\ADSManager.cs" />
     <Compile Include="Features\GadgetPlacer.cs" />
     <Compile Include="Features\PointSystem.cs" />
@@ -143,6 +142,9 @@
     <Compile Include="Items\GobbleGums\WhereIsWaldo.cs" />
     <Compile Include="Items\SCPs\Gasmask.cs" />
     <Compile Include="Items\SCPs\GogglesItem.cs" />
+    <Compile Include="Items\Weapons\Grenade\DoorFrameTrap.cs" />
+    <Compile Include="Items\Weapons\Grenade\TestGrenade.cs" />
+    <Compile Include="Items\Weapons\LMGs\ExplosiveLMG.cs" />
     <Compile Include="Items\Weapons\LMGs\GrenadeLauncher.cs" />
     <Compile Include="Items\Weapons\Pistols\HackGun.cs" />
     <Compile Include="Items\Weapons\Pistols\PlaceSwap.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="Items\Weapons\Shotguns\BreachShotgun.cs" />
     <Compile Include="Items\Weapons\SMGs\MedicGun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Roles\Chaos\NTFTraitor.cs" />
     <Compile Include="Roles\ClassD\LockPicker.cs" />
     <Compile Include="Roles\NTF\RiotOperator.cs" />
     <Compile Include="Features\SchematicSpawner.cs" />

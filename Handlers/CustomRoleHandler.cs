@@ -1,4 +1,5 @@
 ﻿using Exiled.CustomRoles.API;
+using GockelsAIO_exiled.Roles.Chaos;
 using GockelsAIO_exiled.Roles.ClassD;
 using GockelsAIO_exiled.Roles.NTF;
 using System;
@@ -16,6 +17,7 @@ namespace GockelsAIO_exiled.Handlers
             new RiotOperator().Register();
             new KamikazeZombie().Register();
             new Lockpicker().Register();
+            new NTFTraitor().Register();
         }
 
         public static void UnregisterRoles()
@@ -23,6 +25,7 @@ namespace GockelsAIO_exiled.Handlers
             new RiotOperator().Unregister();
             new KamikazeZombie().Unregister();
             new Lockpicker().Unregister();
+            new NTFTraitor().Unregister();
         }
     }
 }

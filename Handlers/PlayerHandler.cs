@@ -2,7 +2,9 @@
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.CustomRoles.API;
+using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using GockelsAIO_exiled.Abilities.Active;
@@ -50,6 +52,19 @@ namespace GockelsAIO_exiled.Handlers
                     playerDisplay.AddHint(hint);
                 }
             });
+        }
+
+        public void OnInteractLocker(InteractingLockerEventArgs ev)
+        {
+
+        }
+
+        public void OnThrowingGrenade(ThrownProjectileEventArgs ev)
+        {
+            if (ev.Projectile is ExplosionGrenadeProjectile grenade)
+            {
+                grenade.Base._playerDamageOverDistance = grenade.Base._playerDamageOverDistance.Multiply(0f);
+            }
         }
 
         public void OnChangingRolePoints(ChangingRoleEventArgs ev)

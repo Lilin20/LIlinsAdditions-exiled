@@ -1,15 +1,6 @@
 ﻿using Exiled.API.Features;
-using Exiled.CustomItems;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API;
-using Exiled.CustomRoles.Events;
-using GockelsAIO_exiled.Features;
 using GockelsAIO_exiled.Handlers;
-using GockelsAIO_exiled.Roles.ClassD;
-using GockelsAIO_exiled.Roles.NTF;
-using HarmonyLib;
-using System;
-using System.Text;
 
 namespace GockelsAIO_exiled
 {
@@ -18,7 +9,6 @@ namespace GockelsAIO_exiled
         public override string Name => "Gockels AIO";
         public override string Author => "Gockel";
         public static GockelsAIO Instance;
-        public EventHandlers EventHandlers;
         public PlayerHandler PlayerHandler;
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
@@ -26,7 +16,6 @@ namespace GockelsAIO_exiled
 
         public override void OnEnabled()
         {
-            EventHandlers = new EventHandlers();
             PlayerHandler = new PlayerHandler();
             ServerHandler = new ServerHandler();
             PMERHandler = new PMERHandler();
@@ -55,7 +44,6 @@ namespace GockelsAIO_exiled
 
             CustomWeapon.UnregisterItems();
 
-            EventHandlers = null;
             PlayerHandler = null;
             ServerHandler = null;
             PMERHandler = null;
@@ -130,6 +118,7 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
+            Exiled.Events.Handlers.Player.ThrownProjectile += PlayerHandler.OnThrowingGrenade;
         }
 
         public void UnregisterPlayerHandlers()
@@ -141,6 +130,7 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
+            Exiled.Events.Handlers.Player.ThrownProjectile -= PlayerHandler.OnThrowingGrenade;
         }
     }
 }
