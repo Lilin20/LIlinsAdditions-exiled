@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 808;
         public override string Name { get; set; } = "Bye Bye Buddy";
-        public override string Description { get; set; } = "Das Schicksal zieht heute nur eine Nummer.";
+        public override string Description { get; set; } = "Fate draws only one number today (or is it?)";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

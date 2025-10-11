@@ -8,10 +8,10 @@ namespace GockelsAIO_exiled.Roles.ClassD
 {
     public class Lockpicker : CustomRole
     {
-        public override uint Id { get; set; } = 201;
+        public override uint Id { get; set; } = 200;
         public override int MaxHealth { get; set; } = 100;
         public override string Name { get; set; } = "Class-D - Lockpicker";
-        public override string Description { get; set; } = "Du bist ein Class-D mit der Fähigkeit Türen zu knacken.";
+        public override string Description { get; set; } = "You can lockpick doors.";
         public override string CustomInfo { get; set; } = "Class-D - Lockpicker";
         public override RoleTypeId Role { get; set; } = RoleTypeId.ClassD;
         public int Chance { get; set; } = 20;
@@ -20,7 +20,7 @@ namespace GockelsAIO_exiled.Roles.ClassD
             new DoorPicking
             {
                 Name = "Lockpicking Ability [Active]",
-                Description = "Allows you to open any door for a short period of time, but limited by some external factors",
+                Description = "Allows you to open any door for a short period of time.",
             }
         };
         public override SpawnProperties SpawnProperties { get; set; } = new()

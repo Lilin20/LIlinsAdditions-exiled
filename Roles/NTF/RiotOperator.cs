@@ -13,7 +13,7 @@ namespace GockelsAIO_exiled.Roles.NTF
         public override uint Id { get; set; } = 100;
         public override int MaxHealth { get; set; } = 200;
         public override string Name { get; set; } = "MTF Nu-7";
-        public override string Description { get; set; } = "Eine speziell ausgerüstete Einheit für größere Einsätze. Kommt mit einem Einsatzschild.";
+        public override string Description { get; set; } = "A specially equipped unit. Comes equipped with a riot shield.";
         public override string CustomInfo { get; set; } = "MTF Nu-7";
         public override RoleTypeId Role { get; set; } = RoleTypeId.NtfCaptain;
         public override float SpawnChance { get; set; } = 25;

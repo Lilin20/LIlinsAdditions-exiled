@@ -12,7 +12,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 810;
         public override string Name { get; set; } = "Better Be Small";
-        public override string Description { get; set; } = "Klein sein hat auch seine Vorteile.";
+        public override string Description { get; set; } = "Being small also has its benefits.";
         public override float Weight { get; set; } = 0.5f;
 
         public override SpawnProperties SpawnProperties { get; set; }

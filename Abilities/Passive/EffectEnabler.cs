@@ -12,7 +12,7 @@ namespace GockelsAIO_exiled.Abilities.Passive
 {
     public class EffectEnabler : PassiveAbility
     {
-        public override string Name { get; set; } = "Effect Enabler";
+        public override string Name { get; set; } = "Effect Giver";
         public override string Description { get; set; } = "Enables Effects to the player";
 
         public Dictionary<EffectType, byte> EffectsToApply { get; set; } = new Dictionary<EffectType, byte>();
@@ -23,7 +23,6 @@ namespace GockelsAIO_exiled.Abilities.Passive
             {
                 foreach (var effect in EffectsToApply)
                 {
-                    Log.Debug($"Custom Abilities: Activating {effect.Key} to {player.Nickname}");
                     player.EnableEffect(effect.Key, effect.Value, 0);
                 }
             });
@@ -33,7 +32,6 @@ namespace GockelsAIO_exiled.Abilities.Passive
         {
             foreach (var effect in EffectsToApply)
             {
-                Log.Debug($"Custom Abilities: Removing {effect.Key} from {player.Nickname}");
                 player.DisableEffect(effect.Key);
             }
         }

@@ -19,7 +19,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Shotguns
     {
         public override uint Id { get; set; } = 300;
         public override string Name { get; set; } = "Kerberos-12";
-        public override string Description { get; set; } = "Ermöglicht es dir Türen zu zerstören. Teilt keinen Schaden an Spieler aus.";
+        public override string Description { get; set; } = "Destroys doors. Deals no damage to players.";
         public override float Damage { get; set; } = 0;
         public override byte ClipSize { get; set; } = 20;
         public override float Weight { get; set; } = 1.5f;

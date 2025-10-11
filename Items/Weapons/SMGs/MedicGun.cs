@@ -22,7 +22,7 @@ namespace GockelsAIO_exiled.Items.Weapons.SMGs
     {
         public override uint Id { get; set; } = 500;
         public override string Name { get; set; } = "MS9K - MedShot 9000";
-        public override string Description { get; set; } = "Ein Werkzeug welches Menschen heilt.";
+        public override string Description { get; set; } = "A tool to heal entities.";
         public override byte ClipSize { get; set; } = 60;
         public override float Weight { get; set; } = 0.5f;
         public override float Damage { get; set; } = 0f;

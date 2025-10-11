@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
     {
         public override uint Id { get; set; } = 101;
         public override string Name { get; set; } = "RangeTec - .308 Lapua";
-        public override string Description { get; set; } = "Schaltet Ziele sauber und schnell aus.";
+        public override string Description { get; set; } = "Kill your targets fast and easy.";
         public override float Damage { get; set; } = 95;
         public override byte ClipSize { get; set; } = 1;
         public override float Weight { get; set; } = 1.5f;
@@ -38,11 +38,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
             base.UnsubscribeEvents();
         }
 
-        protected override void OnShooting(ShootingEventArgs ev)
-        {
-            ev.Firearm.Recoil = new CameraShaking.RecoilSettings(2, 5, 10, 10, 0);
-        }
-
         public void OnAttachmentChange(ChangingAttachmentsEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
@@ -61,17 +56,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
             }
 
             ev.IsAllowed = false;
-        }
-
-        protected override void OnPickingUp(PickingUpItemEventArgs ev)
-        {
-            if (!CustomRole.Get(65).Check(ev.Player))
-            {
-                ev.IsAllowed = false;
-                ev.Player.Hurt(1);
-
-                ev.Player.ShowHint("Ein Sicherheitsmechanismus greift ein und gibt dir einen Stromschlag.");
-            }
         }
 
         protected override void OnShot(ShotEventArgs ev)

@@ -22,8 +22,8 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
     {
         public override uint Id { get; set; } = 401;
         public override float Damage { get; set; } = 0.1f;
-        public override string Name { get; set; } = "test";
-        public override string Description { get; set; } = "...";
+        public override string Name { get; set; } = "Prototype LMG - Nano Rockets";
+        public override string Description { get; set; } = "Shoots nano rockets.";
         public override byte ClipSize { get; set; } = 200;
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }

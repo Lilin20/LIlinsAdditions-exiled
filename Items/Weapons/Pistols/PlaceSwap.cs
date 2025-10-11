@@ -19,7 +19,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         public override uint Id { get; set; } = 200;
         public override float Damage { get; set; } = 1;
         public override string Name { get; set; } = "Entity Swapper";
-        public override string Description { get; set; } = "Tausche die Position mit deinem Ziel.";
+        public override string Description { get; set; } = "Swap positions with your target.";
         public override byte ClipSize { get; set; } = 5;
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }

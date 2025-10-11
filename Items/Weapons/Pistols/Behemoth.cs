@@ -21,7 +21,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
     {
         public override uint Id { get; set; } = 203;
         public override string Name { get; set; } = "Behemoth 50.cal";
-        public override string Description { get; set; } = "Ein sehr tödlicher Revolver.";
+        public override string Description { get; set; } = "A very deadly revolver. Can shoot through walls.";
         public override byte ClipSize { get; set; } = 6;
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }

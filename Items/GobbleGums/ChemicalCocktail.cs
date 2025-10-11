@@ -8,11 +8,11 @@ using MEC;
 namespace GockelsAIO_exiled.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
-    public class AmericanDream : CustomItem
+    public class ChemicalCocktail : CustomItem
     {
         public override uint Id { get; set; } = 806;
-        public override string Name { get; set; } = "American Dream";
-        public override string Description { get; set; } = "Das gute aus Amerika.";
+        public override string Name { get; set; } = "Chemical Cocktail";
+        public override string Description { get; set; } = "Well, you should never take that.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

@@ -12,7 +12,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 800;
         public override string Name { get; set; } = "Forget Me Not";
-        public override string Description { get; set; } = "Du vergisst sämtliche Gesichter die du je gesehen hast.";
+        public override string Description { get; set; } = "You forget every face you saw.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
@@ -34,6 +34,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
 
             Timing.CallDelayed(2f, () =>
             {
+                ev.Item.Destroy();
                 foreach (Exiled.API.Features.Player player in Exiled.API.Features.Player.List)
                 {
                     if (player.Role == RoleTypeId.Scp096)
@@ -49,7 +50,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                         }
 
                         scp096.RemoveTarget(ev.Player);
-                        ev.Item.Destroy();
+                        
                         return;
                     }
                 }

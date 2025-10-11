@@ -13,7 +13,7 @@ namespace GockelsAIO_exiled.Items.SCPs
     {
         public override uint Id { get; set; } = 999;
         public override string Name { get; set; } = "SCP-1499";
-        public override string Description { get; set; } = "yup";
+        public override string Description { get; set; } = "Sends you to another dimension.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; } = new()
         {

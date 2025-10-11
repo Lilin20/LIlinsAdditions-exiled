@@ -12,7 +12,7 @@ namespace GockelsAIO_exiled.Abilities.Active
     public class RiotShield : ActiveAbility
     {
         public override string Name { get; set; } = "Riot Shield";
-        public override string Description { get; set; } = "Toggled das Riot Shield.";
+        public override string Description { get; set; } = "Toggles the riot shield.";
         public override float Duration { get; set; } = 1f;
         public override float Cooldown { get; set; } = 2f;
         public static readonly Dictionary<Player, SchematicObject> activeShields = new();

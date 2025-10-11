@@ -18,9 +18,9 @@ namespace GockelsAIO_exiled.Abilities.Active
     public class Burst : ActiveAbility
     {
         public override string Name { get; set; } = "Burst";
-        public override string Description { get; set; } = "Jage alles in die Luft!";
+        public override string Description { get; set; } = "test";
         public override float Duration { get; set; } = 1f;
-        public override float Cooldown { get; set; } = 2f;
+        public override float Cooldown { get; set; } = 60f;
         protected override void AbilityAdded(Player player)
         {
             SelectAbility(player);
@@ -48,7 +48,7 @@ namespace GockelsAIO_exiled.Abilities.Active
                 speaker.transform.localPosition = Vector3.zero;
             });
 
-            audioPlayer.AddClip("bombsound", loop: false, volume: 1, destroyOnEnd: true);
+            audioPlayer.AddClip("bombsound", loop: false, volume: GockelsAIO.Instance.Config.BurstSoundVolume, destroyOnEnd: true);
 
             Timing.CallDelayed(7f, () =>
             {

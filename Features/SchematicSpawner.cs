@@ -82,7 +82,7 @@ namespace GockelsAIO_exiled
 
                 var room = rooms[UnityEngine.Random.Range(0, rooms.Count)];
 
-                Log.Info($"Coin spawned in: {room.Name}");
+                Log.Debug($"Coin spawned in: {room.Name}");
 
                 Vector3 globalPosition = room.transform.localToWorldMatrix * new Vector4(data.pos.x, data.pos.y, data.pos.z, 1);
                 Quaternion globalRotation = room.transform.rotation * Quaternion.Euler(data.rot);
@@ -128,7 +128,7 @@ namespace GockelsAIO_exiled
 
                 var room = rooms[UnityEngine.Random.Range(0, rooms.Count)];
 
-                Log.Info(room.Type);
+                Log.Debug(room.Type);
 
                 Vector3 globalPosition = room.transform.localToWorldMatrix * new Vector4(data.pos.x, data.pos.y, data.pos.z, 1);
                 Quaternion globalRotation = room.transform.rotation * Quaternion.Euler(data.rot);
@@ -159,7 +159,6 @@ namespace GockelsAIO_exiled
             {
                 if (block.name == "TrapBase")
                 {
-                    Log.Info("TrapBase gefunden");
                     GameObject trapBase = block.gameObject;
 
                     BoxCollider collider = trapBase.AddComponent<BoxCollider>();
@@ -211,7 +210,7 @@ namespace GockelsAIO_exiled
                                 speaker.transform.localPosition = Vector3.zero;
                             });
 
-                            audioPlayer.AddClip("gobblegum", loop: true, volume: 2, destroyOnEnd: false);
+                            audioPlayer.AddClip("gobblegum", loop: true, volume: GockelsAIO.Instance.Config.VendingMachineMusicVolume, destroyOnEnd: false);
                         }
                     }
                 }

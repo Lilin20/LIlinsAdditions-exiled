@@ -18,8 +18,8 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
     public class RussianRoulette : CustomWeapon
     {
         public override uint Id { get; set; } = 202;
-        public override string Name { get; set; } = "Russisches Roulette";
-        public override string Description { get; set; } = "Lasse das Schicksal entscheiden.";
+        public override string Name { get; set; } = "Russian Roulette";
+        public override string Description { get; set; } = "Let the fate decide.";
         public override byte ClipSize { get; set; } = 6;
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }

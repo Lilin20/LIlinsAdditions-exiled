@@ -13,7 +13,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 805;
         public override string Name { get; set; } = "Shadow Step";
-        public override string Description { get; set; } = "Sieh was vor dir liegt.";
+        public override string Description { get; set; } = "Walk freely and see whats to come.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

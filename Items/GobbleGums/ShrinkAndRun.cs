@@ -17,7 +17,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 816;
         public override string Name { get; set; } = "Shrink and Run";
-        public override string Description { get; set; } = "Für kurze Zeit ganz klein!";
+        public override string Description { get; set; } = "Tiny people run faster!";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

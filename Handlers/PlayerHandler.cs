@@ -1,22 +1,29 @@
-﻿using Exiled.API.Enums;
+﻿using CustomPlayerEffects;
+using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
+using Exiled.API.Features.Roles;
+using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using GockelsAIO_exiled.Abilities.Active;
 using GockelsAIO_exiled.Features;
-using HintServiceMeow.Core.Utilities;
 using MEC;
 using PlayerRoles;
+using PlayerRoles.Voice;
+using RueI.API;
+using RueI.API.Elements;
+using RueI.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
-using Hint = HintServiceMeow.Core.Models.Hints.Hint;
 
 namespace GockelsAIO_exiled.Handlers
 {
@@ -33,23 +40,32 @@ namespace GockelsAIO_exiled.Handlers
                 ev.Player.Role.Team == Team.ChaosInsurgency ||
                 ev.Player.Role.Team == Team.Scientists)
                 {
-                    if (!PlayerPoints.ContainsKey(ev.Player))
-                    {
-                        PlayerPoints.Add(ev.Player, 800);
-                    }
+                    RueDisplay display = RueDisplay.Get(ev.Player);
 
-                    Hint hint = new Hint
+                    DynamicElement de = new DynamicElement(position: 500f, _ => GetContent(ev.Player))
                     {
-                        AutoText = display => $"{GetContent(ev.Player)}",
+                        UpdateInterval = TimeSpan.FromSeconds(1),
+                        VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Center,
+                        ResolutionBasedAlign = true,
+                        ZIndex = 100,
                     };
 
-                    hint.Alignment = HintServiceMeow.Core.Enum.HintAlignment.Left;
-                    hint.FontSize = 32;
-                    hint.XCoordinate = Helper.HelperScripts.GetLeftXPosition(ev.Player.ReferenceHub.aspectRatioSync.AspectRatio);
-                    hint.YCoordinate = 500;
+                    display.Show(new Tag(), de);
+                    
 
-                    PlayerDisplay playerDisplay = PlayerDisplay.Get(ev.Player);
-                    playerDisplay.AddHint(hint);
+
+                    //Hint hint = new Hint
+                    //{
+                    //    AutoText = display => $"{GetContent(ev.Player)}",
+                    //};
+
+                    //hint.Alignment = HintServiceMeow.Core.Enum.HintAlignment.Left;
+                    //hint.FontSize = 32;
+                    //hint.XCoordinate = Helper.HelperScripts.GetLeftXPosition(ev.Player.ReferenceHub.aspectRatioSync.AspectRatio);
+                    //hint.YCoordinate = 500;
+
+                    //PlayerDisplay playerDisplay = PlayerDisplay.Get(ev.Player);
+                    //playerDisplay.AddHint(hint);
                 }
             });
         }
@@ -57,14 +73,6 @@ namespace GockelsAIO_exiled.Handlers
         public void OnInteractLocker(InteractingLockerEventArgs ev)
         {
 
-        }
-
-        public void OnThrowingGrenade(ThrownProjectileEventArgs ev)
-        {
-            if (ev.Projectile is ExplosionGrenadeProjectile grenade)
-            {
-                grenade.Base._playerDamageOverDistance = grenade.Base._playerDamageOverDistance.Multiply(0f);
-            }
         }
 
         public void OnChangingRolePoints(ChangingRoleEventArgs ev)
@@ -99,18 +107,7 @@ namespace GockelsAIO_exiled.Handlers
                 if (!PlayerPoints.ContainsKey(ev.Player))
                 {
                     PlayerPoints[ev.Player] = 400;
-                    Log.Debug($"[PointSystem] {ev.Player.Nickname} wurde mit 0 Punkten eingetragen.");
-
-                    //QuestManager.Instance.AssignQuest(ev.Player, new Quest
-                    //{
-                    //    Id = "Kill Scientists",
-                    //    Type = QuestType.KillEnemy,
-                    //    Target = "Scientists",
-                    //    RequiredAmount = 3,
-                    //    RewardPoints = 20
-                    //});
-
-                    //QuestManager.Instance.ShowActiveQuests(ev.Player);
+                    Log.Debug($"[PointSystem] {ev.Player.Nickname} was added with 0 Points.");
                 }
             }
         }
@@ -148,7 +145,7 @@ namespace GockelsAIO_exiled.Handlers
             if (isEnemy && PlayerPoints.ContainsKey(killer))
             {
                 PointSystem.AddPoints(killer, 200); // z. B. 200 Punkte für Kills
-                Log.Debug($"[PointSystem] {killer.Nickname} hat einen Gegner ({victim.Nickname}) getötet und 200 Punkte erhalten.");
+                Log.Debug($"[PointSystem] {killer.Nickname} has killed an enemy ({victim.Nickname}) and received 200 points.");
             }
         }
 
@@ -157,7 +154,7 @@ namespace GockelsAIO_exiled.Handlers
             if (PlayerPoints.ContainsKey(ev.Player))
             {
                 PlayerPoints.Remove(ev.Player);
-                Log.Debug($"Spieler {ev.Player.Nickname} wurde aus dem Dictionary entfernt.");
+                Log.Debug($"Player {ev.Player.Nickname} was removed from the dictionary.");
             }
         }
 
@@ -217,14 +214,14 @@ namespace GockelsAIO_exiled.Handlers
                 // Spieler hat Waffe -> Schild zur Seite drehen
                 shieldTransform.localPosition = new Vector3(-0.4f, -1f, 0.4f); // leicht links
                 shieldTransform.localRotation = Quaternion.Euler(0f, -70f, 0f); // seitlich
-                Log.Debug($"[{ev.Player.Nickname}] Waffe erkannt – Schild nach links gedreht.");
+                Log.Debug($"[{ev.Player.Nickname}] weapon detected – shield rotated to the left.");
             }
             else
             {
                 // Standardausrichtung
                 shieldTransform.localPosition = new Vector3(0f, -1f, 0.5f);
                 shieldTransform.localRotation = Quaternion.identity;
-                Log.Debug($"[{ev.Player.Nickname}] Keine Waffe – Schild zentriert.");
+                Log.Debug($"[{ev.Player.Nickname}] no weapon detected. – shield centered.");
             }
         }
 
@@ -234,16 +231,14 @@ namespace GockelsAIO_exiled.Handlers
             {
                 if (UnityEngine.Random.value <= 0.9f)
                 {
-                    // 50% seiner aktuellen HP abziehen
                     float damage = ev.Player.Health / 2f;
                     ev.Player.Hurt(damage);
 
-                    // Teleportiere Spieler an zufällige Position (z.B. in eine zufällige Room-Position)
                     var randomRoom = Room.Random(ZoneType.LightContainment);
-                    Log.Info(randomRoom);
+                    Log.Debug(randomRoom);
                     if (randomRoom != null)
                     {
-                        Log.Info(randomRoom.Name);
+                        Log.Debug(randomRoom.Name);
                         Timing.CallDelayed(0.15f, () =>
                         {
                             ev.Player.Teleport(randomRoom.Position + UnityEngine.Vector3.up);
@@ -253,66 +248,120 @@ namespace GockelsAIO_exiled.Handlers
             }
         }
 
-        //Quest-System relevant - erstmal Disabled!
-        public void OnPlayerDied(DyingEventArgs ev)
+        public void OnCraftingTrackingAccess(Exiled.Events.EventArgs.Scp914.UpgradingPickupEventArgs ev)
         {
-            if (ev.Attacker == null || ev.Attacker == ev.Player)
+            if (ev.KnobSetting != Scp914.Scp914KnobSetting.Fine) return;
+
+            if (ev.Pickup.Type == ItemType.KeycardO5)
             {
-                Log.Info("Todes-Event ignoriert: Kein Angreifer oder Selbstmord.");
+                ev.IsAllowed = false;
+
+                var customOutput = CustomItem.TrySpawn(4444, ev.OutputPosition, out Pickup customPickuop);
+                ev.Pickup.Destroy();
+            }
+        }
+
+        private bool _isRunning = false; // debounce flag
+
+        public void OnUsingIntercomWithCard(IntercomSpeakingEventArgs args)
+        {
+            if (_isRunning) // if already running, ignore new activations
+            {
+                args.IsAllowed = false;
                 return;
             }
 
-            var killer = ev.Attacker;
+            if (args.Player.CurrentItem == null)
+                return;
 
-            if (ev.Player.Role.Team == killer.Role.Team)
+            if (CustomItem.TryGet(args.Player.CurrentItem, out CustomItem customItem))
             {
-                Log.Info($"Todes-Event ignoriert: {killer.Nickname} und {ev.Player.Nickname} sind im selben Team ({killer.Role.Team}).");
-                return; // Nur gegnerische Teams
-            }
-
-            Log.Info($"Todes-Event: {killer.Nickname} ({killer.Role.Team}) hat {ev.Player.Nickname} ({ev.Player.Role.Team}) getötet.");
-
-            var quests = QuestManager.Instance.GetPlayerProgress(killer);
-
-            foreach (var progress in quests.Where(q => q.Quest.Type == QuestType.KillEnemy))
-            {
-                Log.Info($"Prüfe Quest: {progress.Quest.Id} – Zielteam: {progress.Quest.Target}, Benötigt: {progress.Quest.RequiredAmount}, Aktuell: {progress.Progress}");
-
-                if (progress.Quest.Target == ev.Player.Role.Team.ToString())
+                if (customItem is CustomKeycard customKeycard)
                 {
-                    if (!progress.IsCompleted)
+                    if (customKeycard.Id == 4444)
                     {
-                        progress.AddProgress();
-                        Log.Info($"Fortschritt für {killer.Nickname} in Quest '{progress.Quest.Id}': {progress.Progress}/{progress.Quest.RequiredAmount}");
+                        args.IsAllowed = false;
+                        _isRunning = true; // lock sequence
 
-                        if (progress.IsCompleted)
+                        int totalSteps = 5;
+                        float duration = 10f;
+                        float stepTime = duration / totalSteps;
+
+                        // Progress bar display
+                        for (int i = 1; i <= totalSteps; i++)
                         {
-                            Log.Info($"Quest '{progress.Quest.Id}' abgeschlossen! Belohnung wird vergeben.");
-                            QuestManager.Instance.GrantReward(killer, progress);
-                        }
-                    }
-                    else
-                    {
-                        Log.Info($"Quest '{progress.Quest.Id}' ist bereits abgeschlossen. Kein weiterer Fortschritt.");
-                    }
-                    Log.Info($"Fortschritt für {killer.Nickname} in Quest '{progress.Quest.Id}': {progress.Progress}/{progress.Quest.RequiredAmount}");
+                            int progress = i;
+                            Timing.CallDelayed(progress * stepTime, () =>
+                            {
+                                StringBuilder sb = new StringBuilder();
+                                sb.Append("Loading...\n");
+                                sb.Append('[');
+                                sb.Append(new string('█', progress));
+                                sb.Append(new string('-', totalSteps - progress));
+                                sb.Append(']');
 
-                    if (progress.IsCompleted)
-                    {
-                        Log.Info($"Quest '{progress.Quest.Id}' abgeschlossen! Belohnung wird vergeben.");
-                        QuestManager.Instance.GrantReward(killer, progress);
+                                IntercomDisplay._singleton.Network_overrideText = sb.ToString();
+                            });
+                        }
+
+                        // After progress finishes
+                        Timing.CallDelayed(duration + 0.5f, () =>
+                        {
+                            Player executor = args.Player;
+                            string message;
+
+                            // Check if this player has a selected target
+                            if (Storage.SelectedPlayers.TryGetValue(executor, out Player selected) && selected.IsAlive)
+                            {
+                                string zone = selected.Zone.ToString();
+                                string room = selected.CurrentRoom?.Name ?? "Unknown Room";
+
+                                message = $"{selected.Nickname} detected\nZone: {zone}\nRoom: {room}";
+
+                                // Play tracking sound ONCE
+                                var audioPlayer = AudioPlayer.CreateOrGet(
+                                    $"TrackingSound_{UnityEngine.Random.Range(1, 10000)}",
+                                    onIntialCreation: p =>
+                                    {
+                                        var speaker = p.AddSpeaker(
+                                            $"Main_{UnityEngine.Random.Range(1, 10000)}",
+                                            isSpatial: true,
+                                            minDistance: 20f,
+                                            maxDistance: 30f);
+                                        speaker.transform.SetParent(selected.Transform, false);
+                                    });
+
+                                audioPlayer.AddClip("trackingsound", loop: false, volume: 1.25f, destroyOnEnd: true);
+                                Timing.CallDelayed(2.5f, () =>
+                                {
+                                    selected.EnableEffect(EffectType.Blurred, 1, 2);
+                                    selected.EnableEffect(EffectType.Flashed, 1, 1);
+
+                                    selected.ShowHint("You're being tracked.", 5f);
+                                });
+                            }
+                            else
+                            {
+                                message = "No player selected.";
+                            }
+
+                            IntercomDisplay._singleton.Network_overrideText = message;
+
+                            // Reset intercom text and unlock debounce after 5 seconds
+                            Timing.CallDelayed(5f, () =>
+                            {
+                                IntercomDisplay._singleton.Network_overrideText = null;
+                                _isRunning = false; // unlock for next use
+                            });
+                        });
                     }
-                }
-                else
-                {
-                    Log.Info($"Zielteam passt nicht: Erwartet '{progress.Quest.Target}', aber getötet wurde '{ev.Player.Role.Team}'.");
                 }
             }
         }
 
         public static IEnumerator<float> AddPointsOverTime()
         {
-            Log.Info("[AddPointsOverTime] Coroutine gestartet.");
+            Log.Debug("[AddPointsOverTime] Coroutine started.");
 
             while (true)
             {
@@ -323,15 +372,15 @@ namespace GockelsAIO_exiled.Handlers
                     if (player != null && player.IsAlive)
                     {
                         PlayerPoints[player] += 100;
-                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +50 Punkte => {PlayerPoints[player]}");
+                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +100 Points => {PlayerPoints[player]}");
                     }
                     else
                     {
-                        Log.Debug($"[AddPointsOverTime] {player?.Nickname ?? "???"} ist nicht lebendig oder null.");
+                        Log.Debug($"[AddPointsOverTime] {player?.Nickname ?? "???"} is not alive or null.");
                     }
                 }
 
-                yield return Timing.WaitForSeconds(120);
+                yield return Timing.WaitForSeconds(GockelsAIO.Instance.Config.PointsOverTimeDelay);
             }
         }
 
@@ -348,10 +397,18 @@ namespace GockelsAIO_exiled.Handlers
 
         public static string GetContent(Player player)
         {
-            if (!PlayerPoints.ContainsKey(player))
-                return $"💰: -";
+            StringBuilder sb = new();
+            sb.SetAlignment(RueI.Utils.Enums.AlignStyle.Left);
 
-            return $"💰: {PointSystem.GetPoints(player)}";
+            if (!PlayerPoints.ContainsKey(player))
+            {
+                sb.Append($"💰: -");
+                return sb.ToString();
+            }
+
+            sb.Append($"💰: {PointSystem.GetPoints(player)}");
+
+            return sb.ToString();
         }
     }
 }

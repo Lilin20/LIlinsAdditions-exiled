@@ -15,7 +15,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 809;
         public override string Name { get; set; } = "I Dont Want To Be Here";
-        public override string Description { get; set; } = "Holt dich aus Dimensionen raus.";
+        public override string Description { get; set; } = "Gets you out of certain dimensions.";
         public override float Weight { get; set; } = 0.5f;
 
         public override SpawnProperties SpawnProperties { get; set; }

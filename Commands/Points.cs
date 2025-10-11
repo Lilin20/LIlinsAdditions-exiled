@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Commands
     {
         public string Command => "points";
         public string[] Aliases => new[] { "pts" };
-        public string Description => "Verwalte die Punkte eines Spielers (add/set/remove/get)";
+        public string Description => "Manages points for a selected player (add/set/remove/get)";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -30,7 +30,7 @@ namespace GockelsAIO_exiled.Commands
 
             if (player == null)
             {
-                response = $"Spieler '{playerName}' nicht gefunden.";
+                response = $"Player '{playerName}' not found.";
                 return false;
             }
 
@@ -38,7 +38,7 @@ namespace GockelsAIO_exiled.Commands
             {
                 case "get":
                     int currentPoints = PointSystem.GetPoints(player);
-                    response = $"Spieler {player.Nickname} hat {currentPoints} Punkte.";
+                    response = $"Player {player.Nickname} has {currentPoints} Points.";
                     return true;
 
                 case "add":
@@ -46,30 +46,30 @@ namespace GockelsAIO_exiled.Commands
                 case "remove":
                     if (arguments.Count < 3 || !int.TryParse(arguments.At(2), out int amount))
                     {
-                        response = "Bitte gib eine gültige Punktzahl an.";
+                        response = "Please enter a valid value.";
                         return false;
                     }
 
                     if (action == "add")
                     {
                         PointSystem.AddPoints(player, amount);
-                        response = $"Spieler {player.Nickname} wurden {amount} Punkte hinzugefügt.";
+                        response = $"Player {player.Nickname} got {amount} Points.";
                     }
                     else if (action == "set")
                     {
                         PointSystem.SetPoints(player, amount);
-                        response = $"Spieler {player.Nickname} hat nun {amount} Punkte.";
+                        response = $"Player {player.Nickname} now has {amount} Points.";
                     }
                     else // remove
                     {
                         PointSystem.RemovePoints(player, amount);
-                        response = $"{amount} Punkte von {player.Nickname} entfernt.";
+                        response = $"Player's {player.Nickname} points where removed.";
                     }
 
                     return true;
 
                 default:
-                    response = "Ungültige Aktion. Verwende: get, add, set, remove";
+                    response = "Not a valid aciton. Use: get, add, set, remove";
                     return false;
             }
         }

@@ -16,7 +16,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 814;
         public override string Name { get; set; } = "Luck of the Draw";
-        public override string Description { get; set; } = "Einmal ziehen, alles riskieren.";
+        public override string Description { get; set; } = "Risk it all.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

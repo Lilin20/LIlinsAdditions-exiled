@@ -7,7 +7,7 @@ namespace GockelsAIO_exiled
     {
         public void OnTriggerEnter(Collider collider)
         {
-            Log.Info(collider.name + " entered!");
+            Log.Debug(collider.name + " entered!");
 
             if (!collider.CompareTag("Player") || !Player.TryGet(collider.transform.root.gameObject, out Player player)) return;
 
@@ -15,11 +15,11 @@ namespace GockelsAIO_exiled
             if (animator != null)
             {
                 //animator.SetTrigger("StartAnim");
-                Log.Info("Animation triggered.");
+                Log.Debug("Animation triggered.");
             }
             else
             {
-                Log.Warn("Animator not found on parent!");
+                Log.Debug("Animator not found on parent!");
             }
         }
     }

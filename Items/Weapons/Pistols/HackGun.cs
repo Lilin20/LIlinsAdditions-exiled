@@ -21,7 +21,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
     {
         public override uint Id { get; set; } = 201;
         public override string Name { get; set; } = "Nullifier";
-        public override string Description { get; set; } = "Eine Toolgun welches offene Türen sperrt und geschlossene Türen öffnet. Kann 3 mal benutzt werden.";
+        public override string Description { get; set; } = "A tool gun which locks doors when shot. Also causes a blackout on generators.";
         public override float Damage { get; set; } = 1;
         public override byte ClipSize { get; set; } = 3;
         public override float Weight { get; set; } = 0.1f;

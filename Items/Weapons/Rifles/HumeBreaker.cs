@@ -24,7 +24,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
     {
         public override uint Id { get; set; } = 100;
         public override string Name { get; set; } = "HumeBreaker v2.1";
-        public override string Description { get; set; } = "Eine experimentelle Waffe die annormale Schilde mit sofortiger Wirkung zerstört. Anwendung kann tödlich enden.";
+        public override string Description { get; set; } = "An experimental weapon which destroys the complete hume shield. Usage could end up deadly.";
         public override float Damage { get; set; } = 1;
         public override byte ClipSize { get; set; } = 1;
         public override float Weight { get; set; } = 1.5f;
@@ -101,7 +101,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
                 if (distance <= maxDistance)
                 {
                     nearbyPlayers.Add(player);
-                    Log.Info($"Adding {player}...");
+                    Log.Debug($"Adding {player}...");
                 }
             }
 

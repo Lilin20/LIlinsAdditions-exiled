@@ -18,7 +18,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 813;
         public override string Name { get; set; } = "Switcherooo";
-        public override string Description { get; set; } = "Orte tauschen, Wege kreuzen – das Chaos entscheidet.";
+        public override string Description { get; set; } = "Swap places – the chaos decides.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
         public HashSet<RoleTypeId> PlayerSwapIgnoredRoles { get; set; } = new()

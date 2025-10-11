@@ -1,6 +1,8 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using GockelsAIO_exiled.Handlers;
+using GockelsAIO_exiled.Helper;
+using HarmonyLib;
 
 namespace GockelsAIO_exiled
 {
@@ -13,6 +15,7 @@ namespace GockelsAIO_exiled
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
         public CustomRoleHandler CustomRoleHandler;
+        public Harmony harmony = new Harmony("gockel.patch");
 
         public override void OnEnabled()
         {
@@ -31,6 +34,8 @@ namespace GockelsAIO_exiled
             CustomWeapon.RegisterItems();
 
             LoadAudioClips();
+
+            harmony.PatchAll();
 
             base.OnEnabled();
         }
@@ -51,24 +56,18 @@ namespace GockelsAIO_exiled
 
             Instance = null;
 
+            harmony.UnpatchAll();
+
             base.OnDisabled();
         }
 
         public void LoadAudioClips()
         {
-            bool mysteryLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPDevelopmentEnvironment01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\mysterybox.ogg", "mysterybox");
-            bool gobblegumLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPDevelopmentEnvironment01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\gobblegum.ogg", "gobblegum");
-            bool bombsoundLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPDevelopmentEnvironment01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\bombsound.ogg", "bombsound");
-
-            if (mysteryLoaded)
-                Log.Info("Mysterybox Audio geladen.");
-            else
-                Log.Info("Mysterybox Audio konnte nicht geladen werden.");
-
-            if (gobblegumLoaded)
-                Log.Info("Gobblegum Audio geladen.");
-            else
-                Log.Info("Gobblegum Audio konnte nicht geladen werden.");
+            //C:\AMPDatastore\Instances\SCPSecretLaboratory01\scp-secret-laboratory\996560\AppData\EXILED\Audio\
+            bool mysteryLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\mysterybox.ogg", "mysterybox");
+            bool gobblegumLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\gobblegum.ogg", "gobblegum");
+            bool bombsoundLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\bombsound.ogg", "bombsound");
+            bool trackingLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\trackingsound.ogg", "trackingsound");
         }
 
         public void RegisterCustomRoles()
@@ -118,7 +117,8 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
-            Exiled.Events.Handlers.Player.ThrownProjectile += PlayerHandler.OnThrowingGrenade;
+            Exiled.Events.Handlers.Player.IntercomSpeaking += PlayerHandler.OnUsingIntercomWithCard;
+            Exiled.Events.Handlers.Scp914.UpgradingPickup += PlayerHandler.OnCraftingTrackingAccess;
         }
 
         public void UnregisterPlayerHandlers()
@@ -130,7 +130,8 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
-            Exiled.Events.Handlers.Player.ThrownProjectile -= PlayerHandler.OnThrowingGrenade;
+            Exiled.Events.Handlers.Player.IntercomSpeaking -= PlayerHandler.OnUsingIntercomWithCard;
+            Exiled.Events.Handlers.Scp914.UpgradingPickup -= PlayerHandler.OnCraftingTrackingAccess;
         }
     }
 }

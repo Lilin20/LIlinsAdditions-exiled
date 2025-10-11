@@ -1,12 +1,8 @@
 ﻿using Exiled.CustomRoles.API;
-using GockelsAIO_exiled.Roles.Chaos;
+using Exiled.Loader;
 using GockelsAIO_exiled.Roles.ClassD;
 using GockelsAIO_exiled.Roles.NTF;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GockelsAIO_exiled.Handlers
 {
@@ -15,17 +11,33 @@ namespace GockelsAIO_exiled.Handlers
         public static void RegisterRoles()
         {
             new RiotOperator().Register();
+
             new KamikazeZombie().Register();
-            new Lockpicker().Register();
-            new NTFTraitor().Register();
+
+            if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
+            {
+                new Lockpicker().Register();
+            }
+
+            new LuckyMan().Register();
+
+            new Thief().Register();
         }
 
         public static void UnregisterRoles()
         {
             new RiotOperator().Unregister();
+
             new KamikazeZombie().Unregister();
-            new Lockpicker().Unregister();
-            new NTFTraitor().Unregister();
+
+            if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
+            {
+                new Lockpicker().Unregister();
+            }
+
+            new LuckyMan().Unregister();
+
+            new Thief().Unregister();
         }
     }
 }

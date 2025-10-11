@@ -20,7 +20,6 @@ namespace GockelsAIO_exiled.Handlers
             801,
             802,
             803,
-            804,
             805,
             806,
             807,
@@ -43,13 +42,12 @@ namespace GockelsAIO_exiled.Handlers
             int playerPoints = PointSystem.GetPoints(ev.Player);
             if (playerPoints < 800)
             {
-                ev.Player.SendBroadcast("<color=red>Du brauchst mindestens 800 Punkte!</color>", 5);
-                Log.Debug($"Spieler {ev.Player.Nickname} hatte nur {playerPoints} Punkte.");
+                ev.Player.SendBroadcast("<color=red>You need 800 Points to open the box!</color>", 5);
                 return;
             }
 
             PointSystem.RemovePoints(ev.Player, 800);
-            Log.Info($"[Debug] Button-Interaktion in bekanntem Schematic '{schematic.name}' erkannt.");
+            Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
 
             foreach (var block in schematic.AttachedBlocks)
             {
@@ -71,7 +69,7 @@ namespace GockelsAIO_exiled.Handlers
                                 speaker.transform.SetParent(go.transform, false);
                             });
 
-                            audioPlayer.AddClip("mysterybox", loop: false, volume: 1.5f, destroyOnEnd: true);
+                            audioPlayer.AddClip("mysterybox", loop: false, volume: GockelsAIO.Instance.Config.MysteryBoxMusicVolume, destroyOnEnd: true);
                         }
                         break;
                 }
@@ -89,7 +87,7 @@ namespace GockelsAIO_exiled.Handlers
                     if (PointSystem.GetPoints(ev.Player) >= 200)
                     {
                         PointSystem.RemovePoints(ev.Player, 200);
-                        Log.Info($"[Debug] Button-Interaktion in bekanntem Schematic '{schematic.name}' erkannt.");
+                        Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
 
                         uint randomGobblegum = GobblegumIDs[UnityEngine.Random.Range(0, GobblegumIDs.Count())];
 
@@ -97,8 +95,7 @@ namespace GockelsAIO_exiled.Handlers
                     }
                     else
                     {
-                        ev.Player.SendBroadcast("<color=red>Du brauchst mindestens 200 Punkte!</color>", 5);
-                        Log.Debug($"Spieler {ev.Player.Nickname} hatte nur {PointSystem.GetPoints(ev.Player)} Punkte.");
+                        ev.Player.SendBroadcast("<color=red>You need 200 points!</color>", 5);
                         break;
                     }
                 }
@@ -122,7 +119,7 @@ namespace GockelsAIO_exiled.Handlers
         {
             if (ev.Schematic == null)
             {
-                Log.Warn("[Debug] SchematicSpawned-Event hat ein NULL-Schematic geliefert.");
+                Log.Warn("[Debug] SchematicSpawned-Event delivered a NULL-schematic.");
                 return;
             }
 

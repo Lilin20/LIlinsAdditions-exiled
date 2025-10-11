@@ -17,7 +17,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 803;
         public override string Name { get; set; } = "Now You See Me";
-        public override string Description { get; set; } = "Zeigt dir alles.";
+        public override string Description { get; set; } = "Shows you everything.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

@@ -14,11 +14,9 @@ namespace GockelsAIO_exiled
         {
             if (!collider.CompareTag("Player")) return;
 
-            Log.Info("uhm did it work?");
-
             if (Player.TryGet(collider.gameObject, out Player pl))
             {
-                pl.Kill("yuh");
+                pl.Kill("Was crushed by the ceiling trap.");
             }
         }
     }

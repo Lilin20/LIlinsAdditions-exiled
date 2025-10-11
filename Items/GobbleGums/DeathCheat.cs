@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 804;
         public override string Name { get; set; } = "Death Cheat";
-        public override string Description { get; set; } = "Belebt dich nach dem Tot wieder (vielleicht).";
+        public override string Description { get; set; } = "Revives you from the dead. Maybe.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

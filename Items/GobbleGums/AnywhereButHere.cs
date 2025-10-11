@@ -16,7 +16,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 801;
         public override string Name { get; set; } = "Anywhere But Here";
-        public override string Description { get; set; } = "Teleportiert dich an einen zufälligen Ort.";
+        public override string Description { get; set; } = "Teleports you to a random positon.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
@@ -68,7 +68,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                     randomRoom = allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
                 }
 
-                Log.Info($"Player {ev.Player.CustomName} teleported to {randomRoom.Type}");
+                Log.Debug($"Player {ev.Player.CustomName} teleported to {randomRoom.Type}");
                 ev.Player.Teleport(randomRoom.Position + Vector3.up);
 
                 ev.Item.Destroy();

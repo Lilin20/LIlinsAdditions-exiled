@@ -12,8 +12,9 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 802;
         public override string Name { get; set; } = "In Plain Sight";
-        public override string Description { get; set; } = "Macht dich für eine bestimmte Zeit unsichtbar.";
+        public override string Description { get; set; } = "Makes you invisible for a period of time.";
         public override float Weight { get; set; } = 0.5f;
+        public float InvisibleDuration = 5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
         protected override void SubscribeEvents()
@@ -34,7 +35,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
 
             Timing.CallDelayed(2f, () =>
             {
-                ev.Player.EnableEffect(EffectType.Invisible, 10, false);
+                ev.Player.EnableEffect(EffectType.Invisible, InvisibleDuration, false);
 
                 ev.Item.Destroy();
             });

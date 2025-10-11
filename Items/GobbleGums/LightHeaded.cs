@@ -15,7 +15,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     {
         public override uint Id { get; set; } = 815;
         public override string Name { get; set; } = "Light Headed";
-        public override string Description { get; set; } = "Alles fühlt sich so leicht an?";
+        public override string Description { get; set; } = "Everything feels so light?";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

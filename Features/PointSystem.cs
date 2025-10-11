@@ -15,7 +15,7 @@ namespace GockelsAIO_exiled.Features
             if (PlayerHandler.PlayerPoints.ContainsKey(player))
             {
                 PlayerHandler.PlayerPoints[player] += points;
-                Log.Debug($"Spieler {player.Nickname} hat jetzt {PlayerHandler.PlayerPoints[player]} Punkte.");
+                Log.Debug($"Player {player.Nickname} now has {PlayerHandler.PlayerPoints[player]} Points.");
             }
         }
 
@@ -24,7 +24,7 @@ namespace GockelsAIO_exiled.Features
             if (PlayerHandler.PlayerPoints.TryGetValue(player, out int points))
                 return points;
 
-            return 0; // Falls Spieler nicht gefunden wird, z. B. wenn er noch nicht gespawnt ist
+            return 0;
         }
 
         public static void SetPoints(Player player, int points)
@@ -32,7 +32,7 @@ namespace GockelsAIO_exiled.Features
             if (PlayerHandler.PlayerPoints.ContainsKey(player))
             {
                 PlayerHandler.PlayerPoints[player] = points;
-                Log.Debug($"Spieler {player.Nickname} hat jetzt {PlayerHandler.PlayerPoints[player]} Punkte.");
+                Log.Debug($"Player {player.Nickname} now has {PlayerHandler.PlayerPoints[player]} Points.");
             }
         }
 
