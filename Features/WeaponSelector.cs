@@ -83,8 +83,6 @@ namespace GockelsAIO_exiled
 
                 uint randomWeapon = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
 
-                Log.Info(randomWeapon.ToString());
-
                 Vector3 currentPosition = position + new Vector3(0f, yOffset, 0f);
 
                 CustomItem.TrySpawn(randomWeapon, currentPosition, out currentPickup);
@@ -100,7 +98,6 @@ namespace GockelsAIO_exiled
                 elapsed += Interval;
             }
 
-            // Finale Waffe auf finaler Position
             currentPickup?.Destroy();
             uint finalCustom = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
             CustomItem.TrySpawn(finalCustom, position + new Vector3(0f, yOffset, 0f), out finalPickup);

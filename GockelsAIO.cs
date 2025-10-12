@@ -1,73 +1,97 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
+using Exiled.CustomRoles.API.Features;
+using Exiled.Events.Commands.PluginManager;
 using GockelsAIO_exiled.Handlers;
 using GockelsAIO_exiled.Helper;
 using HarmonyLib;
+using System.Linq;
 
 namespace GockelsAIO_exiled
 {
     public class GockelsAIO : Plugin<Config>
     {
-        public override string Name => "Gockels AIO";
-        public override string Author => "Gockel";
+        public override string Name => "Lilin's Additions";
+        public override string Author => "Lilin";
         public static GockelsAIO Instance;
         public PlayerHandler PlayerHandler;
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
         public CustomRoleHandler CustomRoleHandler;
-        public Harmony harmony = new Harmony("gockel.patch");
+        public Harmony harmony = new Harmony("lilin.patches");
 
         public override void OnEnabled()
         {
-            PlayerHandler = new PlayerHandler();
-            ServerHandler = new ServerHandler();
-            PMERHandler = new PMERHandler();
-            CustomRoleHandler = new CustomRoleHandler();
+            if (!LoadAudioClips())
+            {
+                Log.Error($"{Name} failed to load audio clips. Plugin wont load.");
+            } 
+            else
+            {
+                PlayerHandler = new PlayerHandler();
+                ServerHandler = new ServerHandler();
+                PMERHandler = new PMERHandler();
+                CustomRoleHandler = new CustomRoleHandler();
 
-            Instance = this;
-            
-            RegisterMERHandlers();
-            RegisterPlayerHandlers();
-            RegisterServerHandlers();
-            RegisterCustomRoles();
+                Instance = this;
 
-            CustomWeapon.RegisterItems();
+                CustomAbility.RegisterAbilities(false, null);
 
-            LoadAudioClips();
+                RegisterMERHandlers();
+                RegisterPlayerHandlers();
+                RegisterServerHandlers();
+                RegisterCustomRoles();
 
-            harmony.PatchAll();
+                CustomWeapon.RegisterItems();
 
-            base.OnEnabled();
+
+                harmony.PatchAll();
+            }
+
+
+
+                base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            UnregisterMERHandlers();
-            UnregisterPlayerHandlers();
-            UnregisterServerHandlers();
-            UnregisterCustomRoles();
+            if (LoadAudioClips())
+            {
+                UnregisterMERHandlers();
+                UnregisterPlayerHandlers();
+                UnregisterServerHandlers();
+                UnregisterCustomRoles();
 
-            CustomWeapon.UnregisterItems();
+                CustomWeapon.UnregisterItems();
+                CustomAbility.UnregisterAbilities();
 
-            PlayerHandler = null;
-            ServerHandler = null;
-            PMERHandler = null;
-            CustomRoleHandler = null;
+                PlayerHandler = null;
+                ServerHandler = null;
+                PMERHandler = null;
+                CustomRoleHandler = null;
 
-            Instance = null;
+                Instance = null;
 
-            harmony.UnpatchAll();
+                harmony.UnpatchAll();
+            }            
 
             base.OnDisabled();
         }
 
-        public void LoadAudioClips()
+        public bool LoadAudioClips()
         {
-            //C:\AMPDatastore\Instances\SCPSecretLaboratory01\scp-secret-laboratory\996560\AppData\EXILED\Audio\
-            bool mysteryLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\mysterybox.ogg", "mysterybox");
-            bool gobblegumLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\gobblegum.ogg", "gobblegum");
-            bool bombsoundLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\bombsound.ogg", "bombsound");
-            bool trackingLoaded = AudioClipStorage.LoadClip("C:\\AMPDatastore\\Instances\\SCPSecretLaboratory01\\scp-secret-laboratory\\996560\\AppData\\EXILED\\Audio\\trackingsound.ogg", "trackingsound");
+            bool mysteryLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.MysteryBoxMusicPath, "mysterybox");
+            bool gobblegumLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.VendingMachineMusicPath, "gobblegum");
+            bool bombsoundLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.BurstSoundPath, "bombsound");
+            bool trackingLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.TrackingSoundPath, "trackingsound");
+
+            if (!mysteryLoaded || !gobblegumLoaded || !bombsoundLoaded || !trackingLoaded)
+            {
+                Log.Error("Failed to load one or more audio clips. Plugin will not load.");
+                return false;
+            }
+
+            return true;
         }
 
         public void RegisterCustomRoles()

@@ -16,11 +16,9 @@ namespace GockelsAIO_exiled.Abilities.Active
         public override string Description { get; set; } = "Allows you to open any door for a short period of time.";
         public override float Duration { get; set; } = 15f;
         public override float Cooldown { get; set; } = 90f;
-
         public float TimeMin { get; set; } = 6f;
         public float TimeMax { get; set; } = 12f;
         public float TimeForDoorToBeOpen { get; set; } = 5f;
-
         public string BeforePickingDoorText { get; set; } = "Interact with a door to start to pick it";
         public string PickingDoorText { get; set; } = "Picking door...";
 
@@ -36,9 +34,10 @@ namespace GockelsAIO_exiled.Abilities.Active
             base.AbilityAdded(player);
         }
 
-        protected override void AbilityUsed(Player player)
+        protected override void SubscribeEvents()
         {
             Exiled.Events.Handlers.Player.InteractingDoor += OnInteractingDoor;
+            base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()

@@ -54,7 +54,6 @@ namespace GockelsAIO_exiled.Patches
 
                         RueDisplay display = RueDisplay.Get(player);
 
-                        // Clear any existing hints before showing the new one  
                         display.Remove(new Tag("test"));
 
                         BasicElement be = new BasicElement(300, content)
