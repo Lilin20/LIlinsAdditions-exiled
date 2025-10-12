@@ -380,7 +380,7 @@ namespace GockelsAIO_exiled.Handlers
                     }
                 }
 
-                yield return Timing.WaitForSeconds(GockelsAIO.Instance.Config.PointsOverTimeDelay);
+                yield return Timing.WaitForSeconds(LilinsAdditions.Instance.Config.PointsOverTimeDelay);
             }
         }
 

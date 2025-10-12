@@ -210,7 +210,7 @@ namespace GockelsAIO_exiled
                                 speaker.transform.localPosition = Vector3.zero;
                             });
 
-                            audioPlayer.AddClip("gobblegum", loop: true, volume: GockelsAIO.Instance.Config.VendingMachineMusicVolume, destroyOnEnd: false);
+                            audioPlayer.AddClip("gobblegum", loop: true, volume: LilinsAdditions.Instance.Config.VendingMachineMusicVolume, destroyOnEnd: false);
                         }
                     }
                 }

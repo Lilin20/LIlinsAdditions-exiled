@@ -31,28 +31,28 @@ namespace GockelsAIO_exiled.Handlers
         {
             Timing.CallDelayed(2f, () =>
             {
-                if (GockelsAIO.Instance.Config.EnableMysteryBox)
+                if (LilinsAdditions.Instance.Config.EnableMysteryBox)
                 {
                     ss.SpawnMysteryBoxes(8);
                 }
 
-                if (GockelsAIO.Instance.Config.EnableFortunaFizz)
+                if (LilinsAdditions.Instance.Config.EnableFortunaFizz)
                 {
                     ss.SpawnGobblegumMachines(5);
                 }
                 
-                if (GockelsAIO.Instance.Config.EnableCeilingTrap)
+                if (LilinsAdditions.Instance.Config.EnableCeilingTrap)
                 {
                     ss.SpawnTrapTest();
                 }
 
-                if (GockelsAIO.Instance.Config.EnableHiddenCoins)
+                if (LilinsAdditions.Instance.Config.EnableHiddenCoins)
                 {
                     ss.SpawnCoins(2);
                 }
             });
 
-            Timing.CallDelayed(GockelsAIO.Instance.Config.PointsOverTimeDelay, () =>
+            Timing.CallDelayed(LilinsAdditions.Instance.Config.PointsOverTimeDelay, () =>
             {
                 tickCoroutine = Timing.RunCoroutine(PlayerHandler.AddPointsOverTime());
             });
@@ -60,7 +60,7 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnSpawningGuards()
         {
-            if (GockelsAIO.Instance.Config.EnableRandomGuardSpawn)
+            if (LilinsAdditions.Instance.Config.EnableRandomGuardSpawn)
             {
 
                 Room[] allRooms = Room.List.ToArray();

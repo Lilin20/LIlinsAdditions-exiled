@@ -48,7 +48,7 @@ namespace GockelsAIO_exiled.Abilities.Active
                 speaker.transform.localPosition = Vector3.zero;
             });
 
-            audioPlayer.AddClip("bombsound", loop: false, volume: GockelsAIO.Instance.Config.BurstSoundVolume, destroyOnEnd: true);
+            audioPlayer.AddClip("bombsound", loop: false, volume: LilinsAdditions.Instance.Config.BurstSoundVolume, destroyOnEnd: true);
 
             Timing.CallDelayed(7f, () =>
             {

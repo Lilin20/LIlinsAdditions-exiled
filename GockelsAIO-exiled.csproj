@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GockelsAIO_exiled</RootNamespace>
-    <AssemblyName>GockelsAIO-exiled</AssemblyName>
+    <AssemblyName>LilinsAdditions-exiled</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -114,7 +114,7 @@
     <Compile Include="Components\DeathComponent.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Features\PointSystem.cs" />
-    <Compile Include="GockelsAIO.cs" />
+    <Compile Include="LilinsAdditions.cs" />
     <Compile Include="Handlers\CustomRoleHandler.cs" />
     <Compile Include="Handlers\PlayerHandler.cs" />
     <Compile Include="Handlers\PMERHandler.cs" />

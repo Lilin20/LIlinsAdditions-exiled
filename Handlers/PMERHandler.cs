@@ -69,7 +69,7 @@ namespace GockelsAIO_exiled.Handlers
                                 speaker.transform.SetParent(go.transform, false);
                             });
 
-                            audioPlayer.AddClip("mysterybox", loop: false, volume: GockelsAIO.Instance.Config.MysteryBoxMusicVolume, destroyOnEnd: true);
+                            audioPlayer.AddClip("mysterybox", loop: false, volume: LilinsAdditions.Instance.Config.MysteryBoxMusicVolume, destroyOnEnd: true);
                         }
                         break;
                 }

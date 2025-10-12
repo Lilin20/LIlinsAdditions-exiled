@@ -1,19 +1,18 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API.Features;
-using Exiled.Events.Commands.PluginManager;
 using GockelsAIO_exiled.Handlers;
-using GockelsAIO_exiled.Helper;
 using HarmonyLib;
-using System.Linq;
+using System;
 
 namespace GockelsAIO_exiled
 {
-    public class GockelsAIO : Plugin<Config>
+    public class LilinsAdditions : Plugin<Config>
     {
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
-        public static GockelsAIO Instance;
+        public override Version Version => new Version(0, 1);
+        public static LilinsAdditions Instance;
         public PlayerHandler PlayerHandler;
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
@@ -22,76 +21,58 @@ namespace GockelsAIO_exiled
 
         public override void OnEnabled()
         {
-            if (!LoadAudioClips())
-            {
-                Log.Error($"{Name} failed to load audio clips. Plugin wont load.");
-            } 
-            else
-            {
-                PlayerHandler = new PlayerHandler();
-                ServerHandler = new ServerHandler();
-                PMERHandler = new PMERHandler();
-                CustomRoleHandler = new CustomRoleHandler();
+            Instance = this;
+            LoadAudioClips();
 
-                Instance = this;
+            PlayerHandler = new PlayerHandler();
+            ServerHandler = new ServerHandler();
+            PMERHandler = new PMERHandler();
+            CustomRoleHandler = new CustomRoleHandler();
 
-                CustomAbility.RegisterAbilities(false, null);
+            
 
-                RegisterMERHandlers();
-                RegisterPlayerHandlers();
-                RegisterServerHandlers();
-                RegisterCustomRoles();
+            CustomAbility.RegisterAbilities(false, null);
 
-                CustomWeapon.RegisterItems();
+            RegisterMERHandlers();
+            RegisterPlayerHandlers();
+            RegisterServerHandlers();
+            RegisterCustomRoles();
+
+            CustomWeapon.RegisterItems();
 
 
-                harmony.PatchAll();
-            }
-
-
-
-                base.OnEnabled();
+            harmony.PatchAll();
+            base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            if (LoadAudioClips())
-            {
-                UnregisterMERHandlers();
-                UnregisterPlayerHandlers();
-                UnregisterServerHandlers();
-                UnregisterCustomRoles();
+            UnregisterMERHandlers();
+            UnregisterPlayerHandlers();
+            UnregisterServerHandlers();
+            UnregisterCustomRoles();
 
-                CustomWeapon.UnregisterItems();
-                CustomAbility.UnregisterAbilities();
+            CustomWeapon.UnregisterItems();
+            CustomAbility.UnregisterAbilities();
 
-                PlayerHandler = null;
-                ServerHandler = null;
-                PMERHandler = null;
-                CustomRoleHandler = null;
+            PlayerHandler = null;
+            ServerHandler = null;
+            PMERHandler = null;
+            CustomRoleHandler = null;
 
-                Instance = null;
+            Instance = null;
 
-                harmony.UnpatchAll();
-            }            
+            harmony.UnpatchAll();        
 
             base.OnDisabled();
         }
 
-        public bool LoadAudioClips()
+        public void LoadAudioClips()
         {
-            bool mysteryLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.MysteryBoxMusicPath, "mysterybox");
-            bool gobblegumLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.VendingMachineMusicPath, "gobblegum");
-            bool bombsoundLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.BurstSoundPath, "bombsound");
-            bool trackingLoaded = AudioClipStorage.LoadClip(GockelsAIO.Instance.Config.TrackingSoundPath, "trackingsound");
-
-            if (!mysteryLoaded || !gobblegumLoaded || !bombsoundLoaded || !trackingLoaded)
-            {
-                Log.Error("Failed to load one or more audio clips. Plugin will not load.");
-                return false;
-            }
-
-            return true;
+            bool mysteryLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.MysteryBoxMusicPath, "mysterybox");
+            bool gobblegumLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.VendingMachineMusicPath, "gobblegum");
+            bool bombsoundLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.BurstSoundPath, "bombsound");
+            bool trackingLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.TrackingSoundPath, "trackingsound");
         }
 
         public void RegisterCustomRoles()
