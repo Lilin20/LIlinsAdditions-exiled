@@ -122,8 +122,8 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
-            Exiled.Events.Handlers.Player.IntercomSpeaking += PlayerHandler.OnUsingIntercomWithCard;
-            Exiled.Events.Handlers.Scp914.UpgradingPickup += PlayerHandler.OnCraftingTrackingAccess;
+            //Exiled.Events.Handlers.Player.IntercomSpeaking += PlayerHandler.OnUsingIntercomWithCard;
+            //Exiled.Events.Handlers.Scp914.UpgradingPickup += PlayerHandler.OnCraftingTrackingAccess;
         }
 
         public void UnregisterPlayerHandlers()
@@ -135,8 +135,8 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
-            Exiled.Events.Handlers.Player.IntercomSpeaking -= PlayerHandler.OnUsingIntercomWithCard;
-            Exiled.Events.Handlers.Scp914.UpgradingPickup -= PlayerHandler.OnCraftingTrackingAccess;
+            //Exiled.Events.Handlers.Player.IntercomSpeaking -= PlayerHandler.OnUsingIntercomWithCard;
+            //Exiled.Events.Handlers.Scp914.UpgradingPickup -= PlayerHandler.OnCraftingTrackingAccess;
         }
     }
 }

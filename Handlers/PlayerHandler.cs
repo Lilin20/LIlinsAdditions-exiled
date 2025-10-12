@@ -227,22 +227,25 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnPlayerIn914(UpgradingPlayerEventArgs ev)
         {
-            if (ev.KnobSetting == Scp914.Scp914KnobSetting.Rough)
+            if (LilinsAdditions.Instance.Config.Enable914Teleport)
             {
-                if (UnityEngine.Random.value <= 0.9f)
+                if (ev.KnobSetting == Scp914.Scp914KnobSetting.Rough)
                 {
-                    float damage = ev.Player.Health / 2f;
-                    ev.Player.Hurt(damage);
-
-                    var randomRoom = Room.Random(ZoneType.LightContainment);
-                    Log.Debug(randomRoom);
-                    if (randomRoom != null)
+                    if (UnityEngine.Random.value <= 0.9f)
                     {
-                        Log.Debug(randomRoom.Name);
-                        Timing.CallDelayed(0.15f, () =>
+                        float damage = ev.Player.Health / 2f;
+                        ev.Player.Hurt(damage);
+
+                        var randomRoom = Room.Random(ZoneType.LightContainment);
+                        Log.Debug(randomRoom);
+                        if (randomRoom != null)
                         {
-                            ev.Player.Teleport(randomRoom.Position + UnityEngine.Vector3.up);
-                        });
+                            Log.Debug(randomRoom.Name);
+                            Timing.CallDelayed(0.15f, () =>
+                            {
+                                ev.Player.Teleport(randomRoom.Position + UnityEngine.Vector3.up);
+                            });
+                        }
                     }
                 }
             }

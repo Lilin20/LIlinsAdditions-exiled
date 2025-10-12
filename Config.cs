@@ -28,6 +28,7 @@ namespace GockelsAIO_exiled
         public bool EnableHiddenCoins { get; set; } = false;
         public bool EnableCeilingTrap { get; set; } = false;
         public bool EnableRandomGuardSpawn { get; set; } = false;
+        public bool Enable914Teleport { get; set; } = false;
         public float BurstSoundVolume { get; set; } = 1;
         public string VendingMachineMusicPath { get; set; } = string.Empty;
         public string MysteryBoxMusicPath { get; set; } = string.Empty;
