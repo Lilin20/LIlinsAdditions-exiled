@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Roles.ClassD
         public override string Description { get; set; } = "You can lockpick doors.";
         public override string CustomInfo { get; set; } = "Class-D - Lockpicker";
         public override RoleTypeId Role { get; set; } = RoleTypeId.ClassD;
-        public int Chance { get; set; } = 20;
+        public int Chance { get; set; } = 0;
         public override List<CustomAbility> CustomAbilities { get; set; } = new()
         {
             new DoorPicking
