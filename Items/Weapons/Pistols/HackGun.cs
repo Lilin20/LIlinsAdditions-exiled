@@ -69,7 +69,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
             }
             catch
             {
-                return;
+                //Ignore
             }
         }
     }

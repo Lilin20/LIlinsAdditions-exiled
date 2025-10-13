@@ -53,24 +53,35 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Stuff\Desktop\Verweise\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>D:\Stuff\Desktop\Verweise\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>D:\Stuff\Desktop\Verweise\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
+      <Reference Include="Assembly-CSharp-firstpass">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\Assembly-CSharp-firstpass.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\Assembly-CSharp-firstpass.dll</HintPath>
+      </Reference>
+      <Reference Include="Mirror">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\Mirror.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\Mirror.dll</HintPath>
+      </Reference>
+      <Reference Include="Unity.TextMeshPro">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\Unity.TextMeshPro.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\Unity.TextMeshPro.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\UnityEngine.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.PhysicsModule">
+          <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)/UnityEngine.PhysicsModule.dll</HintPath>
+          <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.PhysicsModule.dll</HintPath>
+      </Reference>
     <Reference Include="AudioPlayerApi">
       <HintPath>D:\Stuff\Bilder\dependencies\AudioPlayerApi.dll</HintPath>
     </Reference>
     <Reference Include="HintServiceMeow-Exiled">
       <HintPath>D:\Stuff\Desktop\Verweise\HintServiceMeow-Exiled.dll</HintPath>
-    </Reference>
-    <Reference Include="Mirror">
-      <HintPath>D:\Stuff\Desktop\Verweise\Mirror.dll</HintPath>
     </Reference>
     <Reference Include="ProjectMER">
       <HintPath>D:\Stuff\Desktop\Verweise\ProjectMER.dll</HintPath>

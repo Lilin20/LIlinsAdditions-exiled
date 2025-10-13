@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         public override string Name { get; set; } = "In Plain Sight";
         public override string Description { get; set; } = "Makes you invisible for a period of time.";
         public override float Weight { get; set; } = 0.5f;
-        public float InvisibleDuration = 5f;
+        public float InvisibleDuration { get; set; } = 5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
         protected override void SubscribeEvents()

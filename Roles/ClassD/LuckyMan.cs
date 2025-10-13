@@ -1,15 +1,10 @@
 ﻿using Exiled.API.Enums;
-using Exiled.API.Features;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GockelsAIO_exiled.Roles.ClassD
 {
@@ -24,6 +19,8 @@ namespace GockelsAIO_exiled.Roles.ClassD
         public int Chance { get; set; } = 15;
         public override List<CustomAbility> CustomAbilities { get; set; }
         public List<EffectType> GoodEffects { get; set; } = new List<EffectType> { EffectType.MovementBoost, EffectType.Vitality, EffectType.Invigorated };
+
+        public string OpenAllDoorsHint { get; set; } = "Du kannst nun alle Türen öffnen.";
         public override SpawnProperties SpawnProperties { get; set; } = new()
         {
             Limit = 1,
@@ -98,7 +95,7 @@ namespace GockelsAIO_exiled.Roles.ClassD
             Timing.CallDelayed(180f, () =>
             {
                 _canOpenWithoutPerms = true;
-                ev.Player.ShowHint("Du kannst nun alle Türen öffnen.");
+                ev.Player.ShowHint(OpenAllDoorsHint);
             });
         }
 

@@ -63,16 +63,6 @@ namespace GockelsAIO_exiled.Items.SCPs
             player.Rotation = globalRotation;
         }
 
-        protected override void SubscribeEvents()
-        {
-            base.SubscribeEvents();
-        }
-
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
-        }
-
         protected override void EquipGoggles(Player player, bool showMessage = true)
         {
             base.EquipGoggles(player, showMessage);

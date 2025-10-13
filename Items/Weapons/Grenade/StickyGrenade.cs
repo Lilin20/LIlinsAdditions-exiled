@@ -4,12 +4,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Items.Weapons.Grenade

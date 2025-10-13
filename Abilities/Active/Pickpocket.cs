@@ -31,35 +31,23 @@ namespace GockelsAIO_exiled.Abilities.Active
             try
             {
                 Player robbedPlayer = Player.Get(raycastHit.transform.GetComponentInParent<ReferenceHub>());
-                if (robbedPlayer != null)
+                if (robbedPlayer != null && robbedPlayer.Role.Team != PlayerRoles.Team.SCPs)
                 {
-                    if (robbedPlayer.Role.Team != PlayerRoles.Team.SCPs)
+                    if (robbedPlayer.Items.Count <= 0)
                     {
-                        if (robbedPlayer.Items.Count <= 0)
-                        {
-                            player.ShowHint("This player doesnt have any items.");
-                        }
-                        Item randomItem = robbedPlayer.Items.ToList().RandomItem();
-                        player.AddItem(randomItem.Type);
-
-                        robbedPlayer.RemoveItem(randomItem);
-                        player.ShowHint($"You stole something...");
+                        player.ShowHint("This player doesnt have any items.");
                     }
+                    Item randomItem = robbedPlayer.Items.ToList().RandomItem();
+                    player.AddItem(randomItem.Type);
+
+                    robbedPlayer.RemoveItem(randomItem);
+                    player.ShowHint($"You stole something...");
                 }
             }
             catch (Exception e)
             {
                 Log.Debug(e);
             }
-        }
-
-        protected override void AbilityRemoved(Player player)
-        {
-
-        }
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
         }
     }
 }

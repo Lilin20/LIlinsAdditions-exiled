@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Exiled.API.Features.Attributes;
+﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -38,7 +33,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
 
             Timing.CallDelayed(2f, () =>
             {
-                ev.Player.EnableEffect(Exiled.API.Enums.EffectType.SilentWalk, 255, 30, false);
+                ev.Player.EnableEffect(Exiled.API.Enums.EffectType.SilentWalk, 255, 30);
 
                 ev.Item.Destroy();
             });

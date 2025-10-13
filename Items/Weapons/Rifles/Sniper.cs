@@ -70,14 +70,16 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
 
             if (ev.Target.Role.Team != PlayerRoles.Team.SCPs)
             {
-                if (ev.Distance < 8f && ev.Hitbox.HitboxType != HitboxType.Headshot)
+                switch (ev.Distance)
                 {
-                    ev.Target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));
+                    case < 8f when ev.Hitbox.HitboxType != HitboxType.Headshot:
+                        ev.Target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));
+                        break;
+                    case >= 8f when ev.Hitbox.HitboxType != HitboxType.Headshot:
+                        ev.Target.Hurt(55);
+                        break;
                 }
-                else if (ev.Distance >= 8f && ev.Hitbox.HitboxType != HitboxType.Headshot)
-                {
-                    ev.Target.Hurt(55);
-                }
+
                 if (ev.Hitbox.HitboxType == HitboxType.Headshot)
                 {
                     ev.Target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));

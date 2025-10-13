@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Exiled.API.Enums;
-using Exiled.API.Features.Attributes;
+﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -31,9 +25,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         protected override void OnShot(ShotEventArgs ev)
         {
             ev.CanHurt = false;
-
-            if (!Check(ev.Player.CurrentItem))
-                return;
 
             if (ev.Target == null)
                 return;

@@ -69,10 +69,10 @@ namespace GockelsAIO_exiled
 
         public void LoadAudioClips()
         {
-            bool mysteryLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.MysteryBoxMusicPath, "mysterybox");
-            bool gobblegumLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.VendingMachineMusicPath, "gobblegum");
-            bool bombsoundLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.BurstSoundPath, "bombsound");
-            bool trackingLoaded = AudioClipStorage.LoadClip(LilinsAdditions.Instance.Config.TrackingSoundPath, "trackingsound");
+            bool mysteryLoaded = AudioClipStorage.LoadClip(Instance.Config.MysteryBoxMusicPath, "mysterybox");
+            bool gobblegumLoaded = AudioClipStorage.LoadClip(Instance.Config.VendingMachineMusicPath, "gobblegum");
+            bool bombsoundLoaded = AudioClipStorage.LoadClip(Instance.Config.BurstSoundPath, "bombsound");
+            bool trackingLoaded = AudioClipStorage.LoadClip(Instance.Config.TrackingSoundPath, "trackingsound");
         }
 
         public void RegisterCustomRoles()

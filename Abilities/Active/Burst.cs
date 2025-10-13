@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using AdminToys;
-using Exiled.API.Extensions;
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Items;
 using Exiled.CustomRoles.API.Features;
-using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using ProjectMER.Features;
@@ -25,11 +21,6 @@ namespace GockelsAIO_exiled.Abilities.Active
         {
             SelectAbility(player);
             base.AbilityAdded(player);
-        }
-
-        protected override void AbilityRemoved(Player player)
-        {
-            base.AbilityRemoved(player);
         }
 
         protected override void AbilityUsed(Player player)
