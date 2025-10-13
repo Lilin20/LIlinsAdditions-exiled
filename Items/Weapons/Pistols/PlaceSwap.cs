@@ -24,16 +24,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
-        protected override void SubscribeEvents()
-        {
-            base.SubscribeEvents();
-        }
-
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
-        }
-
         protected override void OnReloading(ReloadingWeaponEventArgs ev)
         {
             ev.IsAllowed = false;

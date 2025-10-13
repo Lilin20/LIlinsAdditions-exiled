@@ -18,7 +18,7 @@ namespace GockelsAIO_exiled.Roles.ClassD
         public override string Description { get; set; } = "You can steal from players with your ability..";
         public override string CustomInfo { get; set; } = "Class-D Personnel";
         public override RoleTypeId Role { get; set; } = RoleTypeId.ClassD;
-        public int Chance { get; set; } = 20;
+        public override float SpawnChance { get; set; } = 20;
         public override List<CustomAbility> CustomAbilities { get; set; } = new List<CustomAbility>
         {
             new Pickpocket()

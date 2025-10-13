@@ -30,16 +30,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Shotguns
             AttachmentName.ShotgunSingleShot,
         };
 
-        protected override void SubscribeEvents()
-        {
-            base.SubscribeEvents();
-        }
-
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
-        }
-
         protected override void OnReloading(ReloadingWeaponEventArgs ev)
         {
             ev.IsAllowed = false;
