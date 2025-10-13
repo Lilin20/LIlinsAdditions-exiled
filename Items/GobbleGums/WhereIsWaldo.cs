@@ -16,6 +16,8 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         public override string Name { get; set; } = "Bye Bye Buddy";
         public override string Description { get; set; } = "Fate draws only one number today (or is it?)";
         public override float Weight { get; set; } = 0.5f;
+        public string ByeByeHint { get; set; } = "Bye Bye!";
+        public string HmHint { get; set; } = "Hm...";
         public override SpawnProperties SpawnProperties { get; set; }
 
         protected override void SubscribeEvents()
@@ -41,7 +43,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                 float random = UnityEngine.Random.value;
                 if (random <= 0.25f)
                 {
-                    randomPlayer.ShowHint("Bye Bye!");
+                    randomPlayer.ShowHint(ByeByeHint);
 
                     Timing.CallDelayed(2f, () =>
                     {
@@ -51,7 +53,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                 }
                 else
                 {
-                    ev.Player.ShowHint("Hm...");
+                    ev.Player.ShowHint(HmHint);
                 }
 
                 ev.Item.Destroy();

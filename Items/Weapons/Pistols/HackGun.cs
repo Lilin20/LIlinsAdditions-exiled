@@ -28,16 +28,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
         public override SpawnProperties SpawnProperties { get; set; }
 
-        protected override void SubscribeEvents()
-        {
-            base.SubscribeEvents();
-        }
-
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
-        }
-
         protected override void OnShot(ShotEventArgs ev)
         {
             try
@@ -79,7 +69,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
             }
             catch
             {
-                return;
+                //Ignore
             }
         }
     }

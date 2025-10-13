@@ -1,19 +1,9 @@
 ﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Player;
-using MEC;
 using PlayerRoles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Player = Exiled.Events.Handlers.Player;
-using Light = Exiled.API.Features.Toys.Light;
-using UnityEngine;
-using Exiled.API.Features;
 
 namespace GockelsAIO_exiled.Items.Weapons.SMGs
 {
@@ -75,10 +65,6 @@ namespace GockelsAIO_exiled.Items.Weapons.SMGs
                 {
                     ev.Target.Role.Set(RoleTypeId.ClassD, RoleSpawnFlags.None);
                 }
-            }
-            else
-            {
-                return;
             }
         }
     }

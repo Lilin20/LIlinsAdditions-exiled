@@ -68,7 +68,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                     byte intensity = (byte)random.Next(1, 255); // 1–254
                     float duration = (float)(random.NextDouble() * 20 + 10); // 10–30s
 
-                    ev.Player.EnableEffect(effect, intensity, duration, false);
+                    ev.Player.EnableEffect(effect, intensity, duration);
                 }
 
                 ev.Item.Destroy();

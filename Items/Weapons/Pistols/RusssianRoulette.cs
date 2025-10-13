@@ -1,16 +1,10 @@
-﻿using Exiled.API.Enums;
-using Exiled.API.Features.Attributes;
+﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.Handlers;
 using MEC;
 using PlayerStatsSystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GockelsAIO_exiled.Items.Weapons.Pistols
 {

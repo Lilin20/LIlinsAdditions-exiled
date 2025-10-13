@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -38,16 +34,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
         {
             AttachmentName.ScopeSight,
         };
-        protected override void SubscribeEvents()
-        {
-            base.SubscribeEvents();
-        }
-
-        protected override void UnsubscribeEvents()
-        {
-            base.UnsubscribeEvents();
-        }
-
+        
         protected override void OnReloading(ReloadingWeaponEventArgs ev)
         {
             ev.IsAllowed = false;

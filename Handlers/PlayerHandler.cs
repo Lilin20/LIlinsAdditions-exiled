@@ -203,7 +203,7 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnChangingItem(ChangingItemEventArgs ev)
         {
-            if (!ev.Player.GetCustomRoles().Any(r => r.Name == "MTF Nu-7")) return;
+            if (ev.Player.GetCustomRoles().All(r => r.Name != "MTF Nu-7")) return;
 
             if (!RiotShield.activeShields.TryGetValue(ev.Player, out var shield)) return;
 

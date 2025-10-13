@@ -44,19 +44,19 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                 float random = UnityEngine.Random.value;
                 if (random <= 0.25f)
                 {
-                    ev.Player.EnableEffect(EffectType.CardiacArrest, 1, 100f, false);
-                    ev.Player.EnableEffect(EffectType.AmnesiaItems, 1, 100f, false);
-                    ev.Player.EnableEffect(EffectType.Bleeding, 1, 100f, false);
-                    ev.Player.EnableEffect(EffectType.Poisoned, 1, 100f, false);
-                    ev.Player.EnableEffect(EffectType.Hemorrhage, 1, 100f, false);
-                    ev.Player.EnableEffect(EffectType.SeveredHands, 1, 100f, false);
+                    ev.Player.EnableEffect(EffectType.CardiacArrest, 1, 100f);
+                    ev.Player.EnableEffect(EffectType.AmnesiaItems, 1, 100f);
+                    ev.Player.EnableEffect(EffectType.Bleeding, 1, 100f);
+                    ev.Player.EnableEffect(EffectType.Poisoned, 1, 100f);
+                    ev.Player.EnableEffect(EffectType.Hemorrhage, 1, 100f);
+                    ev.Player.EnableEffect(EffectType.SeveredHands, 1, 100f);
                 }
                 else
                 {
-                    ev.Player.EnableEffect(EffectType.Invisible, 1, 15f, false);
-                    ev.Player.EnableEffect(EffectType.MovementBoost, 50, 15f, false);
-                    ev.Player.EnableEffect(EffectType.Flashed, 1, 1f, false);
-                    ev.Player.EnableEffect(EffectType.SilentWalk, 10, 15f, false);
+                    ev.Player.EnableEffect(EffectType.Invisible, 1, 15f);
+                    ev.Player.EnableEffect(EffectType.MovementBoost, 50, 15f);
+                    ev.Player.EnableEffect(EffectType.Flashed, 1, 1f);
+                    ev.Player.EnableEffect(EffectType.SilentWalk, 10, 15f);
                     ev.Player.Health = 25;
                     ev.Player.MaxHealth = 25;
                     Ragdoll ragdoll = Ragdoll.CreateAndSpawn(ev.Player.Role, ev.Player.DisplayNickname, "Es sieht aus wie eine leblose Hülle.", ev.Player.Position, ev.Player.ReferenceHub.PlayerCameraReference.rotation);
