@@ -63,10 +63,5 @@ namespace GockelsAIO_exiled.Roles.NTF
             ItemType.Ammo9x19.ToString(),
             ItemType.Ammo9x19.ToString(),
         };
-
-        protected override void RoleAdded(Player player)
-        {
-            base.RoleAdded(player);
-        }
     }
 }

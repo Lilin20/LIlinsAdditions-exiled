@@ -27,10 +27,5 @@ namespace GockelsAIO_exiled.Roles.NTF
         };
 
         public override SpawnProperties SpawnProperties { get; set; }
-
-        protected override void RoleAdded(Player player)
-        {
-            base.RoleAdded(player);
-        }
     }
 }
