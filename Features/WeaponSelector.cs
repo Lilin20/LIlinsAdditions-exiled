@@ -2,11 +2,13 @@
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
+using InventorySystem.Items.Usables;
 using MapGeneration;
 using MEC;
 using ProjectMER.Features;
 using ProjectMER.Features.Objects;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace GockelsAIO_exiled
@@ -26,6 +28,14 @@ namespace GockelsAIO_exiled
             new WeightedCustomItem(500, 6),
             new WeightedCustomItem(401, 1),
         };
+
+        public static void WeightedCustomWeaponsWithConfig()
+        {
+            var weightedItems = LilinsAdditions.Instance.Config.MysteryBoxItemPool
+                .Where(p => int.TryParse(p.Id.ToString(), out int _))
+                .Select(p => new WeightedCustomItem(uint.Parse(p.Id.ToString()), p.Weight))
+                .ToList();
+        }
         
         private static readonly float Duration = 5f;
         private static readonly float Interval = 0.2f;

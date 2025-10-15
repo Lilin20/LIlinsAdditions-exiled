@@ -10,34 +10,34 @@ namespace GockelsAIO_exiled.Handlers
     {
         public static void RegisterRoles()
         {
-            new RiotOperator().Register();
+            LilinsAdditions.Instance.Config.riotOperator.Register();
 
-            new KamikazeZombie().Register();
+            LilinsAdditions.Instance.Config.kamikazeZombie.Register();
 
             if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
             {
-                new Lockpicker().Register();
+                LilinsAdditions.Instance.Config.lockpicker.Register();
             }
 
-            new LuckyMan().Register();
+            LilinsAdditions.Instance.Config.luckyMan.Register();
 
-            new Thief().Register();
+            LilinsAdditions.Instance.Config.thief.Register();
         }
 
         public static void UnregisterRoles()
         {
-            new RiotOperator().Unregister();
+            LilinsAdditions.Instance.Config.riotOperator.Unregister();
 
-            new KamikazeZombie().Unregister();
+            LilinsAdditions.Instance.Config.kamikazeZombie.Unregister();
 
             if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
             {
-                new Lockpicker().Unregister();
+                LilinsAdditions.Instance.Config.lockpicker.Unregister();
             }
 
-            new LuckyMan().Unregister();
+            LilinsAdditions.Instance.Config.luckyMan.Unregister();
 
-            new Thief().Unregister();
+            LilinsAdditions.Instance.Config.thief.Unregister();
         }
     }
 }

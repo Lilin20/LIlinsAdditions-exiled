@@ -13,5 +13,12 @@ namespace GockelsAIO_exiled.Helper
         {
             return (622.27444f * Mathf.Pow(_aspectRatio, 3f)) + (-2869.08991f * Mathf.Pow(_aspectRatio, 2f)) + (3827.03102f * _aspectRatio) - 1580.21554f;
         }
+
+    }
+
+    public class MysteryBoxPoolConfi()
+    {
+        public int Id { get; set; }
+        public int Weight { get; set; }
     }
 }

@@ -36,7 +36,11 @@ namespace GockelsAIO_exiled
         public int PointsForKillingEnemy { get; set; } = 200;
         public int PointsOverTime { get; set; } = 100;
         public int PointsOverTimeDelay { get; set; } = 120;
-        public List<Lockpicker> lockpicker { get; set; } = new()
+        public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()
+        {
+            new() {Id = 100, Weight = 2 },
+        };
+        public List<Lockpicker> lockpicker { get; private set; } = new()
         {
             new Lockpicker()
         };
