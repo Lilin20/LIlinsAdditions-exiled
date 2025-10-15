@@ -4,6 +4,8 @@ using Exiled.CustomRoles.API.Features;
 using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
 using System;
+using System.Linq;
+using Exiled.CustomRoles.API;
 
 namespace GockelsAIO_exiled
 {
@@ -28,10 +30,6 @@ namespace GockelsAIO_exiled
             ServerHandler = new ServerHandler();
             PMERHandler = new PMERHandler();
             CustomRoleHandler = new CustomRoleHandler();
-
-            
-
-            CustomAbility.RegisterAbilities(false, null);
 
             RegisterMERHandlers();
             RegisterPlayerHandlers();
@@ -78,6 +76,8 @@ namespace GockelsAIO_exiled
         public void RegisterCustomRoles()
         {
             CustomRoleHandler.RegisterRoles();
+            foreach (var ability in CustomRole.Registered.Where(role => role.CustomAbilities is not null).SelectMany(role => role.CustomAbilities))
+                ability.Register();
         }
 
         public void UnregisterCustomRoles()
