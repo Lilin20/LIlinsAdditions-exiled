@@ -27,7 +27,7 @@ namespace GockelsAIO_exiled.Handlers
             Timing.KillCoroutines(tickCoroutine);
         }
 
-        public void OnStart()
+        public void OnMapGeneration()
         {
             Timing.CallDelayed(2f, () =>
             {
@@ -40,7 +40,7 @@ namespace GockelsAIO_exiled.Handlers
                 {
                     ss.SpawnGobblegumMachines(5);
                 }
-                
+
                 if (LilinsAdditions.Instance.Config.EnableCeilingTrap)
                 {
                     ss.SpawnTrapTest();
@@ -51,7 +51,10 @@ namespace GockelsAIO_exiled.Handlers
                     ss.SpawnCoins(2);
                 }
             });
+        }
 
+        public void OnStart()
+        {
             Timing.CallDelayed(LilinsAdditions.Instance.Config.PointsOverTimeDelay, () =>
             {
                 tickCoroutine = Timing.RunCoroutine(PlayerHandler.AddPointsOverTime());

@@ -104,6 +104,7 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnStart; // Used for spawning Mystery Boxes.
             Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnSpawningGuards;
             Exiled.Events.Handlers.Server.RoundEnded += ServerHandler.OnRoundEnd;
+            Exiled.Events.Handlers.Map.Generated += ServerHandler.OnMapGeneration;
         }
 
         public void UnregisterServerHandlers()
@@ -111,6 +112,7 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnStart;
             Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnSpawningGuards;
             Exiled.Events.Handlers.Server.RoundEnded -= ServerHandler.OnRoundEnd;
+            Exiled.Events.Handlers.Map.Generated -= ServerHandler.OnMapGeneration;
         }
 
         public void RegisterPlayerHandlers()
