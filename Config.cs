@@ -40,7 +40,7 @@ namespace GockelsAIO_exiled
         {
             new() {Id = 100, Weight = 2 },
         };
-        public List<Lockpicker> lockpicker { get; private set; } = new()
+        public List<Lockpicker> lockpicker { get; set; } = new()
         {
             new Lockpicker()
         };
