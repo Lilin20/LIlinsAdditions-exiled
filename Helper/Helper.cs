@@ -18,7 +18,7 @@ namespace GockelsAIO_exiled.Helper
 
     public class MysteryBoxPoolConfi()
     {
-        public int Id { get; set; }
+        public string Name { get; set; }
         public int Weight { get; set; }
     }
 }

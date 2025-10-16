@@ -38,6 +38,12 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             base.UnsubscribeEvents();
         }
 
+        protected override void OnReloading(ReloadingWeaponEventArgs ev)
+        {
+            ev.IsAllowed = false;
+            base.OnReloading(ev);
+        }
+
         private void OnShotDD(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))

@@ -18,6 +18,7 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
         public override string Description { get; set; } = "Shoots nano rockets.";
         public override byte ClipSize { get; set; } = 200;
         public override float Weight { get; set; } = 0.5f;
+        
         public override SpawnProperties SpawnProperties { get; set; }
 
         protected override void SubscribeEvents()
@@ -32,6 +33,12 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             Exiled.Events.Handlers.Player.Shot -= OnShotDD;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHurting;
             base.UnsubscribeEvents();
+        }
+
+        protected override void OnReloading(ReloadingWeaponEventArgs ev)
+        {
+            ev.IsAllowed = false;
+            base.OnReloading(ev);
         }
 
         public void PlayerHurting(HurtingEventArgs ev)

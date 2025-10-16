@@ -15,44 +15,34 @@ namespace GockelsAIO_exiled
 {
     public class WeaponSelector
     {
-        private static readonly List<WeightedCustomItem> WeightedCustomWeapons = new()
-        {
-            new WeightedCustomItem(100, 2),
-            new WeightedCustomItem(101, 3),
-            new WeightedCustomItem(200, 10),
-            new WeightedCustomItem(201, 10),
-            new WeightedCustomItem(202, 10),
-            new WeightedCustomItem(203, 3),
-            new WeightedCustomItem(300, 10),
-            new WeightedCustomItem(400, 2),
-            new WeightedCustomItem(500, 6),
-            new WeightedCustomItem(401, 1),
-        };
+        public static List<WeightedCustomItem> WeightedCustomWeapons = new();
 
         public static void WeightedCustomWeaponsWithConfig()
         {
             var weightedItems = LilinsAdditions.Instance.Config.MysteryBoxItemPool
-                .Where(p => int.TryParse(p.Id.ToString(), out int _))
-                .Select(p => new WeightedCustomItem(uint.Parse(p.Id.ToString()), p.Weight))
+                .Where(p => !string.IsNullOrWhiteSpace(p.Name))
+                .Select(p => new WeightedCustomItem(p.Name, p.Weight))
                 .ToList();
+
+            WeightedCustomWeapons.AddRange(weightedItems);
         }
         
         private static readonly float Duration = 5f;
         private static readonly float Interval = 0.2f;
 
-        private class WeightedCustomItem
+        public class WeightedCustomItem
         {
-            public uint Id;
+            public string Name;
             public int Weight;
 
-            public WeightedCustomItem(uint id, int weight)
+            public WeightedCustomItem(string name, int weight)
             {
-                Id = id;
+                Name = name;
                 Weight = weight;
             }
         }
 
-        private static uint GetWeightedCustomItem()
+        private static string GetWeightedCustomItem()
         {
             int totalWeight = 0;
             foreach (var item in WeightedCustomWeapons)
@@ -68,11 +58,11 @@ namespace GockelsAIO_exiled
                 currentWeight += item.Weight;
                 if (randomWeight < currentWeight)
                 {
-                    return item.Id;
+                    return item.Name;
                 }
             }
 
-            return WeightedCustomWeapons[0].Id;
+            return WeightedCustomWeapons[0].Name;
         }
 
         public static void StartMysteryBox(Vector3 position)
@@ -91,7 +81,7 @@ namespace GockelsAIO_exiled
             {
                 currentPickup?.Destroy();
 
-                uint randomWeapon = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
+                string randomWeapon = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
 
                 Vector3 currentPosition = position + new Vector3(0f, yOffset, 0f);
 
@@ -109,7 +99,7 @@ namespace GockelsAIO_exiled
             }
 
             currentPickup?.Destroy();
-            uint finalCustom = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
+            string finalCustom = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
             CustomItem.TrySpawn(finalCustom, position + new Vector3(0f, yOffset, 0f), out finalPickup);
             finalPickup.Rigidbody.isKinematic = true;
             finalPickup.PhysicsModule.ServerSendRpc(finalPickup.PhysicsModule.ServerWriteRigidbody);

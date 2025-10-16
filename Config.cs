@@ -38,7 +38,16 @@ namespace GockelsAIO_exiled
         public int PointsOverTimeDelay { get; set; } = 120;
         public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()
         {
-            new() {Id = 100, Weight = 2 },
+            new() {Name = "Prototype LMG - Nano Rockets", Weight = 1},
+            new() {Name = "Grenade Launcher", Weight = 2},
+            new() {Name = "Behemoth 50.cal", Weight = 3},
+            new() {Name = "Nullifier", Weight = 10},
+            new() {Name = "Entity Swapper", Weight = 10},
+            new() {Name = "Russian Roulette", Weight = 10},
+            new() {Name = "HumeBreaker v2.1", Weight = 2},
+            new() {Name = "RangeTec - .308 Lapua", Weight = 3},
+            new() {Name = "Kerberos-12", Weight = 10},
+            new() {Name = "MS9K - MedShot 9000", Weight = 6},
         };
         public List<Lockpicker> lockpicker { get; set; } = new()
         {

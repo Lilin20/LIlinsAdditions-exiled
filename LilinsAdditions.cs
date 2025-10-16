@@ -35,6 +35,7 @@ namespace GockelsAIO_exiled
             RegisterPlayerHandlers();
             RegisterServerHandlers();
             RegisterCustomRoles();
+            WeaponSelector.WeightedCustomWeaponsWithConfig();
 
             CustomWeapon.RegisterItems();
 

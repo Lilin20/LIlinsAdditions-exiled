@@ -15,6 +15,8 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         public override string Description { get; set; } = "A very deadly revolver. Can shoot through walls.";
         public override byte ClipSize { get; set; } = 6;
         public override float Weight { get; set; } = 0.5f;
+        public float DamagingDistance { get; set; } = 100f;
+        public float DamageOverride { get; set; } = 80f;
         public override SpawnProperties SpawnProperties { get; set; }
 
         protected override void SubscribeEvents()
@@ -50,11 +52,10 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
             Vector3 origin = ev.Player.CameraTransform.position;
             Vector3 direction = ev.Player.CameraTransform.forward;
-            float maxDistance = 100f;
 
             // RaycastAll holt alle Treffer entlang der Strecke, auch hinter Wänden
             int layer13Mask = 1 << 13;
-            RaycastHit[] hits = Physics.RaycastAll(origin, direction, maxDistance, layer13Mask);
+            RaycastHit[] hits = Physics.RaycastAll(origin, direction, DamagingDistance, layer13Mask);
 
             foreach (RaycastHit hit in hits)
             {
@@ -66,7 +67,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
                         ev.Player.ShowHitMarker();
                         Timing.CallDelayed(0.25f, () =>
                         {
-                            target.Hurt(80f);
+                            target.Hurt(DamageOverride);
                         });
                         break;
                     }
