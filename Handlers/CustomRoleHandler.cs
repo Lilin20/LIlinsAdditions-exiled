@@ -16,7 +16,7 @@ namespace GockelsAIO_exiled.Handlers
 
             if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
             {
-                LilinsAdditions.Instance.Config.lockpicker.Register();
+                //LilinsAdditions.Instance.Config.lockpicker.Register();
             }
 
             LilinsAdditions.Instance.Config.luckyMan.Register();
@@ -32,7 +32,7 @@ namespace GockelsAIO_exiled.Handlers
 
             if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
             {
-                LilinsAdditions.Instance.Config.lockpicker.Unregister();
+                //LilinsAdditions.Instance.Config.lockpicker.Unregister();
             }
 
             LilinsAdditions.Instance.Config.luckyMan.Unregister();

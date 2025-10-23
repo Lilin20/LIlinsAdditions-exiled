@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled.Abilities.Active
     public class Burst : ActiveAbility
     {
         public override string Name { get; set; } = "Burst";
-        public override string Description { get; set; } = "test";
+        public override string Description { get; set; } = "Mix a chemical cocktail to burst.";
         public override float Duration { get; set; } = 1f;
         public override float Cooldown { get; set; } = 60f;
         protected override void AbilityAdded(Player player)

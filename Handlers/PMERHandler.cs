@@ -42,7 +42,7 @@ namespace GockelsAIO_exiled.Handlers
             int playerPoints = PointSystem.GetPoints(ev.Player);
             if (playerPoints < 800)
             {
-                ev.Player.SendBroadcast("<color=red>You need 800 Points to open the box!</color>", 5);
+                ev.Player.SendBroadcast(LilinsAdditions.Instance.Config.MysteryBoxMissingPointsText, 5);
                 return;
             }
 
@@ -95,7 +95,7 @@ namespace GockelsAIO_exiled.Handlers
                     }
                     else
                     {
-                        ev.Player.SendBroadcast("<color=red>You need 200 points!</color>", 5);
+                        ev.Player.SendBroadcast(LilinsAdditions.Instance.Config.VendingMachineMissingPointsText, 5);
                         break;
                     }
                 }

@@ -36,6 +36,8 @@ namespace GockelsAIO_exiled
         public int PointsForKillingEnemy { get; set; } = 200;
         public int PointsOverTime { get; set; } = 100;
         public int PointsOverTimeDelay { get; set; } = 120;
+        public string MysteryBoxMissingPointsText { get; set; } = "<color=red>You need 800 Points to open the box!</color>";
+        public string VendingMachineMissingPointsText { get; set; } = "<color=red>You need 200 points!</color>";
         public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()
         {
             new() {Name = "Prototype LMG - Nano Rockets", Weight = 1},

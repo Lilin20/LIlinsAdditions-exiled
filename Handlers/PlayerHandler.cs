@@ -1,14 +1,9 @@
-﻿using CustomPlayerEffects;
-using Exiled.API.Enums;
-using Exiled.API.Extensions;
+﻿using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
-using Exiled.API.Features.Pickups.Projectiles;
-using Exiled.API.Features.Roles;
 using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API;
-using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using GockelsAIO_exiled.Abilities.Active;
@@ -68,11 +63,6 @@ namespace GockelsAIO_exiled.Handlers
                     //playerDisplay.AddHint(hint);
                 }
             });
-        }
-
-        public void OnInteractLocker(InteractingLockerEventArgs ev)
-        {
-
         }
 
         public void OnChangingRolePoints(ChangingRoleEventArgs ev)
