@@ -168,6 +168,8 @@ namespace GockelsAIO_exiled.Handlers
                         RoomType.EzShelter,
                         RoomType.Pocket,
                         RoomType.HczCrossRoomWater,
+                        RoomType.Hcz096,
+                        RoomType.HczIncineratorWayside,
                     };
 
                     Room[] allRooms = Room.List
