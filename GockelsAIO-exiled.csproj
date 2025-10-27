@@ -126,6 +126,7 @@
     <Compile Include="Components\DeathComponent.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Features\PointSystem.cs" />
+    <Compile Include="Items\Keycards\CreditCard.cs" />
     <Compile Include="LilinsAdditions.cs" />
     <Compile Include="Handlers\CustomRoleHandler.cs" />
     <Compile Include="Handlers\PlayerHandler.cs" />

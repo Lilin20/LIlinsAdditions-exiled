@@ -24,6 +24,7 @@ namespace GockelsAIO_exiled
         public bool EnableCeilingTrap { get; set; } = false;
         public bool EnableRandomGuardSpawn { get; set; } = false;
         public bool Enable914Teleport { get; set; } = false;
+        public bool EnableCreditCardDrop { get; set; } = false;
         public float BurstSoundVolume { get; set; } = 1;
         public string VendingMachineMusicPath { get; set; } = string.Empty;
         public string MysteryBoxMusicPath { get; set; } = string.Empty;
@@ -36,6 +37,9 @@ namespace GockelsAIO_exiled
         public int PointsForKillingEnemy { get; set; } = 200;
         public int PointsOverTime { get; set; } = 100;
         public int PointsOverTimeDelay { get; set; } = 120;
+        public int PointsForMysteryBox { get; set; } = 800;
+        public int PointsForVendingMachine { get; set; } = 200;
+        public int PointsForCoin { get; set; } = 1500;
         public string MysteryBoxMissingPointsText { get; set; } = "<color=red>You need 800 Points to open the box!</color>";
         public string VendingMachineMissingPointsText { get; set; } = "<color=red>You need 200 points!</color>";
         public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()

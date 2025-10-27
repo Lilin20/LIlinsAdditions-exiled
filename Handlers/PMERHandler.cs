@@ -40,13 +40,13 @@ namespace GockelsAIO_exiled.Handlers
             if (schematic == null) return;
 
             int playerPoints = PointSystem.GetPoints(ev.Player);
-            if (playerPoints < 800)
+            if (playerPoints < LilinsAdditions.Instance.Config.PointsForMysteryBox)
             {
                 ev.Player.SendBroadcast(LilinsAdditions.Instance.Config.MysteryBoxMissingPointsText, 5);
                 return;
             }
 
-            PointSystem.RemovePoints(ev.Player, 800);
+            PointSystem.RemovePoints(ev.Player, LilinsAdditions.Instance.Config.PointsForMysteryBox);
             Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
 
             foreach (var block in schematic.AttachedBlocks)
@@ -84,9 +84,9 @@ namespace GockelsAIO_exiled.Handlers
             {
                 if (schematic == ev.Schematic)
                 {
-                    if (PointSystem.GetPoints(ev.Player) >= 200)
+                    if (PointSystem.GetPoints(ev.Player) >= LilinsAdditions.Instance.Config.PointsForVendingMachine)
                     {
-                        PointSystem.RemovePoints(ev.Player, 200);
+                        PointSystem.RemovePoints(ev.Player, LilinsAdditions.Instance.Config.PointsForVendingMachine);
                         Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
 
                         uint randomGobblegum = GobblegumIDs[UnityEngine.Random.Range(0, GobblegumIDs.Count())];
@@ -108,7 +108,7 @@ namespace GockelsAIO_exiled.Handlers
             {
                 if (schematic == ev.Schematic)
                 {
-                    PointSystem.AddPoints(ev.Player, 1500);
+                    PointSystem.AddPoints(ev.Player, LilinsAdditions.Instance.Config.PointsForCoin);
                     TrackedCoins.Remove(schematic);
                     schematic.Destroy();
                 }

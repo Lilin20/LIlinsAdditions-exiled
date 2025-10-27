@@ -8,6 +8,7 @@ using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using GockelsAIO_exiled.Abilities.Active;
 using GockelsAIO_exiled.Features;
+using GockelsAIO_exiled.Items.Keycards;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.Voice;
@@ -96,8 +97,8 @@ namespace GockelsAIO_exiled.Handlers
             {
                 if (!PlayerPoints.ContainsKey(ev.Player))
                 {
-                    PlayerPoints[ev.Player] = 400;
-                    Log.Debug($"[PointSystem] {ev.Player.Nickname} was added with 0 Points.");
+                    PlayerPoints[ev.Player] = LilinsAdditions.Instance.Config.StartingPoints;
+                    Log.Debug($"[PointSystem] {ev.Player.Nickname} was added with 400 Points.");
                 }
             }
         }
@@ -354,6 +355,37 @@ namespace GockelsAIO_exiled.Handlers
             }
         }
 
+        public void DropCreditOnDeath(DyingEventArgs ev)
+        {
+            if (LilinsAdditions.Instance.Config.EnableCreditCardDrop)
+            {
+                PointSystem.SpawnCreditCard(ev.Player, ev.Attacker);
+            }
+        }
+
+        public void OnPickingUpCreditCard(PickingUpItemEventArgs ev)
+        {
+            ev.IsAllowed = false;
+            // Check if this pickup is a CreditCard  
+            if (CustomItem.TryGet(ev.Pickup, out CustomItem? customItem) &&
+                customItem.GetType() == typeof(CreditCard))
+            {
+                string key = $"CreditCard_Points_{ev.Pickup.Serial}";
+
+                if (Server.SessionVariables.TryGetValue(key, out object pointsObj) &&
+                    pointsObj is int points)
+                {
+                    // Award the points to the player  
+                    PointSystem.AddPoints(ev.Player, points);
+
+                    // Clean up the session variable  
+                    Server.SessionVariables.Remove(key);
+                }
+            }
+
+            ev.Pickup.Destroy();
+        }
+
         public static IEnumerator<float> AddPointsOverTime()
         {
             Log.Debug("[AddPointsOverTime] Coroutine started.");
@@ -366,8 +398,8 @@ namespace GockelsAIO_exiled.Handlers
 
                     if (player != null && player.IsAlive)
                     {
-                        PlayerPoints[player] += 100;
-                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +100 Points => {PlayerPoints[player]}");
+                        PlayerPoints[player] += LilinsAdditions.Instance.Config.PointsOverTime;
+                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +{LilinsAdditions.Instance.Config.PointsOverTime} Points => {PlayerPoints[player]}");
                     }
                     else
                     {
