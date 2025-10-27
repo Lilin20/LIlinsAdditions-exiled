@@ -1,11 +1,12 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
+using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
 using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Exiled.CustomRoles.API;
 
 namespace GockelsAIO_exiled
 {
@@ -77,8 +78,18 @@ namespace GockelsAIO_exiled
         public void RegisterCustomRoles()
         {
             CustomRoleHandler.RegisterRoles();
-            foreach (var ability in CustomRole.Registered.Where(role => role.CustomAbilities is not null).SelectMany(role => role.CustomAbilities))
-                ability.Register();
+            HashSet<CustomAbility> existingAbilities = new HashSet<CustomAbility>(CustomAbility.Registered);
+            foreach (CustomRole role in CustomRole.Registered)
+            {
+                if (role.CustomAbilities is not null)
+                {
+                    foreach (var ability in role.CustomAbilities.Where(ability => !existingAbilities.Contains(ability)))
+                    {
+                        Log.Debug($"LA CR: Registering ability {ability.Name}");
+                        ability.Register();
+                    }
+                }
+            }
         }
 
         public void UnregisterCustomRoles()
