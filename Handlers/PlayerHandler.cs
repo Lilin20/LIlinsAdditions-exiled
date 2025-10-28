@@ -135,8 +135,8 @@ namespace GockelsAIO_exiled.Handlers
 
             if (isEnemy && PlayerPoints.ContainsKey(killer))
             {
-                PointSystem.AddPoints(killer, 200); // z. B. 200 Punkte für Kills
-                Log.Debug($"[PointSystem] {killer.Nickname} has killed an enemy ({victim.Nickname}) and received 200 points.");
+                PointSystem.AddPoints(killer, LilinsAdditions.Instance.Config.PointsForKillingEnemy); // z. B. 200 Punkte für Kills
+                Log.Debug($"[PointSystem] {killer.Nickname} has killed an enemy ({victim.Nickname}) and received {LilinsAdditions.Instance.Config.PointsForKillingEnemy} points.");
             }
         }
 
@@ -365,12 +365,14 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnPickingUpCreditCard(PickingUpItemEventArgs ev)
         {
-            ev.IsAllowed = false;
             // Check if this pickup is a CreditCard  
             if (CustomItem.TryGet(ev.Pickup, out CustomItem? customItem) &&
                 customItem.GetType() == typeof(CreditCard))
             {
+                ev.IsAllowed = false;
                 string key = $"CreditCard_Points_{ev.Pickup.Serial}";
+
+                ev.Pickup.Destroy();
 
                 if (Server.SessionVariables.TryGetValue(key, out object pointsObj) &&
                     pointsObj is int points)
@@ -382,8 +384,6 @@ namespace GockelsAIO_exiled.Handlers
                     Server.SessionVariables.Remove(key);
                 }
             }
-
-            ev.Pickup.Destroy();
         }
 
         public static IEnumerator<float> AddPointsOverTime()
