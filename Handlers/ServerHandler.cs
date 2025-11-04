@@ -103,10 +103,57 @@ namespace GockelsAIO_exiled.Handlers
                 }
 
             }
+        }
 
+        public IEnumerator<float> PeriodicPointSystemCheck()
+        {
+            for (; ; ) // Run indefinitely  
+            {
+                yield return Timing.WaitForSeconds(2f); // Check every 5 seconds (adjust as needed)  
 
-            //used to spawn a single instance of the custom keycard so it spawns correctly when using 914 - need to change that.
-            //CustomItem.TrySpawn(4444, Room.Get(RoomType.HczCrossRoomWater).Position, out Pickup test);
+                foreach (Player player in Player.List)
+                {
+                    if (player == null) continue;
+
+                    RoleTypeId currentRole = player.Role.Type;
+                    bool shouldBeInSystem = ShouldPlayerBeInPointSystem(currentRole);
+                    bool isInSystem = PlayerHandler.PlayerPoints.ContainsKey(player);
+
+                    if (shouldBeInSystem && !isInSystem)
+                    {
+                        // Add player to point system  
+                        PlayerHandler.PlayerPoints[player] = LilinsAdditions.Instance.Config.StartingPoints;
+                        Log.Debug($"[PointSystem] {player.Nickname} added to point system. Role: {currentRole}");
+                    }
+                    else if (!shouldBeInSystem && isInSystem)
+                    {
+                        // Remove player from point system  
+                        PlayerHandler.PlayerPoints.Remove(player);
+                        Log.Debug($"[PointSystem] {player.Nickname} removed from point system. Role: {currentRole}");
+                    }
+                }
+            }
+        }
+
+        private bool ShouldPlayerBeInPointSystem(RoleTypeId role)
+        {
+            // Invalid/dead roles should not be in system  
+            if (role == RoleTypeId.Spectator ||
+                role == RoleTypeId.Overwatch ||
+                role == RoleTypeId.Destroyed ||
+                role == RoleTypeId.None ||
+                role == RoleTypeId.Filmmaker ||
+                role == RoleTypeId.Tutorial)
+            {
+                return false;
+            }
+
+            // Check if role belongs to valid team  
+            var team = Exiled.API.Extensions.RoleExtensions.GetTeam(role);
+            return team == Team.FoundationForces ||
+                   team == Team.ChaosInsurgency ||
+                   team == Team.Scientists ||
+                   team == Team.ClassD;
         }
     }
 }

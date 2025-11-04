@@ -4,6 +4,7 @@ using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
 using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
+using MEC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace GockelsAIO_exiled
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
         public Harmony harmony = new Harmony("lilin.patches");
+        private CoroutineHandle pointSystemCheckCoroutine;
 
         public override void OnEnabled()
         {
@@ -37,7 +39,7 @@ namespace GockelsAIO_exiled
 
             CustomWeapon.RegisterItems();
 
-
+            pointSystemCheckCoroutine = Timing.RunCoroutine(ServerHandler.PeriodicPointSystemCheck());
             harmony.PatchAll();
             base.OnEnabled();
         }
@@ -51,6 +53,7 @@ namespace GockelsAIO_exiled
             CustomWeapon.UnregisterItems();
             CustomAbility.UnregisterAbilities();
 
+            Timing.KillCoroutines(pointSystemCheckCoroutine);
             PlayerHandler = null;
             ServerHandler = null;
             PMERHandler = null;
@@ -104,7 +107,7 @@ namespace GockelsAIO_exiled
         {
             Exiled.Events.Handlers.Player.Spawned += PlayerHandler.SpawnSetPoints; // Handler to give players points on spawn
             Exiled.Events.Handlers.Player.Left += PlayerHandler.OnLeft; // Handler to remove the player from the points dict
-            Exiled.Events.Handlers.Player.ChangingRole += PlayerHandler.OnChangingRolePoints;
+            //Exiled.Events.Handlers.Player.ChangingRole += PlayerHandler.OnChangingRolePoints;
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
@@ -118,7 +121,7 @@ namespace GockelsAIO_exiled
         {
             Exiled.Events.Handlers.Player.Spawned -= PlayerHandler.SpawnSetPoints;
             Exiled.Events.Handlers.Player.Left -= PlayerHandler.OnLeft;
-            Exiled.Events.Handlers.Player.ChangingRole -= PlayerHandler.OnChangingRolePoints;
+            //Exiled.Events.Handlers.Player.ChangingRole -= PlayerHandler.OnChangingRolePoints;
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
