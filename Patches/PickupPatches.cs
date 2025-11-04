@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using RueI.API;
 using RueI.API.Elements;
 using RueI.Utils;
+using RueI.Utils.Enums;
 using System.Text;
 
 namespace GockelsAIO_exiled.Patches
@@ -42,6 +43,7 @@ namespace GockelsAIO_exiled.Patches
 
                     try
                     {
+                        sb.SetLineHeight(20, MeasurementUnit.Pixels);
                         sb.SetAlignment(RueI.Utils.Enums.AlignStyle.Center);
                         sb.Append("\n" + textHint.Text + "\n");
 
@@ -55,7 +57,7 @@ namespace GockelsAIO_exiled.Patches
                         BasicElement be = new BasicElement(300, content)
                         {
                             ResolutionBasedAlign = true,
-                            VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Center,
+                            VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Down,
                         };
 
                         display.Show(new Tag("test"), be, duration);

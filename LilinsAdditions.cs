@@ -14,12 +14,11 @@ namespace GockelsAIO_exiled
     {
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
-        public override Version Version => new Version(0, 1);
+        public override Version Version => new Version(0, 10);
         public static LilinsAdditions Instance;
         public PlayerHandler PlayerHandler;
         public ServerHandler ServerHandler;
         public PMERHandler PMERHandler;
-        public CustomRoleHandler CustomRoleHandler;
         public Harmony harmony = new Harmony("lilin.patches");
 
         public override void OnEnabled()
@@ -30,12 +29,10 @@ namespace GockelsAIO_exiled
             PlayerHandler = new PlayerHandler();
             ServerHandler = new ServerHandler();
             PMERHandler = new PMERHandler();
-            CustomRoleHandler = new CustomRoleHandler();
 
             RegisterMERHandlers();
             RegisterPlayerHandlers();
             RegisterServerHandlers();
-            RegisterCustomRoles();
             WeaponSelector.WeightedCustomWeaponsWithConfig();
 
             CustomWeapon.RegisterItems();
@@ -50,7 +47,6 @@ namespace GockelsAIO_exiled
             UnregisterMERHandlers();
             UnregisterPlayerHandlers();
             UnregisterServerHandlers();
-            UnregisterCustomRoles();
 
             CustomWeapon.UnregisterItems();
             CustomAbility.UnregisterAbilities();
@@ -58,7 +54,6 @@ namespace GockelsAIO_exiled
             PlayerHandler = null;
             ServerHandler = null;
             PMERHandler = null;
-            CustomRoleHandler = null;
 
             Instance = null;
 
@@ -73,28 +68,6 @@ namespace GockelsAIO_exiled
             bool gobblegumLoaded = AudioClipStorage.LoadClip(Instance.Config.VendingMachineMusicPath, "gobblegum");
             bool bombsoundLoaded = AudioClipStorage.LoadClip(Instance.Config.BurstSoundPath, "bombsound");
             bool trackingLoaded = AudioClipStorage.LoadClip(Instance.Config.TrackingSoundPath, "trackingsound");
-        }
-
-        public void RegisterCustomRoles()
-        {
-            CustomRoleHandler.RegisterRoles();
-            HashSet<CustomAbility> existingAbilities = new HashSet<CustomAbility>(CustomAbility.Registered);
-            foreach (CustomRole role in CustomRole.Registered)
-            {
-                if (role.CustomAbilities is not null)
-                {
-                    foreach (var ability in role.CustomAbilities.Where(ability => !existingAbilities.Contains(ability)))
-                    {
-                        Log.Debug($"LA CR: Registering ability {ability.Name}");
-                        ability.Register();
-                    }
-                }
-            }
-        }
-
-        public void UnregisterCustomRoles()
-        {
-            CustomRoleHandler.UnregisterRoles();
         }
 
         public void RegisterMERHandlers()
@@ -132,7 +105,6 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Spawned += PlayerHandler.SpawnSetPoints; // Handler to give players points on spawn
             Exiled.Events.Handlers.Player.Left += PlayerHandler.OnLeft; // Handler to remove the player from the points dict
             Exiled.Events.Handlers.Player.ChangingRole += PlayerHandler.OnChangingRolePoints;
-            Exiled.Events.Handlers.Player.ChangingItem += PlayerHandler.OnChangingItem;
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
@@ -147,7 +119,6 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Player.Spawned -= PlayerHandler.SpawnSetPoints;
             Exiled.Events.Handlers.Player.Left -= PlayerHandler.OnLeft;
             Exiled.Events.Handlers.Player.ChangingRole -= PlayerHandler.OnChangingRolePoints;
-            Exiled.Events.Handlers.Player.ChangingItem -= PlayerHandler.OnChangingItem;
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;

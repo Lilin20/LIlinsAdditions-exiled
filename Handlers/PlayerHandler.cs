@@ -6,7 +6,6 @@ using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
-using GockelsAIO_exiled.Abilities.Active;
 using GockelsAIO_exiled.Features;
 using GockelsAIO_exiled.Items.Keycards;
 using MEC;
@@ -47,23 +46,20 @@ namespace GockelsAIO_exiled.Handlers
                     };
 
                     display.Show(new Tag(), de);
-                    
-
-
-                    //Hint hint = new Hint
-                    //{
-                    //    AutoText = display => $"{GetContent(ev.Player)}",
-                    //};
-
-                    //hint.Alignment = HintServiceMeow.Core.Enum.HintAlignment.Left;
-                    //hint.FontSize = 32;
-                    //hint.XCoordinate = Helper.HelperScripts.GetLeftXPosition(ev.Player.ReferenceHub.aspectRatioSync.AspectRatio);
-                    //hint.YCoordinate = 500;
-
-                    //PlayerDisplay playerDisplay = PlayerDisplay.Get(ev.Player);
-                    //playerDisplay.AddHint(hint);
                 }
             });
+        }
+
+        public void OnDeathRemovePoints(DyingEventArgs ev)
+        {
+            if (ev.Player == null)
+                return;
+
+            if (PlayerPoints.ContainsKey(ev.Player))
+            {
+                PlayerPoints.Remove(ev.Player);
+                Log.Debug($"[PointSystem] {ev.Player.Nickname} has been removed from the point system. Reason: Death");
+            }
         }
 
         public void OnChangingRolePoints(ChangingRoleEventArgs ev)
@@ -72,8 +68,7 @@ namespace GockelsAIO_exiled.Handlers
                 return;
 
             // Entfernen, wenn Spieler zu totem Zustand wechselt
-            if (ev.NewRole == RoleTypeId.Spectator ||
-                ev.NewRole == RoleTypeId.Overwatch ||
+            if (ev.NewRole == RoleTypeId.Overwatch ||
                 ev.NewRole == RoleTypeId.Destroyed ||
                 ev.NewRole == RoleTypeId.None ||
                 ev.NewRole == RoleTypeId.Filmmaker ||
@@ -82,7 +77,7 @@ namespace GockelsAIO_exiled.Handlers
                 if (PlayerPoints.ContainsKey(ev.Player))
                 {
                     PlayerPoints.Remove(ev.Player);
-                    Log.Debug($"[PointSystem] {ev.Player.Nickname} wurde wegen Tod entfernt.");
+                    Log.Debug($"[PointSystem] {ev.Player.Nickname} has been removed from the point system. Reason: Invalid Role");
                 }
 
                 return;
@@ -151,6 +146,8 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnSCPVoidJump(HurtingEventArgs ev)
         {
+            if (!LilinsAdditions.Instance.Config.EnableAntiSCPSuicide) return;
+
             if (ev.Player == null) return;
 
             if (ev.Player.Role.Team == Team.SCPs)
@@ -191,30 +188,6 @@ namespace GockelsAIO_exiled.Handlers
                         ev.Player.IsGodModeEnabled = false;
                     });
                 }
-            }
-        }
-
-        public void OnChangingItem(ChangingItemEventArgs ev)
-        {
-            if (ev.Player.GetCustomRoles().All(r => r.Name != "MTF Nu-7")) return;
-
-            if (!RiotShield.activeShields.TryGetValue(ev.Player, out var shield)) return;
-
-            Transform shieldTransform = shield.transform;
-
-            if (ev.Item is Firearm)
-            {
-                // Spieler hat Waffe -> Schild zur Seite drehen
-                shieldTransform.localPosition = new Vector3(-0.4f, -1f, 0.4f); // leicht links
-                shieldTransform.localRotation = Quaternion.Euler(0f, -70f, 0f); // seitlich
-                Log.Debug($"[{ev.Player.Nickname}] weapon detected – shield rotated to the left.");
-            }
-            else
-            {
-                // Standardausrichtung
-                shieldTransform.localPosition = new Vector3(0f, -1f, 0.5f);
-                shieldTransform.localRotation = Quaternion.identity;
-                Log.Debug($"[{ev.Player.Nickname}] no weapon detected. – shield centered.");
             }
         }
 

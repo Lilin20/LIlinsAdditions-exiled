@@ -50,6 +50,20 @@ namespace GockelsAIO_exiled
             { RoomType.HczNuke,             (new Vector3(1.288f, -72.417f, -0.423f),     new Vector3(0, 0, 0))           },
         };
 
+        public class SpawnData
+        {
+            public Vector3 Position { get; set; }
+            public Vector3 Rotation { get; set; }
+
+            public SpawnData() { }
+
+            public SpawnData(Vector3 pos, Vector3 rot)
+            {
+                Position = pos;
+                Rotation = rot;
+            }
+        }
+
         public void SpawnCoins(int amount)
         {
             Dictionary<RoomType, (Vector3 pos, Vector3 rot)> spawnData = CoinRoomSpawnDate;
