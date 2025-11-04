@@ -67,6 +67,19 @@ namespace GockelsAIO_exiled.Handlers
             if (ev.Player == null)
                 return;
 
+            if (ev.NewRole == RoleTypeId.Spectator)
+            {
+                if (ev.Reason != SpawnReason.Died && ev.Reason != SpawnReason.Destroyed)
+                {
+                    if (PlayerPoints.ContainsKey(ev.Player))
+                    {
+                        PlayerPoints.Remove(ev.Player);
+                        Log.Debug($"[PointSystem] {ev.Player.Nickname} removed from point system. Reason: Set to Spectator (non-death)");
+                    }
+                }
+                return;
+            }
+
             // Entfernen, wenn Spieler zu totem Zustand wechselt
             if (ev.NewRole == RoleTypeId.Overwatch ||
                 ev.NewRole == RoleTypeId.Destroyed ||
