@@ -43,21 +43,23 @@ namespace GockelsAIO_exiled.Patches
 
                     try
                     {
-                        sb.SetLineHeight(20, MeasurementUnit.Pixels);
+                        sb.SetWidth(3000, MeasurementUnit.Pixels);
                         sb.SetAlignment(RueI.Utils.Enums.AlignStyle.Center);
-                        sb.Append("\n" + textHint.Text + "\n");
+
+                        // Add word wrapping before appending  
+                        string wrappedText = WrapText(textHint.Text, maxLineLength: 80);
+                        sb.Append("\n" + wrappedText + "\n");
 
                         string content = sb.ToString();
                         float duration = textHint.DurationScalar;
 
                         RueDisplay display = RueDisplay.Get(player);
-
                         display.Remove(new Tag("test"));
 
                         BasicElement be = new BasicElement(300, content)
                         {
                             ResolutionBasedAlign = true,
-                            VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Down,
+                            VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Up,
                         };
 
                         display.Show(new Tag("test"), be, duration);
@@ -71,6 +73,34 @@ namespace GockelsAIO_exiled.Patches
                 }
 
                 return true;
+            }
+
+            private static string WrapText(string text, int maxLineLength)
+            {
+                if (string.IsNullOrEmpty(text) || text.Length <= maxLineLength)
+                    return text;
+
+                StringBuilder result = new StringBuilder();
+                int currentLineLength = 0;
+
+                foreach (string word in text.Split(' '))
+                {
+                    if (currentLineLength + word.Length + 1 > maxLineLength)
+                    {
+                        result.Append('\n');
+                        currentLineLength = 0;
+                    }
+                    else if (currentLineLength > 0)
+                    {
+                        result.Append(' ');
+                        currentLineLength++;
+                    }
+
+                    result.Append(word);
+                    currentLineLength += word.Length;
+                }
+
+                return result.ToString();
             }
         }
     }

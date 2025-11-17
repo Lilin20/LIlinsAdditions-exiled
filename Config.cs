@@ -9,7 +9,9 @@ using GockelsAIO_exiled.Items.Weapons.Rifles;
 using GockelsAIO_exiled.Items.Weapons.Shotguns;
 using GockelsAIO_exiled.Items.Weapons.SMGs;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
+using static GockelsAIO_exiled.SchematicSpawner;
 
 namespace GockelsAIO_exiled
 {
@@ -56,6 +58,44 @@ namespace GockelsAIO_exiled
             new() {Name = "Kerberos-12", Weight = 10},
             new() {Name = "MS9K - MedShot 9000", Weight = 6},
         };
+
+        public Dictionary<RoomType, SpawnData> MysteryBoxSpawnPoints { get; set; } = new()
+        {
+            { RoomType.Lcz330, new SpawnData(new Vector3(-5.84f, 0.13f, 3.014f), new Vector3(0, -90, 0)) },
+            { RoomType.LczGlassBox, new SpawnData(new Vector3(4.503f, 0.13f, 4.947f), new Vector3(0, -90, 0)) },
+            { RoomType.LczAirlock, new SpawnData(new Vector3(0f, 0.13f, 1f), new Vector3(0, -90, 0)) },
+            { RoomType.LczCafe, new SpawnData(new Vector3(-5.878f, 0.13f, 4.542f), new Vector3(0, -90, 0)) },
+            { RoomType.LczClassDSpawn, new SpawnData(new Vector3(-24.711f, 0.13f, 0f), new Vector3(0, -180f, 0)) },
+            { RoomType.LczCrossing, new SpawnData(new Vector3(2.343f, 0.13f, -2.31f), new Vector3(0, 45, 0)) },
+            { RoomType.LczPlants, new SpawnData(new Vector3(0f, 0.13f, 1.474f), new Vector3(0, -90f, 0)) },
+            { RoomType.LczStraight, new SpawnData(new Vector3(0f, 0.13f, -1.144f), new Vector3(0, 90f, 0)) },
+            { RoomType.LczTCross, new SpawnData(new Vector3(1.158f, 0.13f, 0f), new Vector3(0, 0f, 0)) },
+            { RoomType.Hcz096, new SpawnData(new Vector3(-1.781f, 0.13f, 1.285f), new Vector3(0, -90f, 0)) },
+            { RoomType.Hcz127, new SpawnData(new Vector3(-3.769f, 0.13f, -5.085f), new Vector3(0, 135f, 0)) },
+            { RoomType.HczIntersectionJunk, new SpawnData(new Vector3(-1.614f, 0.13f, 0f), new Vector3(0, -180f, 0)) },
+            { RoomType.HczHid, new SpawnData(new Vector3(2.247f, 0.13f, -1.868f), new Vector3(0, 90f, 0)) },
+            { RoomType.HczStraightPipeRoom, new SpawnData(new Vector3(-6.326f, 5.204f, 5.375f), new Vector3(0, 180f, 0)) },
+            { RoomType.HczArmory, new SpawnData(new Vector3(2.065f, 0.13f, 5.214f), new Vector3(0, 0f, 0)) },
+        };
+
+        public Dictionary<RoomType, SpawnData> VendingMachineSpawnPoints { get; set; } = new()
+        {
+            { RoomType.LczGlassBox, new SpawnData(new Vector3(8.842f, 0.332f, -2.923f), new Vector3(0, 0, 0)) },
+            { RoomType.LczCafe, new SpawnData(new Vector3(-4.339f, 0.332f, -4.614f), new Vector3(0, 90, 0)) },
+            { RoomType.Lcz914, new SpawnData(new Vector3(0f, 0.332f, 6.879f), new Vector3(0, -90, 0)) },
+            { RoomType.HczHid, new SpawnData(new Vector3(1.037f, 0.332f, 4.992f), new Vector3(0, -90f, 0)) },
+            { RoomType.HczArmory, new SpawnData(new Vector3(2.11f, 0.332f, -5.15f), new Vector3(0, 0f, 0)) },
+        };
+
+        public Dictionary<RoomType, SpawnData> CoinSpawnPoints { get; set; } = new()
+        {
+            { RoomType.LczAirlock, new SpawnData(new Vector3(2.855f, 0.0178f, -4.25f), new Vector3(0, 0, 0)) },
+            { RoomType.Lcz173, new SpawnData(new Vector3(12.099f, 11.479f, 3.962f), new Vector3(0, 0, 0)) },
+            { RoomType.LczArmory, new SpawnData(new Vector3(0.2342f, 0.524f, 2.0502f), new Vector3(0, 0, 0)) },
+            { RoomType.HczHid, new SpawnData(new Vector3(-6.05f, 4.4983f, -4.744f), new Vector3(0, 0, 0)) },
+            { RoomType.HczNuke, new SpawnData(new Vector3(1.288f, -72.417f, -0.423f), new Vector3(0, 0, 0)) },
+        };
+
         public List<Gasmask> gasmask { get; set; } = new()
         {
             new Gasmask()
