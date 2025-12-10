@@ -23,7 +23,6 @@ namespace GockelsAIO_exiled
         public bool EnableFortunaFizz {  get; set; } = true;
         public bool EnableMysteryBox { get; set; } = true;
         public bool EnableHiddenCoins { get; set; } = false;
-        public bool EnableCeilingTrap { get; set; } = false;
         public bool EnableRandomGuardSpawn { get; set; } = false;
         public bool Enable914Teleport { get; set; } = false;
         public bool EnableCreditCardDrop { get; set; } = false;
@@ -70,7 +69,6 @@ namespace GockelsAIO_exiled
             { RoomType.LczPlants, new SpawnData(new Vector3(0f, 0.13f, 1.474f), new Vector3(0, -90f, 0)) },
             { RoomType.LczStraight, new SpawnData(new Vector3(0f, 0.13f, -1.144f), new Vector3(0, 90f, 0)) },
             { RoomType.LczTCross, new SpawnData(new Vector3(1.158f, 0.13f, 0f), new Vector3(0, 0f, 0)) },
-            { RoomType.Hcz096, new SpawnData(new Vector3(-1.781f, 0.13f, 1.285f), new Vector3(0, -90f, 0)) },
             { RoomType.Hcz127, new SpawnData(new Vector3(-3.769f, 0.13f, -5.085f), new Vector3(0, 135f, 0)) },
             { RoomType.HczIntersectionJunk, new SpawnData(new Vector3(-1.614f, 0.13f, 0f), new Vector3(0, -180f, 0)) },
             { RoomType.HczHid, new SpawnData(new Vector3(2.247f, 0.13f, -1.868f), new Vector3(0, 90f, 0)) },

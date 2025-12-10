@@ -12,67 +12,103 @@ using System.Text;
 
 namespace GockelsAIO_exiled.Patches
 {
-    public class PickupPatches
+    /// <summary>
+    /// Harmony patches for pickup and hint system customizations.
+    /// </summary>
+    public static class PickupPatches
     {
+        private const int HINT_WIDTH_PIXELS = 3000;
+        private const float HINT_POSITION = 300f;
+        private const int MAX_LINE_LENGTH = 80;
+        private const string HINT_TAG = "test";
+
+        #region Pickup Physics Patch
+
+        /// <summary>
+        /// Patches pickup freeze synchronization to respect kinematic state.
+        /// </summary>
         [HarmonyPatch(typeof(PickupStandardPhysics), nameof(PickupStandardPhysics.ServerSendFreeze), MethodType.Getter)]
         internal static class PickupIsKinematicSyncPatch
         {
             [UsedImplicitly]
-            static void Postfix(PickupStandardPhysics __instance, ref bool __result)
+            private static void Postfix(PickupStandardPhysics __instance, ref bool __result)
             {
                 __result = __result || __instance.Rb.isKinematic;
             }
         }
 
+        #endregion
+
+        #region Custom Hint Framework Patch
+
+        /// <summary>
+        /// Intercepts and customizes hint display using RueI framework.
+        /// </summary>
         [HarmonyPatch(typeof(HintDisplay), nameof(HintDisplay.Show))]
         [HarmonyPriority(Priority.First)]
         internal static class CustomHintFrameworkPatch
         {
+            [UsedImplicitly]
             private static bool Prefix(HintDisplay __instance, Hints.Hint hint)
             {
-                if (__instance?.gameObject == null)
+                if (!TryGetPlayerFromHintDisplay(__instance, out var player))
                     return true;
 
-                Player player = Player.Get(__instance.gameObject);
-                if (player == null)
+                if (hint is not TextHint textHint)
                     return true;
 
-                if (hint is TextHint textHint)
-                {
-                    StringBuilder sb = StringBuilderPool.Pool.Get();
+                DisplayCustomHint(player, textHint);
+                return false; // Skip original method
+            }
 
-                    try
-                    {
-                        sb.SetWidth(3000, MeasurementUnit.Pixels);
-                        sb.SetAlignment(RueI.Utils.Enums.AlignStyle.Center);
+            private static bool TryGetPlayerFromHintDisplay(HintDisplay hintDisplay, out Player player)
+            {
+                player = null;
 
-                        // Add word wrapping before appending  
-                        string wrappedText = WrapText(textHint.Text, maxLineLength: 80);
-                        sb.Append("\n" + wrappedText + "\n");
-
-                        string content = sb.ToString();
-                        float duration = textHint.DurationScalar;
-
-                        RueDisplay display = RueDisplay.Get(player);
-                        display.Remove(new Tag("test"));
-
-                        BasicElement be = new BasicElement(300, content)
-                        {
-                            ResolutionBasedAlign = true,
-                            VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Up,
-                        };
-
-                        display.Show(new Tag("test"), be, duration);
-                    }
-                    finally
-                    {
-                        StringBuilderPool.Pool.Return(sb);
-                    }
-
+                if (hintDisplay?.gameObject == null)
                     return false;
-                }
 
-                return true;
+                player = Player.Get(hintDisplay.gameObject);
+                return player != null;
+            }
+
+            private static void DisplayCustomHint(Player player, TextHint textHint)
+            {
+                var sb = StringBuilderPool.Pool.Get();
+                try
+                {
+                    var content = BuildHintContent(sb, textHint.Text);
+                    ShowHintToPlayer(player, content, textHint.DurationScalar);
+                }
+                finally
+                {
+                    StringBuilderPool.Pool.Return(sb);
+                }
+            }
+
+            private static string BuildHintContent(StringBuilder sb, string text)
+            {
+                sb.SetWidth(HINT_WIDTH_PIXELS, MeasurementUnit.Pixels);
+                sb.SetAlignment(AlignStyle.Center);
+
+                var wrappedText = WrapText(text, MAX_LINE_LENGTH);
+                sb.Append($"\n{wrappedText}\n");
+
+                return sb.ToString();
+            }
+
+            private static void ShowHintToPlayer(Player player, string content, float duration)
+            {
+                var display = RueDisplay.Get(player);
+                display.Remove(new Tag(HINT_TAG));
+
+                var element = new BasicElement(HINT_POSITION, content)
+                {
+                    ResolutionBasedAlign = true,
+                    VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Up,
+                };
+
+                display.Show(new Tag(HINT_TAG), element, duration);
             }
 
             private static string WrapText(string text, int maxLineLength)
@@ -80,12 +116,16 @@ namespace GockelsAIO_exiled.Patches
                 if (string.IsNullOrEmpty(text) || text.Length <= maxLineLength)
                     return text;
 
-                StringBuilder result = new StringBuilder();
-                int currentLineLength = 0;
+                var result = new StringBuilder(text.Length + (text.Length / maxLineLength) * 2);
+                var words = text.Split(' ');
+                var currentLineLength = 0;
 
-                foreach (string word in text.Split(' '))
+                foreach (var word in words)
                 {
-                    if (currentLineLength + word.Length + 1 > maxLineLength)
+                    var wordLength = word.Length;
+                    
+                    // Check if adding this word would exceed max length
+                    if (currentLineLength > 0 && currentLineLength + wordLength + 1 > maxLineLength)
                     {
                         result.Append('\n');
                         currentLineLength = 0;
@@ -97,11 +137,13 @@ namespace GockelsAIO_exiled.Patches
                     }
 
                     result.Append(word);
-                    currentLineLength += word.Length;
+                    currentLineLength += wordLength;
                 }
 
                 return result.ToString();
             }
         }
+
+        #endregion
     }
 }

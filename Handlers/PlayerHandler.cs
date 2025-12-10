@@ -1,16 +1,12 @@
 ﻿using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Items;
-using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp914;
 using GockelsAIO_exiled.Features;
 using GockelsAIO_exiled.Items.Keycards;
 using MEC;
 using PlayerRoles;
-using PlayerRoles.Voice;
 using RueI.API;
 using RueI.API.Elements;
 using RueI.Utils;
@@ -18,329 +14,207 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Exiled.API.Features.Pickups;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Handlers
 {
     public class PlayerHandler
     {
-        public static Dictionary<Player, int> PlayerPoints = new();
+        private const float GOD_MODE_DURATION = 1f;
+        private const float TELEPORT_DELAY = 0.15f;
+        private const float ROUGH_914_DAMAGE_MULTIPLIER = 0.5f;
+        private const float ROUGH_914_TRIGGER_CHANCE = 0.9f;
 
+        private static readonly HashSet<RoomType> ForbiddenScpRoomTypes = new()
+        {
+            RoomType.HczHid,
+            RoomType.HczTestRoom,
+            RoomType.EzCollapsedTunnel,
+            RoomType.EzGateA,
+            RoomType.EzGateB,
+            RoomType.Lcz173,
+            RoomType.HczTesla,
+            RoomType.EzShelter,
+            RoomType.Pocket,
+            RoomType.HczCrossRoomWater,
+            RoomType.Hcz096,
+            RoomType.HczIncineratorWayside,
+        };
+        
+        public static Dictionary<Player, int> PlayerPoints = new();
+        
+        #region Spawn & Display
+        
         public void SpawnSetPoints(SpawnedEventArgs ev)
         {
-            Timing.CallDelayed(1, () =>
-            {
-                if (ev.Player.Role.Team == Team.ClassD ||
-                ev.Player.Role.Team == Team.FoundationForces ||
-                ev.Player.Role.Team == Team.ChaosInsurgency ||
-                ev.Player.Role.Team == Team.Scientists)
-                {
-                    RueDisplay display = RueDisplay.Get(ev.Player);
-
-                    DynamicElement de = new DynamicElement(position: 500f, _ => GetContent(ev.Player))
-                    {
-                        UpdateInterval = TimeSpan.FromSeconds(1),
-                        VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Center,
-                        ResolutionBasedAlign = true,
-                        ZIndex = 100,
-                    };
-
-                    display.Show(new Tag(), de);
-                }
-            });
+            Timing.CallDelayed(1f, () => InitializePlayerDisplay(ev.Player));
         }
 
-        public void OnDeathRemovePoints(DyingEventArgs ev)
+        private void InitializePlayerDisplay(Player player)
         {
-            if (ev.Player == null)
+            if (!IsEligibleForPointSystem(player))
                 return;
 
-            if (PlayerPoints.ContainsKey(ev.Player))
-            {
-                PlayerPoints.Remove(ev.Player);
-                Log.Debug($"[PointSystem] {ev.Player.Nickname} has been removed from the point system. Reason: Death");
-            }
+            var display = RueDisplay.Get(player);
+            var element = CreatePointDisplayElement(player);
+            display.Show(new Tag(), element);
         }
-
-        public void OnChangingRolePoints(ChangingRoleEventArgs ev)
+        
+        private static bool IsEligibleForPointSystem(Player player)
         {
-            if (ev.Player == null)
-                return;
-
-            if (ev.NewRole == RoleTypeId.Spectator)
+            return player.Role.Team switch
             {
-                if (ev.Reason != SpawnReason.Died && ev.Reason != SpawnReason.Destroyed && ev.Reason != SpawnReason.ForceClass)
-                {
-                    if (PlayerPoints.ContainsKey(ev.Player))
-                    {
-                        PlayerPoints.Remove(ev.Player);
-                        Log.Debug($"[PointSystem] {ev.Player.Nickname} removed from point system. Reason: Set to Spectator (non-death) {ev.Reason.ToString()}");
-                    }
-                }
-                return;
-            }
-
-            // Entfernen, wenn Spieler zu totem Zustand wechselt
-            if (ev.NewRole == RoleTypeId.Overwatch ||
-                ev.NewRole == RoleTypeId.Destroyed ||
-                ev.NewRole == RoleTypeId.None ||
-                ev.NewRole == RoleTypeId.Filmmaker ||
-                ev.NewRole == RoleTypeId.Tutorial)
-            {
-                if (PlayerPoints.ContainsKey(ev.Player))
-                {
-                    PlayerPoints.Remove(ev.Player);
-                    Log.Debug($"[PointSystem] {ev.Player.Nickname} has been removed from the point system. Reason: Invalid Role");
-                }
-
-                return;
-            }
-
-            // Nur hinzufügen, wenn Team gültig ist
-            var team = Exiled.API.Extensions.RoleExtensions.GetTeam(ev.NewRole);
-            if (team == Team.FoundationForces ||
-                team == Team.ChaosInsurgency ||
-                team == Team.Scientists ||
-                team == Team.ClassD)
-            {
-                if (!PlayerPoints.ContainsKey(ev.Player))
-                {
-                    PlayerPoints[ev.Player] = LilinsAdditions.Instance.Config.StartingPoints;
-                    Log.Debug($"[PointSystem] {ev.Player.Nickname} was added with 400 Points.");
-                }
-            }
+                Team.ClassD or Team.FoundationForces or Team.ChaosInsurgency or Team.Scientists => true,
+                _ => false
+            };
         }
-
+        
+        private static DynamicElement CreatePointDisplayElement(Player player)
+        {
+            return new DynamicElement(position: 500f, _ => GetContent(player))
+            {
+                UpdateInterval = TimeSpan.FromSeconds(1),
+                VerticalAlign = RueI.API.Elements.Enums.VerticalAlign.Center,
+                ResolutionBasedAlign = true,
+                ZIndex = 100,
+            };
+        }
+        
+        #endregion
+        
+        #region Point System Events
+        
         public void OnKillGivePoints(DyingEventArgs ev)
         {
-            if (ev.Attacker == null || ev.Player == null || ev.Attacker == ev.Player)
+            if (!IsValidKill(ev.Attacker, ev.Player))
                 return;
 
-            Player killer = ev.Attacker;
-            Player victim = ev.Player;
+            var killer = ev.Attacker;
+            var victim = ev.Player;
 
-            var killerTeam = killer.Role.Team;
-            var victimTeam = victim.Role.Team;
-
-            bool isEnemy = false;
-
-            // Gegenseitige Feindlogik
-            switch (killerTeam)
+            if (AreEnemies(killer.Role.Team, victim.Role.Team) && PlayerPoints.ContainsKey(killer))
             {
-                case Team.ClassD:
-                    isEnemy = victimTeam == Team.FoundationForces || victimTeam == Team.Scientists || victimTeam == Team.SCPs;
-                    break;
-                case Team.FoundationForces:
-                    isEnemy = victimTeam == Team.ClassD || victimTeam == Team.ChaosInsurgency || victimTeam == Team.SCPs;
-                    break;
-                case Team.ChaosInsurgency:
-                    isEnemy = victimTeam == Team.FoundationForces || victimTeam == Team.Scientists || victimTeam == Team.SCPs;
-                    break;
-                case Team.Scientists:
-                    isEnemy = victimTeam == Team.ClassD || victimTeam == Team.ChaosInsurgency || victimTeam == Team.SCPs;
-                    break;
-            }
-
-            if (isEnemy && PlayerPoints.ContainsKey(killer))
-            {
-                PointSystem.AddPoints(killer, LilinsAdditions.Instance.Config.PointsForKillingEnemy); // z. B. 200 Punkte für Kills
-                Log.Debug($"[PointSystem] {killer.Nickname} has killed an enemy ({victim.Nickname}) and received {LilinsAdditions.Instance.Config.PointsForKillingEnemy} points.");
+                var pointsToAdd = LilinsAdditions.Instance.Config.PointsForKillingEnemy;
+                PointSystem.AddPoints(killer, pointsToAdd);
+                
+                Log.Debug($"[PointSystem] {killer.Nickname} killed {victim.Nickname} and received {pointsToAdd} points.");
             }
         }
 
+        private static bool IsValidKill(Player attacker, Player victim)
+        {
+            return attacker != null && victim != null && attacker != victim;
+        }
+
+        private static bool AreEnemies(Team attackerTeam, Team victimTeam)
+        {
+            return attackerTeam switch
+            {
+                Team.ClassD => victimTeam is Team.FoundationForces or Team.Scientists or Team.SCPs,
+                Team.FoundationForces => victimTeam is Team.ClassD or Team.ChaosInsurgency or Team.SCPs,
+                Team.ChaosInsurgency => victimTeam is Team.FoundationForces or Team.Scientists or Team.SCPs,
+                Team.Scientists => victimTeam is Team.ClassD or Team.ChaosInsurgency or Team.SCPs,
+                _ => false
+            };
+        }
+        
         public void OnLeft(LeftEventArgs ev)
         {
-            if (PlayerPoints.ContainsKey(ev.Player))
+            RemovePlayerFromPointSystem(ev.Player, "Player left");
+        }
+        
+        private static void RemovePlayerFromPointSystem(Player player, string reason)
+        {
+            if (PlayerPoints.Remove(player))
             {
-                PlayerPoints.Remove(ev.Player);
-                Log.Debug($"Player {ev.Player.Nickname} was removed from the dictionary.");
+                Log.Debug($"[PointSystem] {player.Nickname} removed. Reason: {reason}");
             }
         }
-
+        
+        #endregion
+        
+        #region SCP Anti-Suicide
+        
         public void OnSCPVoidJump(HurtingEventArgs ev)
         {
-            if (!LilinsAdditions.Instance.Config.EnableAntiSCPSuicide) return;
+            if (!ShouldPreventScpSuicide(ev))
+                return;
 
-            if (ev.Player == null) return;
-
-            if (ev.Player.Role.Team == Team.SCPs)
+            var safeRoom = GetRandomSafeHeavyRoom();
+            if (safeRoom == null)
             {
-                if (ev.DamageHandler.Type == DamageType.Crushed)
-                {
-                    List<RoomType> forbiddenRoomTypes = new List<RoomType>
-                    {
-                        RoomType.HczHid,
-                        RoomType.HczTestRoom,
-                        RoomType.EzCollapsedTunnel,
-                        RoomType.EzGateA,
-                        RoomType.EzGateB,
-                        RoomType.Lcz173,
-                        RoomType.HczTesla,
-                        RoomType.EzShelter,
-                        RoomType.Pocket,
-                        RoomType.HczCrossRoomWater,
-                        RoomType.Hcz096,
-                        RoomType.HczIncineratorWayside,
-                    };
-
-                    Room[] allRooms = Room.List
-                        .Where(r => !forbiddenRoomTypes.Contains(r.Type) && r.Zone == ZoneType.HeavyContainment)
-                        .ToArray();
-
-                    Room randomRoom = allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
-                    while (forbiddenRoomTypes.Contains(randomRoom.Type) || randomRoom.Zone != ZoneType.HeavyContainment)
-                    {
-                        randomRoom = allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
-                    }
-
-                    ev.IsAllowed = false;
-                    ev.Player.Teleport(randomRoom);
-                    ev.Player.IsGodModeEnabled = true;
-                    Timing.CallDelayed(1f, () =>
-                    {
-                        ev.Player.IsGodModeEnabled = false;
-                    });
-                }
+                Log.Warn("[AntiSCPSuicide] No sfe room found!");
+                return;
             }
-        }
 
+            ev.IsAllowed = false;
+            TeleportScpToSafeRoom(ev.Player, safeRoom);
+        }
+        
+        private static Room GetRandomSafeHeavyRoom()
+        {
+            var safeRooms = Room.List
+                .Where(r => r.Zone == ZoneType.HeavyContainment && !ForbiddenScpRoomTypes.Contains(r.Type))
+                .ToArray();
+
+            return safeRooms.Length > 0 
+                ? safeRooms[UnityEngine.Random.Range(0, safeRooms.Length)] 
+                : null;
+        }
+        
+        private static bool ShouldPreventScpSuicide(HurtingEventArgs ev)
+        {
+            return LilinsAdditions.Instance.Config.EnableAntiSCPSuicide
+                   && ev.Player != null
+                   && ev.Player.Role.Team == Team.SCPs
+                   && ev.DamageHandler.Type == DamageType.Crushed;
+        }
+        
+        private static void TeleportScpToSafeRoom(Player player, Room room)
+        {
+            player.Teleport(room);
+            player.IsGodModeEnabled = true;
+        
+            Timing.CallDelayed(GOD_MODE_DURATION, () => player.IsGodModeEnabled = false);
+        }
+        
+        #endregion
+        
+        #region SCP-914 Events
+        
         public void OnPlayerIn914(UpgradingPlayerEventArgs ev)
         {
-            if (LilinsAdditions.Instance.Config.Enable914Teleport)
-            {
-                if (ev.KnobSetting == Scp914.Scp914KnobSetting.Rough)
-                {
-                    if (UnityEngine.Random.value <= 0.9f)
-                    {
-                        float damage = ev.Player.Health / 2f;
-                        ev.Player.Hurt(damage);
-
-                        var randomRoom = Room.Random(ZoneType.LightContainment);
-                        Log.Debug(randomRoom);
-                        if (randomRoom != null)
-                        {
-                            Log.Debug(randomRoom.Name);
-                            Timing.CallDelayed(0.15f, () =>
-                            {
-                                ev.Player.Teleport(randomRoom.Position + UnityEngine.Vector3.up);
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        public void OnCraftingTrackingAccess(Exiled.Events.EventArgs.Scp914.UpgradingPickupEventArgs ev)
-        {
-            if (ev.KnobSetting != Scp914.Scp914KnobSetting.Fine) return;
-
-            if (ev.Pickup.Type == ItemType.KeycardO5)
-            {
-                ev.IsAllowed = false;
-
-                var customOutput = CustomItem.TrySpawn(4444, ev.OutputPosition, out Pickup customPickuop);
-                ev.Pickup.Destroy();
-            }
-        }
-
-        private bool _isRunning = false; // debounce flag
-
-        public void OnUsingIntercomWithCard(IntercomSpeakingEventArgs args)
-        {
-            if (_isRunning) // if already running, ignore new activations
-            {
-                args.IsAllowed = false;
-                return;
-            }
-
-            if (args.Player.CurrentItem == null)
+            if (!LilinsAdditions.Instance.Config.Enable914Teleport)
                 return;
 
-            if (CustomItem.TryGet(args.Player.CurrentItem, out CustomItem customItem))
+            if (ev.KnobSetting == Scp914.Scp914KnobSetting.Rough && 
+                UnityEngine.Random.value <= ROUGH_914_TRIGGER_CHANCE)
             {
-                if (customItem is CustomKeycard customKeycard)
-                {
-                    if (customKeycard.Id == 4444)
-                    {
-                        args.IsAllowed = false;
-                        _isRunning = true; // lock sequence
-
-                        int totalSteps = 5;
-                        float duration = 10f;
-                        float stepTime = duration / totalSteps;
-
-                        // Progress bar display
-                        for (int i = 1; i <= totalSteps; i++)
-                        {
-                            int progress = i;
-                            Timing.CallDelayed(progress * stepTime, () =>
-                            {
-                                StringBuilder sb = new StringBuilder();
-                                sb.Append("Loading...\n");
-                                sb.Append('[');
-                                sb.Append(new string('█', progress));
-                                sb.Append(new string('-', totalSteps - progress));
-                                sb.Append(']');
-
-                                IntercomDisplay._singleton.Network_overrideText = sb.ToString();
-                            });
-                        }
-
-                        // After progress finishes
-                        Timing.CallDelayed(duration + 0.5f, () =>
-                        {
-                            Player executor = args.Player;
-                            string message;
-
-                            // Check if this player has a selected target
-                            if (Storage.SelectedPlayers.TryGetValue(executor, out Player selected) && selected.IsAlive)
-                            {
-                                string zone = selected.Zone.ToString();
-                                string room = selected.CurrentRoom?.Name ?? "Unknown Room";
-
-                                message = $"{selected.Nickname} detected\nZone: {zone}\nRoom: {room}";
-
-                                // Play tracking sound ONCE
-                                var audioPlayer = AudioPlayer.CreateOrGet(
-                                    $"TrackingSound_{UnityEngine.Random.Range(1, 10000)}",
-                                    onIntialCreation: p =>
-                                    {
-                                        var speaker = p.AddSpeaker(
-                                            $"Main_{UnityEngine.Random.Range(1, 10000)}",
-                                            isSpatial: true,
-                                            minDistance: 20f,
-                                            maxDistance: 30f);
-                                        speaker.transform.SetParent(selected.Transform, false);
-                                    });
-
-                                audioPlayer.AddClip("trackingsound", loop: false, volume: 1.25f, destroyOnEnd: true);
-                                Timing.CallDelayed(2.5f, () =>
-                                {
-                                    selected.EnableEffect(EffectType.Blurred, 1, 2);
-                                    selected.EnableEffect(EffectType.Flashed, 1, 1);
-
-                                    selected.ShowHint("You're being tracked.", 5f);
-                                });
-                            }
-                            else
-                            {
-                                message = "No player selected.";
-                            }
-
-                            IntercomDisplay._singleton.Network_overrideText = message;
-
-                            // Reset intercom text and unlock debounce after 5 seconds
-                            Timing.CallDelayed(5f, () =>
-                            {
-                                IntercomDisplay._singleton.Network_overrideText = null;
-                                _isRunning = false; // unlock for next use
-                            });
-                        });
-                    }
-                }
+                HandleRough914Teleport(ev.Player);
             }
         }
 
+        private static void HandleRough914Teleport(Player player)
+        {
+            player.Hurt(player.Health * ROUGH_914_DAMAGE_MULTIPLIER);
+
+            var targetRoom = Room.Random(ZoneType.LightContainment);
+            if (targetRoom == null)
+            {
+                Log.Warn("[914Teleport] No LCZ room found for teleportation!");
+                return;
+            }
+            
+            Log.Debug($"[914Teleport] Teleporting {player.Nickname} to {targetRoom.Name}");
+            Timing.CallDelayed(TELEPORT_DELAY, () => 
+                player.Teleport(targetRoom.Position + UnityEngine.Vector3.up));
+        }
+        
+        #endregion
+        
+        #region Credit Card System
+        
         public void DropCreditOnDeath(DyingEventArgs ev)
         {
             if (LilinsAdditions.Instance.Config.EnableCreditCardDrop)
@@ -348,80 +222,95 @@ namespace GockelsAIO_exiled.Handlers
                 PointSystem.SpawnCreditCard(ev.Player, ev.Attacker);
             }
         }
-
+        
         public void OnPickingUpCreditCard(PickingUpItemEventArgs ev)
         {
-            // Check if this pickup is a CreditCard  
-            if (CustomItem.TryGet(ev.Pickup, out CustomItem? customItem) &&
-                customItem.GetType() == typeof(CreditCard))
-            {
-                ev.IsAllowed = false;
-                string key = $"CreditCard_Points_{ev.Pickup.Serial}";
+            if (!TryGetCreditCard(ev.Pickup, out var points))
+                return;
+            
+            ev.IsAllowed = false;
+            ev.Pickup.Destroy();
+            
+            PointSystem.AddPoints(ev.Player, points);
+            CleanupCreditCardData(ev.Pickup.Serial);
+        }
+        
+        private static bool TryGetCreditCard(Pickup pickup, out int points)
+        {
+            points = 0;
 
-                ev.Pickup.Destroy();
+            if (!CustomItem.TryGet(pickup, out var customItem) || 
+                customItem.GetType() != typeof(CreditCard))
+                return false;
 
-                if (Server.SessionVariables.TryGetValue(key, out object pointsObj) &&
-                    pointsObj is int points)
-                {
-                    // Award the points to the player  
-                    PointSystem.AddPoints(ev.Player, points);
+            var key = $"CreditCard_Points_{pickup.Serial}";
+            if (!Server.SessionVariables.TryGetValue(key, out var pointsObj) || 
+                pointsObj is not int extractedPoints)
+                return false;
 
-                    // Clean up the session variable  
-                    Server.SessionVariables.Remove(key);
-                }
-            }
+            points = extractedPoints;
+            return true;
         }
 
+        private static void CleanupCreditCardData(ushort serial)
+        {
+            Server.SessionVariables.Remove($"CreditCard_Points_{serial}");
+        }
+        
+        #endregion
+        
+        #region Coroutines
+        
         public static IEnumerator<float> AddPointsOverTime()
         {
             Log.Debug("[AddPointsOverTime] Coroutine started.");
 
             while (true)
             {
+                var config = LilinsAdditions.Instance.Config;
+            
                 foreach (var kvp in PlayerPoints.ToList())
                 {
-                    Player player = kvp.Key;
-
-                    if (player != null && player.IsAlive)
+                    var player = kvp.Key;
+                
+                    if (player?.IsAlive == true)
                     {
-                        PlayerPoints[player] += LilinsAdditions.Instance.Config.PointsOverTime;
-                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +{LilinsAdditions.Instance.Config.PointsOverTime} Points => {PlayerPoints[player]}");
-                    }
-                    else
-                    {
-                        Log.Debug($"[AddPointsOverTime] {player?.Nickname ?? "???"} is not alive or null.");
+                        PlayerPoints[player] += config.PointsOverTime;
+                        Log.Debug($"[AddPointsOverTime] {player.Nickname} +{config.PointsOverTime} => {PlayerPoints[player]}");
                     }
                 }
 
-                yield return Timing.WaitForSeconds(LilinsAdditions.Instance.Config.PointsOverTimeDelay);
+                yield return Timing.WaitForSeconds(config.PointsOverTimeDelay);
             }
         }
+        
+        #endregion
 
+        #region Utility
+        
         public static void TeleportPlayerToRoom(Player player, Room room, Vector3 localPos, Vector3 localRot)
         {
-            // Lokale Position in globale Weltposition umwandeln
-            Vector3 globalPosition = room.transform.localToWorldMatrix * new Vector4(localPos.x, localPos.y, localPos.z, 1);
-            Quaternion globalRotation = room.transform.rotation * Quaternion.Euler(localRot);
+            var transform = room.transform;
+            var globalPosition = transform.localToWorldMatrix * new Vector4(localPos.x, localPos.y, localPos.z, 1);
+            var globalRotation = transform.rotation * Quaternion.Euler(localRot);
 
-            // Spieler teleportieren
             player.Position = globalPosition;
             player.Rotation = globalRotation;
         }
 
         public static string GetContent(Player player)
         {
-            StringBuilder sb = new();
+            var sb = new StringBuilder();
             sb.SetAlignment(RueI.Utils.Enums.AlignStyle.Left);
 
-            if (!PlayerPoints.ContainsKey(player))
-            {
-                sb.Append($"💰: -");
-                return sb.ToString();
-            }
+            var points = PlayerPoints.ContainsKey(player) 
+                ? PointSystem.GetPoints(player).ToString() 
+                : "-";
 
-            sb.Append($"💰: {PointSystem.GetPoints(player)}");
-
+            sb.Append($"💰: {points}");
             return sb.ToString();
         }
+        
+        #endregion
     }
 }

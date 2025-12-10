@@ -2,8 +2,8 @@
 using Exiled.CustomItems.API.Features;
 using GockelsAIO_exiled.Features;
 using ProjectMER.Features.Objects;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 
@@ -11,126 +11,153 @@ namespace GockelsAIO_exiled.Handlers
 {
     public class PMERHandler
     {
-        public static readonly List<SchematicObject> TrackedSchematics = new();
-        public static readonly List<SchematicObject> TrackedGobblegumMachines = new();
-        public static readonly List<SchematicObject> TrackedCoins = new();
-        public static readonly List<uint> GobblegumIDs = new()
+        private const string CHEST_OPEN_BLOCK_NAME = "ChestOpenTop";
+        private const string WEAPON_SPAWN_BLOCK_NAME = "WeaponSpawn";
+        private const string ANIMATION_TRIGGER = "StartAnim";
+        private const float AUDIO_MIN_DISTANCE = 1f;
+        private const float AUDIO_MAX_DISTANCE = 15f;
+        private const int BROADCAST_DURATION = 5;
+        
+        public static HashSet<SchematicObject> TrackedSchematics { get; } = new();
+        public static HashSet<SchematicObject> TrackedGobblegumMachines { get; } = new();
+        public static HashSet<SchematicObject> TrackedCoins { get; } = new();
+        
+        private static readonly uint[] GobblegumIDs = new uint[]
         {
-            800,
-            801,
-            802,
-            803,
-            805,
-            806,
-            807,
-            808,
-            809,
-            810,
-            811,
-            812,
-            813,
-            814,
-            815,
-            816,
+            800, 801, 802, 803, 805, 806, 807, 808,
+            809, 810, 811, 812, 813, 814, 815, 816
         };
-
+        
+        private Config CachedConfig => LilinsAdditions.Instance.Config;
+        
+        #region Mystery Box
+        
         public void OnButtonInteract(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
         {
-            var schematic = TrackedSchematics.FirstOrDefault(s => s == ev.Schematic);
-            if (schematic == null) return;
-
-            int playerPoints = PointSystem.GetPoints(ev.Player);
-            if (playerPoints < LilinsAdditions.Instance.Config.PointsForMysteryBox)
-            {
-                ev.Player.SendBroadcast(LilinsAdditions.Instance.Config.MysteryBoxMissingPointsText, 5);
+            if (!TrackedSchematics.Contains(ev.Schematic))
                 return;
-            }
-
-            PointSystem.RemovePoints(ev.Player, LilinsAdditions.Instance.Config.PointsForMysteryBox);
-            Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
-
+            
+            var config = CachedConfig;
+            if (!TryPurchase(ev.Player, CachedConfig.PointsForMysteryBox, config.MysteryBoxMissingPointsText))
+                return;
+            
+            Log.Debug($"[MysteryBox] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname}");
+            
+            ProcessMysteryBox(ev.Schematic, config);
+            TrackedSchematics.Remove(ev.Schematic);
+        }
+        
+        private void ProcessMysteryBox(SchematicObject schematic, Config config)
+        {
             foreach (var block in schematic.AttachedBlocks)
             {
                 switch (block.name)
                 {
-                    case "ChestOpenTop":
-                        block.gameObject.GetComponent<Animator>()?.SetTrigger("StartAnim");
+                    case CHEST_OPEN_BLOCK_NAME:
+                        TriggerChestAnimation(block);
                         break;
 
-                    case "WeaponSpawn":
-                        WeaponSelector.StartMysteryBox(block.transform.position);
-
-                        var go = block.gameObject;
-                        if (go != null)
-                        {
-                            var audioPlayer = AudioPlayer.CreateOrGet($"MysteryBoxSound{UnityEngine.Random.Range(1, 10000)}", onIntialCreation: p =>
-                            {
-                                var speaker = p.AddSpeaker($"Main{UnityEngine.Random.Range(1, 10000)}", isSpatial: true, minDistance: 1f, maxDistance: 15f);
-                                speaker.transform.SetParent(go.transform, false);
-                            });
-
-                            audioPlayer.AddClip("mysterybox", loop: false, volume: LilinsAdditions.Instance.Config.MysteryBoxMusicVolume, destroyOnEnd: true);
-                        }
+                    case WEAPON_SPAWN_BLOCK_NAME:
+                        SpawnWeaponWithAudio(block, config);
                         break;
                 }
             }
-
-            TrackedSchematics.Remove(schematic);
+        }
+        
+        private static void TriggerChestAnimation(GameObject block)
+        {
+            block.gameObject.GetComponent<Animator>()?.SetTrigger(ANIMATION_TRIGGER);
         }
 
-        public void OnButtonInteractGobblegum(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
+        private static void SpawnWeaponWithAudio(GameObject block, Config config)
         {
-            foreach (var schematic in TrackedGobblegumMachines.ToList())
-            {
-                if (schematic == ev.Schematic)
-                {
-                    if (PointSystem.GetPoints(ev.Player) >= LilinsAdditions.Instance.Config.PointsForVendingMachine)
-                    {
-                        PointSystem.RemovePoints(ev.Player, LilinsAdditions.Instance.Config.PointsForVendingMachine);
-                        Log.Debug($"[Debug] Button-Interaction from Schematic '{schematic.name}' detected.");
+            WeaponSelector.StartMysteryBox(block.transform.position);
 
-                        uint randomGobblegum = GobblegumIDs[UnityEngine.Random.Range(0, GobblegumIDs.Count())];
-
-                        CustomItem.TryGive(ev.Player, randomGobblegum);
-                    }
-                    else
-                    {
-                        ev.Player.SendBroadcast(LilinsAdditions.Instance.Config.VendingMachineMissingPointsText, 5);
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void OnButtonInteractCoin(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
-        {
-            foreach (var schematic in TrackedCoins.ToList())
-            {
-                if (schematic == ev.Schematic)
-                {
-                    PointSystem.AddPoints(ev.Player, LilinsAdditions.Instance.Config.PointsForCoin);
-                    TrackedCoins.Remove(schematic);
-                    schematic.Destroy();
-                }
-            }
-        }
-
-        public void OnSchematicSpawn(ProjectMER.Events.Arguments.SchematicSpawnedEventArgs ev)
-        {
-            if (ev.Schematic == null)
-            {
-                Log.Warn("[Debug] SchematicSpawned-Event delivered a NULL-schematic.");
+            var gameObject = block.gameObject;
+            if (gameObject == null)
                 return;
-            }
 
-            Player player = Player.Get(3);
-
-            ev.Schematic.transform.parent = player.Transform;
-
-            Vector3 relativeOffset = new Vector3(0f, -1f, 1f);
-            ev.Schematic.transform.localPosition = relativeOffset;
-            ev.Schematic.transform.localRotation = Quaternion.identity;
-
+            CreateMysteryBoxAudio(gameObject, config);
         }
+
+        private static void CreateMysteryBoxAudio(GameObject parent, Config config)
+        {
+            var randomId = UnityEngine.Random.Range(1, 10000);
+            var audioPlayer = AudioPlayer.CreateOrGet($"MysteryBoxSound{randomId}", onIntialCreation: player =>
+            {
+                var speaker = player.AddSpeaker(
+                    $"Main{UnityEngine.Random.Range(1, 10000)}", 
+                    isSpatial: true, 
+                    minDistance: AUDIO_MIN_DISTANCE, 
+                    maxDistance: AUDIO_MAX_DISTANCE
+                );
+                speaker.transform.SetParent(parent.transform, worldPositionStays: false);
+            });
+
+            audioPlayer.AddClip("mysterybox", loop: false, volume: config.MysteryBoxMusicVolume, destroyOnEnd: true);
+        }
+        
+        #endregion
+
+        #region Gobblegum Machine
+
+    public void OnButtonInteractGobblegum(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
+    {
+        // O(1) statt O(n) Lookup
+        if (!TrackedGobblegumMachines.Contains(ev.Schematic))
+            return;
+
+        var config = CachedConfig;
+        if (!TryPurchase(ev.Player, config.PointsForVendingMachine, config.VendingMachineMissingPointsText))
+            return;
+
+        Log.Debug($"[Gobblegum] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname}");
+        
+        GiveRandomGobblegum(ev.Player);
+    }
+
+    private static void GiveRandomGobblegum(Player player)
+    {
+        var randomIndex = UnityEngine.Random.Range(0, GobblegumIDs.Length);
+        CustomItem.TryGive(player, GobblegumIDs[randomIndex]);
+    }
+
+    #endregion
+
+    #region Coin Collection
+
+    public void OnButtonInteractCoin(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
+    {
+        // O(1) statt O(n) Lookup
+        if (!TrackedCoins.Contains(ev.Schematic))
+            return;
+
+        PointSystem.AddPoints(ev.Player, CachedConfig.PointsForCoin);
+        
+        TrackedCoins.Remove(ev.Schematic);
+        ev.Schematic.Destroy();
+
+        Log.Debug($"[Coin] Collected by {ev.Player.Nickname}");
+    }
+
+    #endregion
+    
+    #region Utility
+
+    private static bool TryPurchase(Player player, int cost, string insufficientPointsMessage)
+    {
+        var currentPoints = PointSystem.GetPoints(player);
+        
+        if (currentPoints < cost)
+        {
+            player.Broadcast(BROADCAST_DURATION, insufficientPointsMessage);
+            return false;
+        }
+
+        PointSystem.RemovePoints(player, cost);
+        return true;
+    }
+
+    #endregion
     }
 }

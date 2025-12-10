@@ -1,101 +1,147 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API;
 using Exiled.CustomRoles.API.Features;
 using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
 using MEC;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GockelsAIO_exiled
 {
     public class LilinsAdditions : Plugin<Config>
     {
+        // Plugin Metadata
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
         public override Version Version => new Version(0, 10);
-        public static LilinsAdditions Instance;
-        public PlayerHandler PlayerHandler;
-        public ServerHandler ServerHandler;
-        public PMERHandler PMERHandler;
-        public Harmony harmony = new Harmony("lilin.patches");
-        private CoroutineHandle pointSystemCheckCoroutine;
+        
+        // Singleton Instance
+        public static LilinsAdditions Instance { get; private set; }
+        
+        // Handlers
+        public PlayerHandler PlayerHandler { get; private set; }
+        public ServerHandler ServerHandler { get; private set; }
+        public PMERHandler PMERHandler { get; private set; }
+        
+        // Harmony and Coroutines
+        private Harmony _harmony;
+        private CoroutineHandle _pointSystemCheckCoroutine;
 
         public override void OnEnabled()
         {
             Instance = this;
-            LoadAudioClips();
-
-            PlayerHandler = new PlayerHandler();
-            ServerHandler = new ServerHandler();
-            PMERHandler = new PMERHandler();
-
-            RegisterMERHandlers();
-            RegisterPlayerHandlers();
-            RegisterServerHandlers();
-            WeaponSelector.WeightedCustomWeaponsWithConfig();
-
-            CustomWeapon.RegisterItems();
-
-            pointSystemCheckCoroutine = Timing.RunCoroutine(ServerHandler.PeriodicPointSystemCheck());
-            harmony.PatchAll();
+            
+            InitializeComponents();
+            LoadResources();
+            RegisterEventHandlers();
+            StartBackgroundTasks();
+            
             base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            UnregisterMERHandlers();
-            UnregisterPlayerHandlers();
-            UnregisterServerHandlers();
-
-            CustomWeapon.UnregisterItems();
-            CustomAbility.UnregisterAbilities();
-
-            Timing.KillCoroutines(pointSystemCheckCoroutine);
-            PlayerHandler = null;
-            ServerHandler = null;
-            PMERHandler = null;
+            StopBackgroundTasks();
+            UnregisterEventHandlers();
+            CleanupComponents();
 
             Instance = null;
-
-            harmony.UnpatchAll();        
 
             base.OnDisabled();
         }
 
-        public void LoadAudioClips()
+        #region Initialization
+
+        private void InitializeComponents()
         {
-            bool mysteryLoaded = AudioClipStorage.LoadClip(Instance.Config.MysteryBoxMusicPath, "mysterybox");
-            bool gobblegumLoaded = AudioClipStorage.LoadClip(Instance.Config.VendingMachineMusicPath, "gobblegum");
-            bool bombsoundLoaded = AudioClipStorage.LoadClip(Instance.Config.BurstSoundPath, "bombsound");
-            bool trackingLoaded = AudioClipStorage.LoadClip(Instance.Config.TrackingSoundPath, "trackingsound");
+            PlayerHandler = new PlayerHandler();
+            ServerHandler = new ServerHandler();
+            PMERHandler =  new PMERHandler();
+            _harmony = new Harmony("lilin.patches");
         }
 
-        public void RegisterMERHandlers()
+        private void LoadResources()
         {
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteract; // Mystery Box Button Handler
+            LoadAudioClips();
+            WeaponSelector.WeightedCustomWeaponsWithConfig();
+            CustomWeapon.RegisterItems();
+        }
+        
+        private static void LoadAudioClips()
+        {
+            AudioClipStorage.LoadClip(Instance.Config.MysteryBoxMusicPath, "mysterybox");
+            AudioClipStorage.LoadClip(Instance.Config.VendingMachineMusicPath, "gobblegum");
+            AudioClipStorage.LoadClip(Instance.Config.BurstSoundPath, "bombsound");
+            AudioClipStorage.LoadClip(Instance.Config.TrackingSoundPath, "trackingsound");
+        }
+
+        private void StartBackgroundTasks()
+        {
+            _pointSystemCheckCoroutine = Timing.RunCoroutine(ServerHandler.PeriodicPointSystemCheck());
+            _harmony.PatchAll();
+        }
+        
+        #endregion
+        
+        #region Cleanup
+
+        private void StopBackgroundTasks()
+        {
+            Timing.KillCoroutines(_pointSystemCheckCoroutine);
+            _harmony.UnpatchAll();
+        }
+        
+        private void CleanupComponents()
+        {
+            CustomWeapon.UnregisterItems();
+            CustomAbility.UnregisterAbilities();
+
+            PlayerHandler = null;
+            ServerHandler = null;
+            PMERHandler = null;
+        }
+        
+        #endregion
+        
+        #region Event Registration
+
+        private void RegisterEventHandlers()
+        {
+            RegisterMERHandlers();
+            RegisterServerHandlers();
+            RegisterPlayerHandlers();
+        }
+
+        private void UnregisterEventHandlers()
+        {
+            UnregisterMERHandlers();
+            UnregisterServerHandlers();
+            UnregisterPlayerHandlers();
+        }
+        
+        private void RegisterMERHandlers()
+        {
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteract;
             ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteractGobblegum;
             ProjectMER.Events.Handlers.Schematic.ButtonInteracted += PMERHandler.OnButtonInteractCoin;
         }
 
-        public void UnregisterMERHandlers()
+        private void UnregisterMERHandlers()
         {
-            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteract; // Mystery Box Button Handler
+            ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteract;
             ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteractGobblegum;
             ProjectMER.Events.Handlers.Schematic.ButtonInteracted -= PMERHandler.OnButtonInteractCoin;
         }
 
-        public void RegisterServerHandlers()
+        private void RegisterServerHandlers()
         {
-            Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnStart; // Used for spawning Mystery Boxes.
+            Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnStart;
             Exiled.Events.Handlers.Server.RoundStarted += ServerHandler.OnSpawningGuards;
             Exiled.Events.Handlers.Server.RoundEnded += ServerHandler.OnRoundEnd;
             Exiled.Events.Handlers.Map.Generated += ServerHandler.OnMapGeneration;
         }
 
-        public void UnregisterServerHandlers()
+        private void UnregisterServerHandlers()
         {
             Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnStart;
             Exiled.Events.Handlers.Server.RoundStarted -= ServerHandler.OnSpawningGuards;
@@ -103,32 +149,28 @@ namespace GockelsAIO_exiled
             Exiled.Events.Handlers.Map.Generated -= ServerHandler.OnMapGeneration;
         }
 
-        public void RegisterPlayerHandlers()
+        private void RegisterPlayerHandlers()
         {
-            Exiled.Events.Handlers.Player.Spawned += PlayerHandler.SpawnSetPoints; // Handler to give players points on spawn
-            Exiled.Events.Handlers.Player.Left += PlayerHandler.OnLeft; // Handler to remove the player from the points dict
-            //Exiled.Events.Handlers.Player.ChangingRole += PlayerHandler.OnChangingRolePoints;
+            Exiled.Events.Handlers.Player.Spawned += PlayerHandler.SpawnSetPoints;
+            Exiled.Events.Handlers.Player.Left += PlayerHandler.OnLeft;
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting += PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer += PlayerHandler.OnPlayerIn914;
             Exiled.Events.Handlers.Player.Dying += PlayerHandler.DropCreditOnDeath;
             Exiled.Events.Handlers.Player.PickingUpItem += PlayerHandler.OnPickingUpCreditCard;
-            //Exiled.Events.Handlers.Player.IntercomSpeaking += PlayerHandler.OnUsingIntercomWithCard;
-            //Exiled.Events.Handlers.Scp914.UpgradingPickup += PlayerHandler.OnCraftingTrackingAccess;
         }
 
-        public void UnregisterPlayerHandlers()
+        private void UnregisterPlayerHandlers()
         {
             Exiled.Events.Handlers.Player.Spawned -= PlayerHandler.SpawnSetPoints;
             Exiled.Events.Handlers.Player.Left -= PlayerHandler.OnLeft;
-            //Exiled.Events.Handlers.Player.ChangingRole -= PlayerHandler.OnChangingRolePoints;
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.OnKillGivePoints;
             Exiled.Events.Handlers.Player.Hurting -= PlayerHandler.OnSCPVoidJump;
             Exiled.Events.Handlers.Scp914.UpgradingPlayer -= PlayerHandler.OnPlayerIn914;
             Exiled.Events.Handlers.Player.Dying -= PlayerHandler.DropCreditOnDeath;
             Exiled.Events.Handlers.Player.PickingUpItem -= PlayerHandler.OnPickingUpCreditCard;
-            //Exiled.Events.Handlers.Player.IntercomSpeaking -= PlayerHandler.OnUsingIntercomWithCard;
-            //Exiled.Events.Handlers.Scp914.UpgradingPickup -= PlayerHandler.OnCraftingTrackingAccess;
         }
+        
+        #endregion
     }
 }

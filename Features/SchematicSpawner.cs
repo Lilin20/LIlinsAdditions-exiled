@@ -113,32 +113,6 @@ namespace GockelsAIO_exiled
             }
         }
 
-        public void SpawnTrapTest()
-        {
-            var room = Exiled.API.Features.Room.Get(RoomType.LczCrossing);
-
-            Vector3 yourLocalPositionInTheRoom = new Vector3(0, 0, 0);
-            Vector3 yourLocalRotationInTheRoom = new Vector3(0, 0, 0);
-
-            Vector3 globalPosition = room.transform.localToWorldMatrix * new Vector4(yourLocalPositionInTheRoom.x, yourLocalPositionInTheRoom.y, yourLocalPositionInTheRoom.z, 1);
-            Quaternion globalRotation = room.transform.rotation * Quaternion.Euler(yourLocalRotationInTheRoom);
-
-            ObjectSpawner.TrySpawnSchematic("Trap1", globalPosition, globalRotation, out var trapSchematic);
-
-            foreach (var block in trapSchematic.AttachedBlocks)
-            {
-                if (block.name == "TrapBase")
-                {
-                    GameObject trapBase = block.gameObject;
-
-                    BoxCollider collider = trapBase.AddComponent<BoxCollider>();
-                    collider.size = new Vector3(1f, 7f, 1f);
-                    collider.isTrigger = true;
-                    trapBase.AddComponent<DeathBox>();
-                }
-            }
-        }
-
         public void SpawnGobblegumMachines(int maxCount)
         {
             int spawned = 0;

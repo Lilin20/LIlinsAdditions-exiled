@@ -116,8 +116,6 @@
   <ItemGroup>
     <Compile Include="Commands\Points.cs" />
     <Compile Include="Commands\Selector.cs" />
-    <Compile Include="Components\AnimComponent .cs" />
-    <Compile Include="Components\DeathComponent.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Features\PointSystem.cs" />
     <Compile Include="Items\Keycards\CreditCard.cs" />
