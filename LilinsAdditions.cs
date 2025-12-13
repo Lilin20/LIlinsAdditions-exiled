@@ -5,6 +5,7 @@ using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
 using MEC;
 using System;
+using GockelsAIO_exiled.Items;
 
 namespace GockelsAIO_exiled
 {

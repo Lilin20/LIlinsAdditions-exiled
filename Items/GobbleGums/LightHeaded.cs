@@ -1,9 +1,7 @@
-﻿using Exiled.API.Enums;
+﻿using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
-using Exiled.API.Features.Items.FirearmModules.Primary;
 using Exiled.API.Features.Roles;
 using Exiled.API.Features.Spawn;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
@@ -11,48 +9,67 @@ using UnityEngine;
 namespace GockelsAIO_exiled.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
-    public class LightHeaded : CustomItem
+    public class LightHeaded : FortunaFizzItem
     {
+        private const float USE_DELAY = 2f;
+        private const float EFFECT_DURATION = 15f;
+        private const float REDUCED_GRAVITY_Y = -3.8f;
+
         public override uint Id { get; set; } = 815;
         public override string Name { get; set; } = "Light Headed";
         public override string Description { get; set; } = "Everything feels so light?";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
+        public LightHeaded()
+        {
+            Buyable = true;
+        }
+
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem += OnUsingLightHeaded;
+            Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem -= OnUsingLightHeaded;
+            Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
             base.UnsubscribeEvents();
         }
 
-        private void OnUsingLightHeaded(UsingItemEventArgs ev)
+        private void OnUsingItem(UsingItemEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem)) return;
+            if (!Check(ev.Player.CurrentItem))
+                return;
 
-            var normalGravity = new Vector3(0, 0, 0);
+            if (ev.Player.Role is not FpcRole fpcRole)
+                return;
 
-            if (ev.Player.Role is FpcRole fpc)
-            {
-                normalGravity = fpc.Gravity;
+            var originalGravity = fpcRole.Gravity;
+            Timing.CallDelayed(USE_DELAY, () => ApplyReducedGravity(ev, fpcRole, originalGravity));
+        }
 
-                Timing.CallDelayed(2f, () =>
-                {
-                    fpc.Gravity = new Vector3(0, -3.8f, 0);
+        private static void ApplyReducedGravity(UsingItemEventArgs ev, FpcRole fpcRole, Vector3 originalGravity)
+        {
+            if (ev.Player == null || !ev.Player.IsAlive || ev.Player.Role is not FpcRole)
+                return;
 
-                    ev.Item.Destroy();
+            fpcRole.Gravity = new Vector3(0, REDUCED_GRAVITY_Y, 0);
+            ev.Item?.Destroy();
 
-                    Timing.CallDelayed(15f, () =>
-                    {
-                        fpc.Gravity = normalGravity;
-                    });
-                });
-            }
+            Log.Debug($"[LightHeaded] {ev.Player.Nickname} gravity reduced for {EFFECT_DURATION}s");
+
+            Timing.CallDelayed(EFFECT_DURATION, () => RestoreGravity(ev.Player, fpcRole, originalGravity));
+        }
+
+        private static void RestoreGravity(Player player, FpcRole fpcRole, Vector3 originalGravity)
+        {
+            if (player == null || !player.IsAlive || player.Role is not FpcRole)
+                return;
+
+            fpcRole.Gravity = originalGravity;
+            Log.Debug($"[LightHeaded] {player.Nickname} gravity restored");
         }
     }
 }

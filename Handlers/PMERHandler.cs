@@ -5,6 +5,7 @@ using ProjectMER.Features.Objects;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using GockelsAIO_exiled.Items;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Handlers
@@ -101,63 +102,79 @@ namespace GockelsAIO_exiled.Handlers
 
         #region Gobblegum Machine
 
-    public void OnButtonInteractGobblegum(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
-    {
-        // O(1) statt O(n) Lookup
-        if (!TrackedGobblegumMachines.Contains(ev.Schematic))
-            return;
-
-        var config = CachedConfig;
-        if (!TryPurchase(ev.Player, config.PointsForVendingMachine, config.VendingMachineMissingPointsText))
-            return;
-
-        Log.Debug($"[Gobblegum] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname}");
+        private static List<CustomItem> _cachedBuyableGobblegums;
         
-        GiveRandomGobblegum(ev.Player);
-    }
-
-    private static void GiveRandomGobblegum(Player player)
-    {
-        var randomIndex = UnityEngine.Random.Range(0, GobblegumIDs.Length);
-        CustomItem.TryGive(player, GobblegumIDs[randomIndex]);
-    }
-
-    #endregion
-
-    #region Coin Collection
-
-    public void OnButtonInteractCoin(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
-    {
-        // O(1) statt O(n) Lookup
-        if (!TrackedCoins.Contains(ev.Schematic))
-            return;
-
-        PointSystem.AddPoints(ev.Player, CachedConfig.PointsForCoin);
-        
-        TrackedCoins.Remove(ev.Schematic);
-        ev.Schematic.Destroy();
-
-        Log.Debug($"[Coin] Collected by {ev.Player.Nickname}");
-    }
-
-    #endregion
-    
-    #region Utility
-
-    private static bool TryPurchase(Player player, int cost, string insufficientPointsMessage)
-    {
-        var currentPoints = PointSystem.GetPoints(player);
-        
-        if (currentPoints < cost)
+        public void OnButtonInteractGobblegum(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
         {
-            player.Broadcast(BROADCAST_DURATION, insufficientPointsMessage);
-            return false;
+            // O(1) statt O(n) Lookup
+            if (!TrackedGobblegumMachines.Contains(ev.Schematic))
+                return;
+
+            var config = CachedConfig;
+            if (!TryPurchase(ev.Player, config.PointsForVendingMachine, config.VendingMachineMissingPointsText))
+                return;
+
+            Log.Debug($"[Gobblegum] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname}");
+            
+            GiveRandomGobblegum(ev.Player);
         }
 
-        PointSystem.RemovePoints(player, cost);
-        return true;
-    }
+        private static void GiveRandomGobblegum(Player player)
+        {
+            // Lazy initialization des Caches
+            if (_cachedBuyableGobblegums == null)
+            {
+                _cachedBuyableGobblegums = CustomItem.Registered
+                    .Where(item => item is FortunaFizzItem fizz && fizz.Buyable)
+                    .ToList();
+            }
+    
+            if (_cachedBuyableGobblegums.Count == 0)
+            {
+                Log.Warn("[Gobblegum] No buyable gobblegums available!");
+                return;
+            }
+    
+            var randomItem = _cachedBuyableGobblegums[UnityEngine.Random.Range(0, _cachedBuyableGobblegums.Count)];
+            CustomItem.TryGive(player, randomItem.Id);
+        }
 
-    #endregion
+        #endregion
+
+        #region Coin Collection
+
+        public void OnButtonInteractCoin(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
+        {
+            // O(1) statt O(n) Lookup
+            if (!TrackedCoins.Contains(ev.Schematic))
+                return;
+
+            PointSystem.AddPoints(ev.Player, CachedConfig.PointsForCoin);
+            
+            TrackedCoins.Remove(ev.Schematic);
+            ev.Schematic.Destroy();
+
+            Log.Debug($"[Coin] Collected by {ev.Player.Nickname}");
+        }
+
+        #endregion
+        
+        #region Utility
+
+        private static bool TryPurchase(Player player, int cost, string insufficientPointsMessage)
+        {
+            var currentPoints = PointSystem.GetPoints(player);
+            
+            if (currentPoints < cost)
+            {
+                player.Broadcast(BROADCAST_DURATION, insufficientPointsMessage);
+                return false;
+            }
+
+            PointSystem.RemovePoints(player, cost);
+            return true;
+        }
+
+        #endregion
     }
 }

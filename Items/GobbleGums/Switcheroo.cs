@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
@@ -14,14 +10,11 @@ using PlayerRoles;
 namespace GockelsAIO_exiled.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
-    public class Switcheroo : CustomItem
+    public class Switcheroo : FortunaFizzItem
     {
-        public override uint Id { get; set; } = 813;
-        public override string Name { get; set; } = "Switcherooo";
-        public override string Description { get; set; } = "Swap places – the chaos decides.";
-        public override float Weight { get; set; } = 0.5f;
-        public override SpawnProperties SpawnProperties { get; set; }
-        public HashSet<RoleTypeId> PlayerSwapIgnoredRoles { get; set; } = new()
+        private const float USE_DELAY = 2f;
+        
+        private static readonly HashSet<RoleTypeId> SwapIgnoredRoles = new()
         {
             RoleTypeId.Spectator,
             RoleTypeId.Filmmaker,
@@ -30,40 +23,66 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             RoleTypeId.Tutorial,
         };
 
+        public override uint Id { get; set; } = 813;
+        public override string Name { get; set; } = "Switcherooo";
+        public override string Description { get; set; } = "Swap places – the chaos decides.";
+        public override float Weight { get; set; } = 0.5f;
+        public override SpawnProperties SpawnProperties { get; set; }
+
+        public Switcheroo()
+        {
+            Buyable = true;
+        }
+
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem += OnUsingSwitcheroo;
+            Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem -= OnUsingSwitcheroo;
+            Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
             base.UnsubscribeEvents();
         }
 
-        private void OnUsingSwitcheroo(UsingItemEventArgs ev)
+        private void OnUsingItem(UsingItemEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem)) return;
+            if (!Check(ev.Player.CurrentItem))
+                return;
 
-            Timing.CallDelayed(2f, () =>
-            {
-                var playerList = Player.List.Where(x => x.IsAlive && !PlayerSwapIgnoredRoles.Contains(x.Role.Type)).ToList();
-                playerList.Remove(ev.Player);
+            Timing.CallDelayed(USE_DELAY, () => ExecuteSwap(ev));
+        }
 
-                if (playerList.IsEmpty())
-                {
-                    return;
-                }
+        private static void ExecuteSwap(UsingItemEventArgs ev)
+        {
+            if (ev.Player == null || !ev.Player.IsAlive)
+                return;
 
-                var targetPlayer = playerList.RandomItem();
-                var pos = targetPlayer.Position;
+            var targetPlayer = GetRandomSwapTarget(ev.Player);
+            if (targetPlayer == null)
+                return;
 
-                targetPlayer.Teleport(ev.Player.Position);
-                ev.Player.Teleport(pos);
+            SwapPlayerPositions(ev.Player, targetPlayer);
+            ev.Item?.Destroy();
+        }
 
-                ev.Item.Destroy();
-            });
+        private static Player GetRandomSwapTarget(Player excludePlayer)
+        {
+            var eligiblePlayers = Player.List
+                .Where(p => p != excludePlayer 
+                         && p.IsAlive 
+                         && !SwapIgnoredRoles.Contains(p.Role.Type))
+                .ToList();
+
+            return eligiblePlayers.Count > 0 ? eligiblePlayers.RandomItem() : null;
+        }
+
+        private static void SwapPlayerPositions(Player player1, Player player2)
+        {
+            var tempPosition = player2.Position;
+            player2.Teleport(player1.Position);
+            player1.Teleport(tempPosition);
         }
     }
 }

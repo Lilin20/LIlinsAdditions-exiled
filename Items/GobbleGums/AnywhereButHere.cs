@@ -4,7 +4,6 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
-using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
@@ -12,67 +11,90 @@ using UnityEngine;
 namespace GockelsAIO_exiled.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
-    public class AnywhereButHere : CustomItem
+    public class AnywhereButHere : FortunaFizzItem
     {
+        private const float USE_DELAY = 2f;
+        
+        private static readonly HashSet<RoomType> ForbiddenRoomTypes = new()
+        {
+            RoomType.Hcz079,
+            RoomType.Hcz106,
+            RoomType.HczHid,
+            RoomType.Hcz096,
+            RoomType.Hcz939,
+            RoomType.HczTestRoom,
+            RoomType.Hcz049,
+            RoomType.EzCollapsedTunnel,
+            RoomType.EzGateA,
+            RoomType.EzGateB,
+            RoomType.Lcz173,
+            RoomType.HczTesla,
+            RoomType.EzShelter,
+            RoomType.Pocket,
+            RoomType.HczCrossRoomWater
+        };
+
         public override uint Id { get; set; } = 801;
         public override string Name { get; set; } = "Anywhere But Here";
-        public override string Description { get; set; } = "Teleports you to a random positon.";
+        public override string Description { get; set; } = "Teleports you to a random position.";
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 
+        public AnywhereButHere()
+        {
+            Buyable = true;
+        }
+
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem += OnUsingAnywhereButHere;
+            Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.UsingItem -= OnUsingAnywhereButHere;
+            Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
             base.UnsubscribeEvents();
         }
 
-        private void OnUsingAnywhereButHere(UsingItemEventArgs ev)
+        private void OnUsingItem(UsingItemEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem)) return;
+            if (!Check(ev.Player.CurrentItem))
+                return;
 
-            
+            Timing.CallDelayed(USE_DELAY, () => ExecuteTeleport(ev));
+        }
 
-            Timing.CallDelayed(2f, () =>
+        private static void ExecuteTeleport(UsingItemEventArgs ev)
+        {
+            if (ev.Player == null || !ev.Player.IsAlive || ev.Player.CurrentItem != ev.Item)
+                return;
+
+            var targetRoom = GetRandomSafeRoom();
+            if (targetRoom == null)
             {
-                if (ev.Player.CurrentItem != ev.Item) return;
-                Room[] allRooms = Room.List.ToArray();
-                List<RoomType> forbiddenRoomTypes = new List<RoomType>
-                {
-                    RoomType.Hcz079,
-                    RoomType.Hcz106,
-                    RoomType.HczHid,
-                    RoomType.Hcz096,
-                    RoomType.Hcz939,
-                    RoomType.HczTestRoom,
-                    RoomType.Hcz049,
-                    RoomType.EzCollapsedTunnel,
-                    RoomType.EzGateA,
-                    RoomType.EzGateB,
-                    RoomType.Lcz173,
-                    RoomType.HczTesla,
-                    RoomType.EzShelter,
-                    RoomType.Pocket,
-                    RoomType.HczCrossRoomWater
-                };
+                Log.Warn($"[AnywhereButHere] Could not find safe room for {ev.Player.Nickname}");
+                return;
+            }
 
-                Room randomRoom = allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
+            ev.Player.Teleport(targetRoom.Position + Vector3.up);
+            Log.Debug($"[AnywhereButHere] {ev.Player.Nickname} teleported to {targetRoom.Type}");
+            
+            ev.Item?.Destroy();
+        }
 
-                while (forbiddenRoomTypes.Contains(randomRoom.Type))
-                {
-                    randomRoom = allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
-                }
+        private static Room GetRandomSafeRoom()
+        {
+            var allRooms = Room.List.ToList();
+            var safeRooms = allRooms.Where(r => !ForbiddenRoomTypes.Contains(r.Type)).ToList();
 
-                Log.Debug($"Player {ev.Player.CustomName} teleported to {randomRoom.Type}");
-                ev.Player.Teleport(randomRoom.Position + Vector3.up);
+            if (safeRooms.Count == 0)
+            {
+                Log.Error("[AnywhereButHere] No safe rooms available!");
+                return null;
+            }
 
-                ev.Item.Destroy();
-            });
+            return safeRooms[Random.Range(0, safeRooms.Count)];
         }
     }
 }
