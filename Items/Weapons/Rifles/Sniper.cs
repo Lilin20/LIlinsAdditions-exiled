@@ -1,7 +1,6 @@
 ﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
-using Exiled.CustomRoles.API.Features;
 using Exiled.Events.EventArgs.Item;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Firearms.Attachments;
@@ -18,78 +17,102 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
         public override float Damage { get; set; } = 95;
         public override byte ClipSize { get; set; } = 1;
         public override float Weight { get; set; } = 1.5f;
-
         public override SpawnProperties SpawnProperties { get; set; }
-        public override AttachmentName[] Attachments { get; set; } = new[]
-        {
-            AttachmentName.ScopeSight,
-        };
+        public override AttachmentName[] Attachments { get; set; } = new[] { AttachmentName.ScopeSight };
+        
+        private const float CloseRangeThreshold = 8f;
+        private const float LongRangeBodyDamage = 55f;
+        private const float ScpDamage = 200f;
+
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.ActivatingWorkstation += OnModify;
-            Exiled.Events.Handlers.Item.ChangingAttachments += OnAttachmentChange;
+            Exiled.Events.Handlers.Player.ActivatingWorkstation += OnActivatingWorkstation;
+            Exiled.Events.Handlers.Item.ChangingAttachments += OnChangingAttachments;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.ActivatingWorkstation -= OnModify;
-            Exiled.Events.Handlers.Item.ChangingAttachments -= OnAttachmentChange;
+            Exiled.Events.Handlers.Player.ActivatingWorkstation -= OnActivatingWorkstation;
+            Exiled.Events.Handlers.Item.ChangingAttachments -= OnChangingAttachments;
             base.UnsubscribeEvents();
         }
 
-        public void OnAttachmentChange(ChangingAttachmentsEventArgs ev)
+        private void OnChangingAttachments(ChangingAttachmentsEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem))
+            if (Check(ev.Player.CurrentItem))
             {
-                return;
+                ev.IsAllowed = false;
             }
-
-            ev.IsAllowed = false;
         }
 
-        public void OnModify(ActivatingWorkstationEventArgs ev)
+        private void OnActivatingWorkstation(ActivatingWorkstationEventArgs ev)
         {
-            if (!Check(ev.Player))
+            if (Check(ev.Player))
             {
-                return;
+                ev.IsAllowed = false;
             }
-
-            ev.IsAllowed = false;
         }
 
         protected override void OnShot(ShotEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem))
+            if (!Check(ev.Player.CurrentItem) || ev.Target == null)
                 return;
-
-            if (ev.Target == null) return;
 
             ev.CanHurt = false;
             ev.Player.ShowHitMarker();
 
-            if (ev.Target.Role.Team != PlayerRoles.Team.SCPs)
-            {
-                switch (ev.Distance)
-                {
-                    case < 8f when ev.Hitbox.HitboxType != HitboxType.Headshot:
-                        ev.Target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));
-                        break;
-                    case >= 8f when ev.Hitbox.HitboxType != HitboxType.Headshot:
-                        ev.Target.Hurt(55);
-                        break;
-                }
+            ApplyDamage(ev);
+        }
 
-                if (ev.Hitbox.HitboxType == HitboxType.Headshot)
-                {
-                    ev.Target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));
-                }
-            }
-            else if (ev.Target.Role.Team == PlayerRoles.Team.SCPs)
+        private void ApplyDamage(ShotEventArgs ev)
+        {
+            if (ev.Target.Role.Team == PlayerRoles.Team.SCPs)
             {
-                ev.Target.Hurt(200);
+                ApplyScpDamage(ev.Target);
+            }
+            else
+            {
+                ApplyHumanDamage(ev);
+            }
+        }
+
+        private void ApplyHumanDamage(ShotEventArgs ev)
+        {
+            if (IsHeadshot(ev))
+            {
+                KillTarget(ev.Target);
+                return;
             }
 
+            if (IsCloseRange(ev.Distance))
+            {
+                KillTarget(ev.Target);
+            }
+            else
+            {
+                ev.Target.Hurt(LongRangeBodyDamage);
+            }
+        }
+
+        private void ApplyScpDamage(Exiled.API.Features.Player target)
+        {
+            target.Hurt(ScpDamage);
+        }
+
+        private void KillTarget(Exiled.API.Features.Player target)
+        {
+            target.Kill(new UniversalDamageHandler(-1f, DeathTranslations.BulletWounds));
+        }
+
+        private bool IsHeadshot(ShotEventArgs ev)
+        {
+            return ev.Hitbox.HitboxType == HitboxType.Headshot;
+        }
+
+        private bool IsCloseRange(float distance)
+        {
+            return distance < CloseRangeThreshold;
         }
     }
 }

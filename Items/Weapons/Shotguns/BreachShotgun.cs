@@ -18,45 +18,60 @@ namespace GockelsAIO_exiled.Items.Weapons.Shotguns
         public override float Damage { get; set; } = 0;
         public override byte ClipSize { get; set; } = 20;
         public override float Weight { get; set; } = 1.5f;
-
         public override SpawnProperties SpawnProperties { get; set; }
-        public override AttachmentName[] Attachments { get; set; } = new[]
-        {
-            AttachmentName.ShotgunSingleShot,
-        };
+        public override AttachmentName[] Attachments { get; set; } = new[] { AttachmentName.ShotgunSingleShot };
+        
+        private const float MaxRaycastDistance = 20f;
+        private const int RaycastMask = ~(1 << 1 | 1 << 13 | 1 << 16 | 1 << 28);
 
         protected override void OnReloading(ReloadingWeaponEventArgs ev)
         {
             ev.IsAllowed = false;
         }
+
         protected override void OnShot(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
 
             ev.CanHurt = false;
-            try
+
+            if (TryGetTargetDoor(ev.Player, out Door door))
             {
-                if (!Physics.Raycast(ev.Player.CameraTransform.position, ev.Player.CameraTransform.forward, out RaycastHit raycastHit,
-                    20, ~(1 << 1 | 1 << 13 | 1 << 16 | 1 << 28)))
-                    return;
-
-                if (raycastHit.collider is null)
-                    return;
-
-                DoorVariant dv = raycastHit.collider.gameObject.GetComponentInParent<DoorVariant>();
-                if (dv is null)
-                {
-                    return;
-                }
-
-                var d = Door.Get(raycastHit.collider.gameObject.GetComponentInParent<DoorVariant>());
-
-                d.As<BreakableDoor>().Break();
+                BreakDoor(door);
             }
-            catch
+        }
+
+        private bool TryGetTargetDoor(Exiled.API.Features.Player player, out Door door)
+        {
+            door = null;
+
+            if (!Physics.Raycast(
+                player.CameraTransform.position,
+                player.CameraTransform.forward,
+                out RaycastHit hit,
+                MaxRaycastDistance,
+                RaycastMask))
             {
-                return;
+                return false;
+            }
+
+            if (hit.collider == null)
+                return false;
+
+            DoorVariant doorVariant = hit.collider.gameObject.GetComponentInParent<DoorVariant>();
+            if (doorVariant == null)
+                return false;
+
+            door = Door.Get(doorVariant);
+            return door != null;
+        }
+
+        private void BreakDoor(Door door)
+        {
+            if (door is BreakableDoor breakableDoor)
+            {
+                breakableDoor.Break();
             }
         }
     }

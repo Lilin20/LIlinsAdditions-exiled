@@ -1,4 +1,4 @@
-﻿using Exiled.API.Enums;
+﻿
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
@@ -6,11 +6,6 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Items.Weapons.LMGs
@@ -18,6 +13,12 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
     [CustomItem(ItemType.GunLogicer)]
     public class GrenadeLauncher : CustomWeapon
     {
+        private const float SPAWN_DISTANCE = 1.0f;
+        private const float UPWARD_ARC = 0.2f;
+        private const float LAUNCH_FORCE = 20f;
+        private const float FLIGHT_TIME = 4f;
+        private const float EXPLODE_FUSE_TIME = 1f;
+
         public override uint Id { get; set; } = 400;
         public override float Damage { get; set; } = 0.1f;
         public override string Name { get; set; } = "Grenade Launcher";
@@ -28,13 +29,13 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
 
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot += OnShotDD;
+            Exiled.Events.Handlers.Player.Shot += OnShot;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot -= OnShotDD;
+            Exiled.Events.Handlers.Player.Shot -= OnShot;
             base.UnsubscribeEvents();
         }
 
@@ -44,39 +45,76 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             base.OnReloading(ev);
         }
 
-        private void OnShotDD(ShotEventArgs ev)
+        private void OnShot(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
 
             ev.CanHurt = false;
 
-            Vector3 spawnPos = ev.Player.CameraTransform.position + ev.Player.CameraTransform.forward * 1.0f;
-            Quaternion rotation = Quaternion.identity;
+            LaunchGrenade(ev.Player);
+        }
 
-            Pickup grenade = Pickup.CreateAndSpawn(ItemType.GrenadeHE, spawnPos, rotation);
+        private static void LaunchGrenade(Player player)
+        {
+            var spawnPosition = CalculateSpawnPosition(player);
+            var grenade = Pickup.CreateAndSpawn(ItemType.GrenadeHE, spawnPosition, Quaternion.identity);
 
-            if (grenade.Rigidbody is Rigidbody rb)
+            if (!ApplyPhysics(grenade, player))
             {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-
-                Vector3 launchDirection = ev.Player.CameraTransform.forward + Vector3.up * 0.2f;
-                launchDirection.Normalize();
-
-                float launchForce = 20f;
-                rb.velocity = launchDirection * launchForce;
-            }
-            else
-            {
-                Log.Warn("not a rigidbody (sad emoji).");
+                Log.Error($"[GrenadeLauncher] Failed to apply physics to grenade for {player.Nickname}");
+                grenade.Destroy();
+                return;
             }
 
-            Timing.CallDelayed(4f, () =>
+            Timing.CallDelayed(FLIGHT_TIME, () => ExplodeGrenade(grenade, player));
+            Log.Debug($"[GrenadeLauncher] {player.Nickname} launched grenade");
+        }
+
+        private static Vector3 CalculateSpawnPosition(Player player)
+        {
+            return player.CameraTransform.position + (player.CameraTransform.forward * SPAWN_DISTANCE);
+        }
+
+        private static bool ApplyPhysics(Pickup grenade, Player player)
+        {
+            if (grenade?.Rigidbody is not Rigidbody rb)
+                return false;
+
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            var launchDirection = CalculateLaunchDirection(player);
+            rb.velocity = launchDirection * LAUNCH_FORCE;
+
+            return true;
+        }
+
+        private static Vector3 CalculateLaunchDirection(Player player)
+        {
+            var direction = player.CameraTransform.forward + (Vector3.up * UPWARD_ARC);
+            return direction.normalized;
+        }
+
+        private static void ExplodeGrenade(Pickup grenade, Player player)
+        {
+            if (grenade == null)
             {
-                grenade.As<GrenadePickup>().FuseTime = 1f;
-                grenade.As<GrenadePickup>().Explode();
-            });
+                Log.Debug($"[GrenadeLauncher] Grenade from {player.Nickname} was destroyed before explosion");
+                return;
+            }
+
+            if (grenade is not GrenadePickup grenadePickup)
+            {
+                Log.Error($"[GrenadeLauncher] Pickup is not a GrenadePickup");
+                grenade.Destroy();
+                return;
+            }
+
+            grenadePickup.FuseTime = EXPLODE_FUSE_TIME;
+            grenadePickup.Explode();
+
+            Log.Debug($"[GrenadeLauncher] Grenade from {player.Nickname} exploded");
         }
     }
 }

@@ -142,7 +142,6 @@
     <Compile Include="Items\GobbleGums\SilentStep.cs" />
     <Compile Include="Items\GobbleGums\Switcheroo.cs" />
     <Compile Include="Items\GobbleGums\WhereIsWaldo.cs" />
-    <Compile Include="Items\Keycards\CassieTrackingCard.cs" />
     <Compile Include="Items\SCPs\Gasmask.cs" />
     <Compile Include="Items\SCPs\GogglesItem.cs" />
     <Compile Include="Items\Weapons\Grenade\StickyGrenade.cs" />

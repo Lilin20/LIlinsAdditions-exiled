@@ -1,10 +1,10 @@
-﻿using Exiled.API.Features;
+﻿using System.ComponentModel;
+using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.ThrowableProjectiles;
 using Mirror;
-using System.ComponentModel;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Items.Weapons.Grenade
@@ -12,6 +12,8 @@ namespace GockelsAIO_exiled.Items.Weapons.Grenade
     [CustomItem(ItemType.GrenadeHE)]
     public class StickyGrenade : Exiled.CustomItems.API.Features.CustomWeapon
     {
+        private const float DEFAULT_STICKY_FUSE_TIME = 5.0f;
+
         public override uint Id { get; set; } = 1001;
         public override string Name { get; set; } = "Sticky Grenade";
         public override string Description { get; set; } = "A grenade that sticks to the first surface it touches";
@@ -20,7 +22,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Grenade
         public override SpawnProperties? SpawnProperties { get; set; } = null;
 
         [Description("How long the grenade waits before exploding after sticking")]
-        public float StickyFuseTime { get; set; } = 5.0f;
+        public float StickyFuseTime { get; set; } = DEFAULT_STICKY_FUSE_TIME;
 
         protected override void SubscribeEvents()
         {
@@ -39,62 +41,108 @@ namespace GockelsAIO_exiled.Items.Weapons.Grenade
             if (!Check(ev.Item))
                 return;
 
-            // Add our custom collision handler to make it sticky  
+            if (ev.Projectile?.GameObject == null)
+            {
+                Log.Warn($"[StickyGrenade] Projectile or GameObject is null for {ev.Player.Nickname}");
+                return;
+            }
+
             var stickyHandler = ev.Projectile.GameObject.AddComponent<StickyCollisionHandler>();
             stickyHandler.Init(ev.Player.GameObject, ev.Projectile.Base, StickyFuseTime);
+
+            Log.Debug($"[StickyGrenade] {ev.Player.Nickname} threw sticky grenade (fuse: {StickyFuseTime}s)");
         }
     }
 
     public class StickyCollisionHandler : MonoBehaviour
     {
-        private bool initialized;
-        private bool hasStuck;
-        private GameObject owner;
-        private ThrownProjectile projectile;
-        private float stickyFuseTime;
+        private bool _initialized;
+        private bool _hasStuck;
+        private GameObject _ownerObject;
+        private ThrownProjectile _projectile;
+        private float _stickyFuseTime;
 
-        public void Init(GameObject owner, ThrownProjectile projectile, float fuseTime)
+        public void Init(GameObject ownerObject, ThrownProjectile projectile, float fuseTime)
         {
-            this.owner = owner;
-            this.projectile = projectile;
-            this.stickyFuseTime = fuseTime;
-            this.initialized = true;
+            _ownerObject = ownerObject;
+            _projectile = projectile;
+            _stickyFuseTime = fuseTime;
+            _initialized = true;
+
+            Log.Debug($"[StickyCollisionHandler] Initialized with fuse time: {fuseTime}s");
         }
 
         private void OnCollisionEnter(Collision collision)
         {
             try
             {
-                if (!initialized || hasStuck)
+                if (!_initialized || _hasStuck)
                     return;
 
-                // Skip collision with owner and other grenades (same logic as CollisionHandler)  
-                if (collision.collider.gameObject == owner ||
-                    collision.collider.gameObject.TryGetComponent<EffectGrenade>(out _))
+                if (!ShouldStickToCollision(collision))
                     return;
 
-                // Make it stick by stopping all movement  
-                var rigidbody = projectile.GetComponent<Rigidbody>();
-                if (rigidbody != null)
-                {
-                    rigidbody.velocity = Vector3.zero;
-                    rigidbody.angularVelocity = Vector3.zero;
-                    rigidbody.isKinematic = true;
-                }
+                MakeProjectileStick();
+                SetCustomFuseTime();
 
-                // Set custom fuse time instead of immediate explosion  
-                if (projectile is EffectGrenade effectGrenade)
-                {
-                    effectGrenade.TargetTime = NetworkTime.time + stickyFuseTime;
-                }
+                _hasStuck = true;
 
-                hasStuck = true;
+                Log.Debug($"[StickyCollisionHandler] Grenade stuck to {collision.collider.gameObject.name}");
             }
             catch (System.Exception ex)
             {
-                Log.Error($"StickyCollisionHandler error: {ex}");
+                Log.Error($"[StickyCollisionHandler] Error in OnCollisionEnter: {ex}");
                 Destroy(this);
             }
+        }
+
+        private bool ShouldStickToCollision(Collision collision)
+        {
+            if (collision?.collider?.gameObject == null)
+                return false;
+
+            // Don't stick to owner
+            if (collision.collider.gameObject == _ownerObject)
+                return false;
+
+            // Don't stick to other grenades
+            if (collision.collider.gameObject.TryGetComponent<EffectGrenade>(out _))
+                return false;
+
+            return true;
+        }
+
+        private void MakeProjectileStick()
+        {
+            if (_projectile == null)
+                return;
+
+            var rigidbody = _projectile.GetComponent<Rigidbody>();
+            if (rigidbody == null)
+            {
+                Log.Warn("[StickyCollisionHandler] Rigidbody component not found");
+                return;
+            }
+
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+            rigidbody.isKinematic = true;
+        }
+
+        private void SetCustomFuseTime()
+        {
+            if (_projectile is not EffectGrenade effectGrenade)
+            {
+                Log.Warn("[StickyCollisionHandler] Projectile is not an EffectGrenade");
+                return;
+            }
+
+            effectGrenade.TargetTime = NetworkTime.time + _stickyFuseTime;
+        }
+
+        private void OnDestroy()
+        {
+            Log.Debug("[StickyCollisionHandler] Component destroyed");
         }
     }
 }

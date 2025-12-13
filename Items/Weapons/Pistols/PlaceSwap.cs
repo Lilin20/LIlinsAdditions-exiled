@@ -1,4 +1,6 @@
-﻿using Exiled.API.Features.Attributes;
+﻿
+using Exiled.API.Features;
+using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
@@ -10,6 +12,8 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
     [CustomItem(ItemType.GunCOM15)]
     public class PlaceSwap : CustomWeapon
     {
+        private const float SWAP_DELAY = 0.25f;
+
         public override uint Id { get; set; } = 200;
         public override float Damage { get; set; } = 1;
         public override string Name { get; set; } = "Entity Swapper";
@@ -21,26 +25,71 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         protected override void OnReloading(ReloadingWeaponEventArgs ev)
         {
             ev.IsAllowed = false;
+            base.OnReloading(ev);
         }
+
         protected override void OnShot(ShotEventArgs ev)
         {
             ev.CanHurt = false;
 
-            if (ev.Target == null)
+            if (!IsValidSwapTarget(ev.Target, ev.Player))
                 return;
 
-            if (ev.Target == ev.Player)
-                return;
+            var targetPosition = ev.Target.Position;
+            var shooterPosition = ev.Player.Position;
 
-            Vector3 targetPosition = ev.Target.Position;
-            Vector3 shooterPosition = ev.Player.Position;
+            Timing.CallDelayed(SWAP_DELAY, () => ExecutePositionSwap(ev.Player, ev.Target, shooterPosition, targetPosition));
+        }
 
-            Timing.CallDelayed(0.25f, () =>
+        private static bool IsValidSwapTarget(Player target, Player shooter)
+        {
+            if (target == null)
             {
-                ev.Target.Position = shooterPosition;
-                ev.Player.Position = targetPosition;
-            });
+                Log.Debug($"[PlaceSwap] {shooter.Nickname} shot missed - no target");
+                return false;
+            }
 
+            if (target == shooter)
+            {
+                Log.Debug($"[PlaceSwap] {shooter.Nickname} cannot swap with self");
+                return false;
+            }
+
+            if (!target.IsAlive)
+            {
+                Log.Debug($"[PlaceSwap] {shooter.Nickname} cannot swap with dead target: {target.Nickname}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static void ExecutePositionSwap(Player shooter, Player target, Vector3 shooterPosition, Vector3 targetPosition)
+        {
+            if (!ValidatePlayersForSwap(shooter, target))
+                return;
+
+            target.Position = shooterPosition;
+            shooter.Position = targetPosition;
+
+            Log.Debug($"[PlaceSwap] Swapped positions: {shooter.Nickname} <-> {target.Nickname}");
+        }
+
+        private static bool ValidatePlayersForSwap(Player shooter, Player target)
+        {
+            if (shooter == null || !shooter.IsAlive)
+            {
+                Log.Debug($"[PlaceSwap] Shooter no longer valid for swap");
+                return false;
+            }
+
+            if (target == null || !target.IsAlive)
+            {
+                Log.Debug($"[PlaceSwap] Target no longer valid for swap");
+                return false;
+            }
+
+            return true;
         }
     }
 }
