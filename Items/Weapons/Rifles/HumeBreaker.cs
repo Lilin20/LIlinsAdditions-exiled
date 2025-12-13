@@ -4,13 +4,16 @@ using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.CustomStats;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Roles;
 using Exiled.API.Features.Spawn;
 using Exiled.API.Features.Toys;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Firearms.Attachments;
 using MEC;
+using PlayerStatsSystem;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Items.Weapons.Rifles
@@ -97,8 +100,12 @@ namespace GockelsAIO_exiled.Items.Weapons.Rifles
 
         private void DestroyHumeShield(Player target)
         {
-            target.HumeShield = 0;
-            target.MaxHumeShield = 0;
+            if (target.Role is IHumeShieldRole humeShieldRole)  
+            {  
+                humeShieldRole.HumeShieldModule.HsCurrent = 0;
+            }  
+            
+            Log.Debug("[HumeBreaker] Destroying hume shield.");
         }
 
         private void SpawnGrenade(Vector3 position, Player owner, float fuseTime, float maxRadius = 0f, float scpDamageMultiplier = 0f)

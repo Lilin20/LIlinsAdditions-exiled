@@ -28,19 +28,19 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
         protected override void SubscribeEvents()
         {
-            Player.Shot += OnShot;
-            Player.Hurting += OnHurting;
+            Player.Shot += OnShotPlayer;
+            Player.Hurting += OnHurtingPlayer;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Player.Shot -= OnShot;
-            Player.Hurting -= OnHurting;
+            Player.Shot -= OnShotPlayer;
+            Player.Hurting -= OnHurtingPlayer;
             base.UnsubscribeEvents();
         }
 
-        private void OnHurting(HurtingEventArgs ev)
+        private void OnHurtingPlayer(HurtingEventArgs ev)
         {
             if (ev.Player == null || ev.Attacker == null)
                 return;
@@ -54,7 +54,7 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
             base.OnHurting(ev);
         }
 
-        private void OnShot(ShotEventArgs ev)
+        private void OnShotPlayer(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;

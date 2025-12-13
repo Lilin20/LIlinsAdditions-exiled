@@ -19,24 +19,22 @@ namespace GockelsAIO_exiled.Items.Weapons.SMGs
         public override SpawnProperties SpawnProperties { get; set; }
         
         private const float HealAmount = 5f;
-        private const float ZombieHumeShieldIncrease = 20f;
-        private const float ZombieHumeShieldCureThreshold = 300f;
 
         protected override void SubscribeEvents()
         {
-            PlayerHandlers.Shot += OnShot;
-            PlayerHandlers.Hurting += OnHurting;
+            PlayerHandlers.Shot += OnShotPlayer;
+            PlayerHandlers.Hurting += OnHurtingPlayer;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            PlayerHandlers.Shot -= OnShot;
-            PlayerHandlers.Hurting -= OnHurting;
+            PlayerHandlers.Shot -= OnShotPlayer;
+            PlayerHandlers.Hurting -= OnHurtingPlayer;
             base.UnsubscribeEvents();
         }
 
-        private void OnHurting(HurtingEventArgs ev)
+        private void OnHurtingPlayer(HurtingEventArgs ev)
         {
             if (ev.Player == null || ev.Attacker == null)
                 return;
@@ -48,18 +46,14 @@ namespace GockelsAIO_exiled.Items.Weapons.SMGs
             ev.IsAllowed = false;
         }
 
-        private void OnShot(ShotEventArgs ev)
+        private void OnShotPlayer(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem) || ev.Target == null)
                 return;
 
             ev.CanHurt = false;
 
-            if (IsScpShooter(ev.Player))
-            {
-                HandleScpShot(ev.Target);
-            }
-            else
+            if (!IsScpShooter(ev.Player))
             {
                 HealTarget(ev.Target);
             }
@@ -73,29 +67,6 @@ namespace GockelsAIO_exiled.Items.Weapons.SMGs
         private void HealTarget(Exiled.API.Features.Player target)
         {
             target.Heal(HealAmount);
-        }
-
-        private void HandleScpShot(Exiled.API.Features.Player target)
-        {
-            if (target.Role == RoleTypeId.Scp0492)
-            {
-                TryHealOrCureZombie(target);
-            }
-        }
-
-        private void TryHealOrCureZombie(Exiled.API.Features.Player zombie)
-        {
-            zombie.HumeShield += ZombieHumeShieldIncrease;
-
-            if (zombie.HumeShield >= ZombieHumeShieldCureThreshold)
-            {
-                CureZombie(zombie);
-            }
-        }
-
-        private void CureZombie(Exiled.API.Features.Player zombie)
-        {
-            zombie.Role.Set(RoleTypeId.ClassD, RoleSpawnFlags.None);
         }
     }
 }

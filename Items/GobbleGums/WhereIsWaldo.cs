@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using MEC;
@@ -93,29 +95,28 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                 Log.Debug($"[WhereIsWaldo] Target no longer alive, skipping grenade spawn");
                 return;
             }
-
-            if (Item.Create(ItemType.GrenadeHE, user) is not ExplosiveGrenade grenade)
+            
+            var grenade = Projectile.CreateAndSpawn(
+                ProjectileType.FragGrenade,
+                target.Position,
+                rotation: Quaternion.identity,
+                shouldBeActive: true,
+                previousOwner: user
+            ) as ExplosionGrenadeProjectile;
+            
+            if (grenade == null)
             {
-                Log.Error($"[WhereIsWaldo] Failed to create explosive grenade item");
-                return;
-            }
-
-            if (grenade.Projectile?.Base == null)
-            {
-                Log.Error($"[WhereIsWaldo] Grenade projectile or base is null");
+                Log.Error($"[WhereIsWaldo] Failed to create explosion grenade projectile");
                 return;
             }
             
-            grenade.Projectile.Base._playerDamageOverDistance = 
-                grenade.Projectile.Base._playerDamageOverDistance.Multiply(DamageMultiplier);
-            grenade.Projectile.ScpDamageMultiplier = DamageMultiplier;
-
+            grenade.Base._playerDamageOverDistance =
+                grenade.Base._playerDamageOverDistance.Multiply(DamageMultiplier);
+            grenade.ScpDamageMultiplier = DamageMultiplier;
             grenade.FuseTime = GRENADE_FUSE_TIME;
             
-            grenade.Projectile.Spawn(target.Position, shouldBeActive: true, previousOwner: user);
-
             Log.Debug($"[WhereIsWaldo] {user.Nickname} spawned grenade at {target.Nickname}'s position " +
-                     $"(damage multiplier: {DamageMultiplier:F2}x for all targets)");
+                      $"(damage multiplier: {DamageMultiplier:F2}x for all targets)");
         }
     }
 }

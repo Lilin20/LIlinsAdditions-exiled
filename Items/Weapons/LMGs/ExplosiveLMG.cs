@@ -28,15 +28,15 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
 
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot += OnShot;
-            Exiled.Events.Handlers.Player.Hurting += OnHurting;
+            Exiled.Events.Handlers.Player.Shot += OnShotPlayer;
+            Exiled.Events.Handlers.Player.Hurting += OnHurtingPlayer;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot -= OnShot;
-            Exiled.Events.Handlers.Player.Hurting -= OnHurting;
+            Exiled.Events.Handlers.Player.Shot -= OnShotPlayer;
+            Exiled.Events.Handlers.Player.Hurting -= OnHurtingPlayer;
             base.UnsubscribeEvents();
         }
 
@@ -46,7 +46,7 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             base.OnReloading(ev);
         }
 
-        private void OnHurting(HurtingEventArgs ev)
+        private void OnHurtingPlayer(HurtingEventArgs ev)
         {
             if (ev.Player == null || ev.Attacker == null)
                 return;
@@ -64,7 +64,7 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             base.OnHurting(ev);
         }
 
-        private void OnShot(ShotEventArgs ev)
+        private void OnShotPlayer(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
@@ -97,25 +97,21 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
         private static void ConfigureNanoRocket(ExplosiveGrenade grenade)
         {
             var projectileBase = grenade.Projectile.Base;
-
-            // Reduce player damage to 1%
+            
             projectileBase._playerDamageOverDistance = 
                 projectileBase._playerDamageOverDistance.Multiply(PLAYER_DAMAGE_MULTIPLIER);
-
-            // Disable all status effects
+            
             projectileBase._burnedDuration = 0;
             projectileBase._concussedDuration = 0;
             projectileBase._deafenedDuration = 0;
-
-            // Disable environmental effects
+            
             projectileBase._shakeOverDistance = 
                 projectileBase._shakeOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
             projectileBase._doorDamageOverDistance = 
                 projectileBase._doorDamageOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
             projectileBase._effectDurationOverDistance = 
                 projectileBase._effectDurationOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
-
-            // Instant explosion
+            
             grenade.FuseTime = NANO_ROCKET_FUSE_TIME;
         }
     }

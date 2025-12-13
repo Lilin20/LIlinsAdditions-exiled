@@ -143,7 +143,6 @@
     <Compile Include="Items\GobbleGums\WhereIsWaldo.cs" />
     <Compile Include="Items\SCPs\Gasmask.cs" />
     <Compile Include="Items\SCPs\GogglesItem.cs" />
-    <Compile Include="Items\Weapons\Grenade\StickyGrenade.cs" />
     <Compile Include="Items\Weapons\LMGs\ExplosiveLMG.cs" />
     <Compile Include="Items\Weapons\LMGs\GrenadeLauncher.cs" />
     <Compile Include="Items\Weapons\Pistols\HackGun.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\SchematicSpawner.cs" />
     <Compile Include="Features\WeaponSelector.cs" />
-    <Compile Include="Storage.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExMod.Exiled">

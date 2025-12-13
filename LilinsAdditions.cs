@@ -5,7 +5,6 @@ using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
 using MEC;
 using System;
-using GockelsAIO_exiled.Items;
 
 namespace GockelsAIO_exiled
 {
@@ -14,7 +13,7 @@ namespace GockelsAIO_exiled
         // Plugin Metadata
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
-        public override Version Version => new Version(0, 10);
+        public override Version Version => new Version(1, 0, 0);
         
         // Singleton Instance
         public static LilinsAdditions Instance { get; private set; }

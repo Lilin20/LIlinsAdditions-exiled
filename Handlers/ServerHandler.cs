@@ -5,8 +5,6 @@ using MEC;
 using PlayerRoles;
 using System.Collections.Generic;
 using System.Linq;
-using Exiled.CustomItems.API.Features;
-using GockelsAIO_exiled.Items;
 using UnityEngine;
 
 namespace GockelsAIO_exiled.Handlers

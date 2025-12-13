@@ -14,11 +14,6 @@ namespace GockelsAIO_exiled.Items.GobbleGums
     public class DeathCheat : FortunaFizzItem
     {
         private const float USE_DELAY = 2f;
-        private const float REVIVE_CHANCE = 0.8f;
-        private const float MIN_REVIVE_DELAY = 30f;
-        private const float MAX_REVIVE_DELAY = 121f;
-        private const string DEATH_HINT = "Etwas greift nach deiner Seele...";
-        private const string REVIVE_HINT = "Wake the fuck up Samurai - We got SCPs to kill...";
 
         private readonly Dictionary<Player, Role> _protectedPlayers = new();
 
@@ -26,6 +21,11 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         public override string Name { get; set; } = "Death Cheat";
         public override string Description { get; set; } = "Revives you from the dead. Maybe.";
         public override float Weight { get; set; } = 0.5f;
+        public float ReviveChance { get; set; } = 0.8f;
+        public float MinReviveDelay { get; set; }  = 30f;
+        public float MaxReviveDelay { get; set; }  = 121f;
+        public string DeathHint { get; set; }  = "Something grasps your soul...";
+        public string ReviveHint { get; set; }  = "Wake up.";
         public override SpawnProperties SpawnProperties { get; set; }
 
         public DeathCheat()
@@ -73,12 +73,12 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             if (!_protectedPlayers.TryGetValue(ev.Player, out var originalRole))
                 return;
 
-            var shouldRevive = Random.value <= REVIVE_CHANCE;
+            var shouldRevive = Random.value <= ReviveChance;
             
             if (shouldRevive)
             {
-                var reviveDelay = Random.Range(MIN_REVIVE_DELAY, MAX_REVIVE_DELAY);
-                ev.Player.ShowHint(DEATH_HINT);
+                var reviveDelay = Random.Range(MinReviveDelay, MaxReviveDelay);
+                ev.Player.ShowHint(DeathHint);
                 
                 Timing.CallDelayed(reviveDelay, () => AttemptRevive(ev.Player, originalRole));
             }
@@ -87,13 +87,13 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             Log.Debug($"[DeathCheat] {ev.Player.Nickname} protection consumed (revive: {shouldRevive})");
         }
 
-        private static void AttemptRevive(Player player, Role originalRole)
+        private void AttemptRevive(Player player, Role originalRole)
         {
             if (player == null || player.Role is not SpectatorRole)
                 return;
 
             player.Role.Set(originalRole, RoleSpawnFlags.None);
-            player.ShowHint(REVIVE_HINT);
+            player.ShowHint(ReviveHint);
             
             Log.Debug($"[DeathCheat] {player.Nickname} revived as {originalRole.Type}");
         }

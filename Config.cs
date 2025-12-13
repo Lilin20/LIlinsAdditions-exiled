@@ -2,14 +2,12 @@
 using Exiled.API.Interfaces;
 using GockelsAIO_exiled.Items.GobbleGums;
 using GockelsAIO_exiled.Items.SCPs;
-using GockelsAIO_exiled.Items.Weapons.Grenade;
 using GockelsAIO_exiled.Items.Weapons.LMGs;
 using GockelsAIO_exiled.Items.Weapons.Pistols;
 using GockelsAIO_exiled.Items.Weapons.Rifles;
 using GockelsAIO_exiled.Items.Weapons.Shotguns;
 using GockelsAIO_exiled.Items.Weapons.SMGs;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using static GockelsAIO_exiled.SchematicSpawner;
 
@@ -19,7 +17,6 @@ namespace GockelsAIO_exiled
     {
         public bool IsEnabled { get; set; } = true;
         public bool Debug { get; set; } = false;
-        public bool EnableCustomRoles { get; set; } = false;
         public bool EnableFortunaFizz {  get; set; } = true;
         public bool EnableMysteryBox { get; set; } = true;
         public bool EnableHiddenCoins { get; set; } = false;
@@ -27,14 +24,12 @@ namespace GockelsAIO_exiled
         public bool Enable914Teleport { get; set; } = false;
         public bool EnableCreditCardDrop { get; set; } = false;
         public bool EnableAntiSCPSuicide { get; set; } = false;
-        public float BurstSoundVolume { get; set; } = 1;
         public string VendingMachineMusicPath { get; set; } = string.Empty;
         public string MysteryBoxMusicPath { get; set; } = string.Empty;
         public string BurstSoundPath { get; set; } = string.Empty;
         public string TrackingSoundPath { get; set; } = string.Empty;
         public float VendingMachineMusicVolume { get; set; } = 2;
         public float MysteryBoxMusicVolume { get; set; } = 1.5f;
-        public float PickpocketCooldown { get; set; } = 15;
         public int StartingPoints { get; set; } = 400;
         public int PointsForKillingEnemy { get; set; } = 200;
         public int PointsOverTime { get; set; } = 100;
@@ -97,10 +92,6 @@ namespace GockelsAIO_exiled
         public List<Gasmask> gasmask { get; set; } = new()
         {
             new Gasmask()
-        };
-        public List<StickyGrenade> stickyGrenade { get; set; } = new()
-        {
-            new StickyGrenade()
         };
         public List<ExplosiveLMG> explosiveLMG { get; set; } = new()
         {

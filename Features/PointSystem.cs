@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
@@ -13,6 +12,7 @@ namespace GockelsAIO_exiled.Features
 {
     public class PointSystem
     {
+        // Configuration
         private const float CreditCardSpawnHeight = 0.4f;
         private const float TextToyOffset = 0.2f;
         private const string SessionVariablePrefix = "CreditCard_Points_";
@@ -53,9 +53,9 @@ namespace GockelsAIO_exiled.Features
         {
             int points = GetPoints(dyingPlayer);
             Vector3 spawnPosition = CalculateSpawnPosition(dyingPlayer);
-            Quaternion rotation = CalculateCreditCardRotation(attacker);
+            Quaternion cameraRotation = CalculateCreditCardRotation(attacker);
 
-            Exiled.API.Features.Pickups.Pickup creditCardPickup = SpawnCreditCardPickup(spawnPosition, rotation);
+            Exiled.API.Features.Pickups.Pickup creditCardPickup = SpawnCreditCardPickup(spawnPosition, cameraRotation);
             StoreCreditCardPoints(creditCardPickup, points);
             CreatePointsDisplay(creditCardPickup, points);
         }
@@ -67,29 +67,24 @@ namespace GockelsAIO_exiled.Features
 
         private static Quaternion CalculateCreditCardRotation(Player attacker)
         {
-            Quaternion cameraRotation = attacker?.CameraTransform.rotation ?? Quaternion.identity;
-            return cameraRotation * Quaternion.Euler(-90, 0, 0);
+            return attacker?.CameraTransform.rotation ?? Quaternion.identity;
         }
 
-        private static Exiled.API.Features.Pickups.Pickup SpawnCreditCardPickup(Vector3 position, Quaternion rotation)
-        {
+        private static Exiled.API.Features.Pickups.Pickup SpawnCreditCardPickup(Vector3 position, Quaternion cameraRotation)  
+        {  
             CustomItem creditCard = CustomItem.Get(typeof(CreditCard)).Single();
             Exiled.API.Features.Pickups.Pickup pickup = creditCard.Spawn(position);
-
+            
+            pickup.Rotation = cameraRotation * Quaternion.Euler(-90, 0, 0);
+            
             if (pickup.Rigidbody != null)
             {
-                DisablePhysics(pickup);
+                pickup.Rigidbody.isKinematic = true;
+                pickup.PhysicsModule.ServerSendRpc(pickup.PhysicsModule.ServerWriteRigidbody);
+                pickup.Rigidbody.useGravity = false;
             }
-
-            pickup.Rotation = rotation;
+            
             return pickup;
-        }
-
-        private static void DisablePhysics(Exiled.API.Features.Pickups.Pickup pickup)
-        {
-            pickup.Rigidbody.isKinematic = true;
-            pickup.Rigidbody.useGravity = false;
-            pickup.PhysicsModule.ServerSendRpc(pickup.PhysicsModule.ServerWriteRigidbody);
         }
 
         private static void StoreCreditCardPoints(Exiled.API.Features.Pickups.Pickup pickup, int points)

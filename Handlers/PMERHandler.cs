@@ -3,7 +3,6 @@ using Exiled.CustomItems.API.Features;
 using GockelsAIO_exiled.Features;
 using ProjectMER.Features.Objects;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GockelsAIO_exiled.Items;
 using UnityEngine;
@@ -106,7 +105,6 @@ namespace GockelsAIO_exiled.Handlers
         
         public void OnButtonInteractGobblegum(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
         {
-            // O(1) statt O(n) Lookup
             if (!TrackedGobblegumMachines.Contains(ev.Schematic))
                 return;
 
@@ -121,7 +119,6 @@ namespace GockelsAIO_exiled.Handlers
 
         private static void GiveRandomGobblegum(Player player)
         {
-            // Lazy initialization des Caches
             if (_cachedBuyableGobblegums == null)
             {
                 _cachedBuyableGobblegums = CustomItem.Registered
@@ -145,7 +142,6 @@ namespace GockelsAIO_exiled.Handlers
 
         public void OnButtonInteractCoin(ProjectMER.Events.Arguments.ButtonInteractedEventArgs ev)
         {
-            // O(1) statt O(n) Lookup
             if (!TrackedCoins.Contains(ev.Schematic))
                 return;
 

@@ -29,13 +29,13 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
 
         protected override void SubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot += OnShot;
+            Exiled.Events.Handlers.Player.Shot += OnShotPlayer;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
-            Exiled.Events.Handlers.Player.Shot -= OnShot;
+            Exiled.Events.Handlers.Player.Shot -= OnShotPlayer;
             base.UnsubscribeEvents();
         }
 
@@ -45,7 +45,7 @@ namespace GockelsAIO_exiled.Items.Weapons.LMGs
             base.OnReloading(ev);
         }
 
-        private void OnShot(ShotEventArgs ev)
+        private void OnShotPlayer(ShotEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;

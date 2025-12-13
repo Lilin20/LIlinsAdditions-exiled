@@ -65,15 +65,13 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
         private static void ProcessHit(RaycastHit hit, Player shooter)
         {
-            // Try door first
             var doorVariant = hit.collider.gameObject.GetComponentInParent<DoorVariant>();
             if (doorVariant != null)
             {
                 ToggleDoorLock(doorVariant, shooter);
                 return;
             }
-
-            // Try generator
+            
             var generator = hit.collider.gameObject.GetComponentInParent<Scp079Generator>();
             if (generator != null)
             {

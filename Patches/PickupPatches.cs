@@ -58,7 +58,7 @@ namespace GockelsAIO_exiled.Patches
                     return true;
 
                 DisplayCustomHint(player, textHint);
-                return false; // Skip original method
+                return false;
             }
 
             private static bool TryGetPlayerFromHintDisplay(HintDisplay hintDisplay, out Player player)
@@ -124,7 +124,6 @@ namespace GockelsAIO_exiled.Patches
                 {
                     var wordLength = word.Length;
                     
-                    // Check if adding this word would exceed max length
                     if (currentLineLength > 0 && currentLineLength + wordLength + 1 > maxLineLength)
                     {
                         result.Append('\n');
