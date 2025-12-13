@@ -1,21 +1,32 @@
-﻿using Exiled.API.Features;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
-using Exiled.Events.EventArgs.Player;
-using InventorySystem.Items.Usables;
-using MapGeneration;
 using MEC;
-using ProjectMER.Features;
-using ProjectMER.Features.Objects;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace GockelsAIO_exiled
 {
     public class WeaponSelector
     {
-        public static List<WeightedCustomItem> WeightedCustomWeapons = new();
+        // Animation Configuration
+        private const float AnimationDuration = 5f;
+        private const float AnimationInterval = 0.2f;
+        private const float YOffsetIncrement = 0.035f;
+
+        public static List<WeightedCustomItem> WeightedCustomWeapons { get; } = new();
+
+        public class WeightedCustomItem
+        {
+            public string Name { get; }
+            public int Weight { get; }
+
+            public WeightedCustomItem(string name, int weight)
+            {
+                Name = name;
+                Weight = weight;
+            }
+        }
 
         public static void WeightedCustomWeaponsWithConfig()
         {
@@ -26,31 +37,81 @@ namespace GockelsAIO_exiled
 
             WeightedCustomWeapons.AddRange(weightedItems);
         }
-        
-        private static readonly float Duration = 5f;
-        private static readonly float Interval = 0.2f;
 
-        public class WeightedCustomItem
+        public static void StartMysteryBox(Vector3 position)
         {
-            public string Name;
-            public int Weight;
+            Timing.RunCoroutine(RunMysteryBoxAnimation(position));
+        }
 
-            public WeightedCustomItem(string name, int weight)
+        private static IEnumerator<float> RunMysteryBoxAnimation(Vector3 position)
+        {
+            Pickup currentPickup = null;
+            float elapsed = 0f;
+            float yOffset = 0f;
+
+            while (elapsed < AnimationDuration)
             {
-                Name = name;
-                Weight = weight;
+                currentPickup = SpawnTemporaryPickup(position, yOffset, currentPickup);
+                yOffset += YOffsetIncrement;
+
+                yield return Timing.WaitForSeconds(AnimationInterval);
+                elapsed += AnimationInterval;
+            }
+
+            SpawnFinalPickup(position, yOffset, currentPickup);
+        }
+
+        private static Pickup SpawnTemporaryPickup(Vector3 basePosition, float yOffset, Pickup previousPickup)
+        {
+            previousPickup?.Destroy();
+
+            string itemName = GetWeightedRandomItem();
+            Vector3 spawnPosition = basePosition + Vector3.up * yOffset;
+
+            if (CustomItem.TrySpawn(itemName, spawnPosition, out Pickup pickup))
+            {
+                ConfigurePickupPhysics(pickup, enableGravity: false);
+                return pickup;
+            }
+
+            return null;
+        }
+
+        private static void SpawnFinalPickup(Vector3 basePosition, float yOffset, Pickup previousPickup)
+        {
+            previousPickup?.Destroy();
+
+            string itemName = GetWeightedRandomItem();
+            Vector3 spawnPosition = basePosition + Vector3.up * yOffset;
+
+            if (CustomItem.TrySpawn(itemName, spawnPosition, out Pickup finalPickup))
+            {
+                ConfigurePickupPhysics(finalPickup, enableGravity: false);
             }
         }
 
-        private static string GetWeightedCustomItem()
+        private static void ConfigurePickupPhysics(Pickup pickup, bool enableGravity)
         {
-            int totalWeight = 0;
-            foreach (var item in WeightedCustomWeapons)
-            {
-                totalWeight += item.Weight;
-            }
+            if (pickup.Rigidbody == null)
+                return;
 
-            int randomWeight = UnityEngine.Random.Range(0, totalWeight);
+            pickup.Rotation = Quaternion.identity;
+            pickup.Rigidbody.isKinematic = true;
+            pickup.Rigidbody.useGravity = enableGravity;
+            pickup.Rigidbody.detectCollisions = false;
+            pickup.PhysicsModule.ServerSendRpc(pickup.PhysicsModule.ServerWriteRigidbody);
+        }
+
+        private static string GetWeightedRandomItem()
+        {
+            if (WeightedCustomWeapons.Count == 0)
+                return null;
+
+            int totalWeight = WeightedCustomWeapons.Sum(item => item.Weight);
+            if (totalWeight <= 0)
+                return WeightedCustomWeapons[0].Name;
+
+            int randomWeight = Random.Range(0, totalWeight);
             int currentWeight = 0;
 
             foreach (var item in WeightedCustomWeapons)
@@ -63,48 +124,6 @@ namespace GockelsAIO_exiled
             }
 
             return WeightedCustomWeapons[0].Name;
-        }
-
-        public static void StartMysteryBox(Vector3 position)
-        {
-            Timing.RunCoroutine(RunCustomMysteryBox(position));
-        }
-
-        private static IEnumerator<float> RunCustomMysteryBox(Vector3 position)
-        {
-            Pickup currentPickup = null;
-            Pickup finalPickup = null;
-            float elapsed = 0f;
-            float yOffset = 0f;
-
-            while (elapsed < Duration)
-            {
-                currentPickup?.Destroy();
-
-                string randomWeapon = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
-
-                Vector3 currentPosition = position + new Vector3(0f, yOffset, 0f);
-
-                CustomItem.TrySpawn(randomWeapon, currentPosition, out currentPickup);
-                currentPickup.Rotation = Quaternion.identity;
-                currentPickup.Rigidbody.isKinematic = true;
-                currentPickup.PhysicsModule.ServerSendRpc(currentPickup.PhysicsModule.ServerWriteRigidbody);
-                currentPickup.Rigidbody.useGravity = false;
-                currentPickup.Rigidbody.detectCollisions = false;
-
-                yOffset += 0.035f;
-
-                yield return Timing.WaitForSeconds(Interval);
-                elapsed += Interval;
-            }
-
-            currentPickup?.Destroy();
-            string finalCustom = GetWeightedCustomItem(); //CustomWeaponPool[UnityEngine.Random.Range(0, CustomWeaponPool.Count)];
-            CustomItem.TrySpawn(finalCustom, position + new Vector3(0f, yOffset, 0f), out finalPickup);
-            finalPickup.Rigidbody.isKinematic = true;
-            finalPickup.PhysicsModule.ServerSendRpc(finalPickup.PhysicsModule.ServerWriteRigidbody);
-            finalPickup.Rigidbody.useGravity = false;
-            finalPickup.Rigidbody.detectCollisions = false;
         }
     }
 }
