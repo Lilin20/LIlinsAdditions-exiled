@@ -93,6 +93,12 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
             if (door.IsLocked)
             {
+                if (door.IsGate)
+                {
+                    Log.Debug($"[HackGun] {shooter.Nickname} tried to unlock gate {door.Type} but gates cannot be opened by HackGun");
+                    return;
+                }
+                
                 door.Unlock();
                 Log.Debug($"[HackGun] {shooter.Nickname} unlocked door: {door.Type}");
             }
