@@ -4,6 +4,7 @@ using GockelsAIO_exiled.Features;
 using ProjectMER.Features.Objects;
 using System.Collections.Generic;
 using System.Linq;
+using AdminToys;
 using GockelsAIO_exiled.Items;
 using UnityEngine;
 
@@ -21,11 +22,13 @@ namespace GockelsAIO_exiled.Handlers
         public static HashSet<SchematicObject> TrackedSchematics { get; } = new();
         public static HashSet<SchematicObject> TrackedGobblegumMachines { get; } = new();
         public static HashSet<SchematicObject> TrackedCoins { get; } = new();
+        public static Dictionary<SchematicObject, int> VendingMachineUsage { get; } = new();
         
         private static readonly uint[] GobblegumIDs = new uint[]
         {
             800, 801, 802, 803, 805, 806, 807, 808,
-            809, 810, 811, 812, 813, 814, 815, 816
+            809, 810, 811, 812, 813, 814, 815, 816,
+            817, 818
         };
         
         private Config CachedConfig => LilinsAdditions.Instance.Config;
@@ -107,16 +110,75 @@ namespace GockelsAIO_exiled.Handlers
         {
             if (!TrackedGobblegumMachines.Contains(ev.Schematic))
                 return;
-
+    
             var config = CachedConfig;
             if (!TryPurchase(ev.Player, config.PointsForVendingMachine, config.VendingMachineMissingPointsText))
                 return;
-
-            Log.Debug($"[Gobblegum] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname}");
-            
+    
+            int currentUsage = GetCurrentUsage(ev.Schematic);
+            int newUsage = currentUsage + 1;
+            VendingMachineUsage[ev.Schematic] = newUsage;
+    
+            Log.Debug($"[Gobblegum] Interaction from '{ev.Schematic.name}' by {ev.Player.Nickname} (Usage: {newUsage}/{config.VendingMachineUsageLimit})");
+    
             GiveRandomGobblegum(ev.Player);
+    
+            if (ShouldDestroyVendingMachine(newUsage, config.VendingMachineUsageLimit))
+            {
+                DestroyVendingMachine(ev.Schematic);
+            }
         }
 
+        private static int GetCurrentUsage(SchematicObject schematic)
+        {
+            return VendingMachineUsage.TryGetValue(schematic, out int usage) ? usage : 0;
+        }
+
+        private static bool ShouldDestroyVendingMachine(int currentUsage, int usageLimit)
+        {
+            return currentUsage >= usageLimit;
+        }
+
+        private static void DestroyVendingMachine(SchematicObject schematic)
+        {
+            DestroyVendingMachineSpeaker(schematic);
+            DisableVendingMachineLights(schematic);
+            TrackedGobblegumMachines.Remove(schematic);
+            VendingMachineUsage.Remove(schematic);
+    
+            Log.Debug($"[Gobblegum] Vending machine destroyed: {schematic.name}");
+        }
+        
+        private static void DisableVendingMachineLights(SchematicObject schematic)
+        {
+            foreach (var block in schematic.AttachedBlocks)
+            {
+                if (block.name.Contains("Light") || block.name.Contains("Lamp"))
+                {
+                    var lightSource = block.GetComponent<LightSourceToy>();
+                    if (lightSource != null)
+                    {
+                        lightSource.NetworkLightIntensity = 0f;
+                    }
+            
+                    Log.Debug($"[Gobblegum] Light disabled: {block.name}");
+                }
+            }
+        }
+        
+        private static void DestroyVendingMachineSpeaker(SchematicObject schematic)
+        {
+            foreach (var block in schematic.AttachedBlocks)
+            {
+                if (block.name == "FizzSpeaker")
+                {
+                    Object.Destroy(block.gameObject);
+                    Log.Debug($"[Gobblegum] Speaker destroyed for vending machine: {schematic.name}");
+                    break;
+                }
+            }
+        }
+        
         private static void GiveRandomGobblegum(Player player)
         {
             if (_cachedBuyableGobblegums == null)
@@ -135,7 +197,7 @@ namespace GockelsAIO_exiled.Handlers
             var randomItem = _cachedBuyableGobblegums[UnityEngine.Random.Range(0, _cachedBuyableGobblegums.Count)];
             CustomItem.TryGive(player, randomItem.Id);
         }
-
+        
         #endregion
 
         #region Coin Collection

@@ -137,6 +137,8 @@ namespace GockelsAIO_exiled
                 {
                     spawned++;
                     PMERHandler.TrackedGobblegumMachines.Add(schematic);
+                    
+                    PMERHandler.VendingMachineUsage[schematic] = 0;
 
                     foreach (var block in schematic.AttachedBlocks)
                     {

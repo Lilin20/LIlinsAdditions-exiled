@@ -1,4 +1,5 @@
-﻿using Exiled.API.Enums;
+﻿using System;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Server;
 using MEC;
@@ -56,6 +57,8 @@ namespace GockelsAIO_exiled.Handlers
         public void OnRoundEnd(RoundEndedEventArgs ev)
         {
             Timing.KillCoroutines(TickCoroutine);
+            
+            PMERHandler.VendingMachineUsage.Clear();
         }
 
         public void OnStart()
@@ -79,15 +82,24 @@ namespace GockelsAIO_exiled.Handlers
         private void SpawnMapFeatures()
         {
             var config = LilinsAdditions.Instance.Config;
-
-            if (config.EnableMysteryBox)
-                _schematicSpawner.SpawnMysteryBoxes(DEFAULT_MYSTERY_BOX_COUNT);
-
-            if (config.EnableFortunaFizz)
-                _schematicSpawner.SpawnGobblegumMachines(DEFAULT_GOBBLEGUM_COUNT);
-
+  
+            if (config.EnableMysteryBox)  
+            {  
+                int mysteryBoxCount = Math.Min(config.MaxMysteryBoxCount, DEFAULT_MYSTERY_BOX_COUNT);
+                _schematicSpawner.SpawnMysteryBoxes(mysteryBoxCount);  
+            }  
+  
+            if (config.EnableFortunaFizz)  
+            {  
+                int vendingMachineCount = Math.Min(config.MaxVendingMachineCount, DEFAULT_GOBBLEGUM_COUNT);
+                _schematicSpawner.SpawnGobblegumMachines(vendingMachineCount);
+            }
+            
             if (config.EnableHiddenCoins)
-                _schematicSpawner.SpawnCoins(DEFAULT_COIN_COUNT);
+            {
+                int coinCount = Math.Min(config.MaxCoinCount, DEFAULT_COIN_COUNT);
+                _schematicSpawner.SpawnCoins(coinCount);
+            }
         }
 
         #endregion

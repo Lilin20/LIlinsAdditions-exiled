@@ -118,6 +118,8 @@
     <Compile Include="Config.cs" />
     <Compile Include="Features\PointSystem.cs" />
     <Compile Include="Items\FortunaFizzItem.cs" />
+    <Compile Include="Items\GobbleGums\InventorySwap.cs" />
+    <Compile Include="Items\GobbleGums\Leech.cs" />
     <Compile Include="Items\Keycards\CreditCard.cs" />
     <Compile Include="LilinsAdditions.cs" />
     <Compile Include="Handlers\PlayerHandler.cs" />

@@ -39,6 +39,10 @@ namespace GockelsAIO_exiled
         public int PointsForCoin { get; set; } = 1500;
         public string MysteryBoxMissingPointsText { get; set; } = "<color=red>You need 800 Points to open the box!</color>";
         public string VendingMachineMissingPointsText { get; set; } = "<color=red>You need 200 points!</color>";
+        public int VendingMachineUsageLimit { get; set; } = 10;
+        public int MaxMysteryBoxCount { get; set; } = 8;
+        public int MaxVendingMachineCount { get; set; } = 5;
+        public int MaxCoinCount { get; set; } = 2;
         public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()
         {
             new() {Name = "Prototype LMG - Nano Rockets", Weight = 1},
@@ -200,6 +204,14 @@ namespace GockelsAIO_exiled
         public List<WhereIsWaldo> whereIsWaldo { get; set; } = new()
         {
             new WhereIsWaldo()
+        };
+        public List<InventorySwap> inventorySwap { get; set; } = new()
+        {
+            new InventorySwap()
+        };
+        public List<LifeLeech> lifeLeech { get; set; } = new()
+        {
+            new LifeLeech()
         };
     }
 }
