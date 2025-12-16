@@ -17,8 +17,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
         private const float RAYCAST_DISTANCE = 20f;
         private const float DOOR_LOCK_DURATION = 5f;
         private const float BLACKOUT_DURATION = 10f;
-        private const string GENERATOR_CASSIE_MESSAGE = "GENERATOR DAMAGE DETECTED . REPAIRING GENERATOR";
-        private const string GENERATOR_CASSIE_SUBTITLE = "Generator Malfunction";
         
         private const int RAYCAST_LAYER_MASK = ~(1 << 1 | 1 << 13 | 1 << 16 | 1 << 28);
 
@@ -111,14 +109,6 @@ namespace GockelsAIO_exiled.Items.Weapons.Pistols
 
         private static void TriggerGeneratorBlackout(Player shooter)
         {
-            Cassie.MessageTranslated(
-                GENERATOR_CASSIE_MESSAGE,
-                GENERATOR_CASSIE_SUBTITLE,
-                isHeld: false,
-                isNoisy: true,
-                isSubtitles: true
-            );
-
             Map.TurnOffAllLights(BLACKOUT_DURATION);
 
             Log.Debug($"[HackGun] {shooter.Nickname} triggered generator blackout for {BLACKOUT_DURATION}s");

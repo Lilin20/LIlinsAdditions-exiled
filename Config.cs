@@ -213,5 +213,9 @@ namespace GockelsAIO_exiled
         {
             new LifeLeech()
         };
+        public List<CardiacOverdrive> cardiacOverdrive { get; set; } = new()
+        {
+            new CardiacOverdrive()
+        };
     }
 }

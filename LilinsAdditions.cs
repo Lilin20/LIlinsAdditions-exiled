@@ -14,7 +14,7 @@ namespace GockelsAIO_exiled
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
         public override Version Version => new Version(1, 0, 0);
-        
+
         // Singleton Instance
         public static LilinsAdditions Instance { get; private set; }
         
