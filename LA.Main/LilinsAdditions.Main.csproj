@@ -10,8 +10,8 @@
     <ProjectGuid>{470A4873-AA7F-4354-BBBE-DBA7605E50C3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GockelsAIO_exiled</RootNamespace>
-    <AssemblyName>LilinsAdditions-exiled</AssemblyName>
+    <RootNamespace>LilinsAdditions</RootNamespace>
+    <AssemblyName>LilinsAdditions.Main</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
