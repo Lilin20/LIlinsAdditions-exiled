@@ -5,7 +5,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class Juggernaut : FortunaFizzItem
@@ -41,17 +41,10 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
+
+            ev.IsAllowed = false;
             
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
-            
-            Timing.CallDelayed(USE_DELAY, () => IncreaseMaxHealth(ev));
+            IncreaseMaxHealth(ev);
         }
 
         private static void IncreaseMaxHealth(UsingItemEventArgs ev)

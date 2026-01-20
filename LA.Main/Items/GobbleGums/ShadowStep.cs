@@ -6,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class ShadowStep : FortunaFizzItem
@@ -43,17 +43,10 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
-            
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
 
-            Timing.CallDelayed(USE_DELAY, () => ActivateShadowStep(ev));
+            ev.IsAllowed = false;
+
+            ActivateShadowStep(ev);
         }
 
         private static void ActivateShadowStep(UsingItemEventArgs ev)

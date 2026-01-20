@@ -1,12 +1,12 @@
-﻿using Exiled.API.Features;
+﻿using System.Collections.Generic;
+using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using MEC;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class LifeLeech : FortunaFizzItem
@@ -49,16 +49,9 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
+            ev.IsAllowed = false;
             
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
-            
-            Timing.CallDelayed(USE_DELAY, () => ActivateLifeLeech(ev));
+            ActivateLifeLeech(ev);
         }
 
         private void ActivateLifeLeech(UsingItemEventArgs ev)

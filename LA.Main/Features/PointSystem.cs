@@ -2,13 +2,13 @@
 using System.Linq;
 using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
-using GockelsAIO_exiled.Handlers;
-using GockelsAIO_exiled.Items.Keycards;
+using LilinsAdditions.Handlers;
+using LilinsAdditions.Items.Keycards;
 using UnityEngine;
 using Player = Exiled.API.Features.Player;
 using TextToy = LabApi.Features.Wrappers.TextToy;
 
-namespace GockelsAIO_exiled.Features
+namespace LilinsAdditions.Features
 {
     public class PointSystem
     {

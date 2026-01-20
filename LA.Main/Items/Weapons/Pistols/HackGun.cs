@@ -9,7 +9,7 @@ using Interactables.Interobjects.DoorUtils;
 using MapGeneration.Distributors;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.Pistols
+namespace LilinsAdditions.Items.Weapons.Pistols
 {
     [CustomItem(ItemType.GunCOM15)]
     public class HackGun : CustomWeapon

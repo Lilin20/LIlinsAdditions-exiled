@@ -1,13 +1,13 @@
-﻿using Exiled.API.Enums;
+﻿using System.Collections.Generic;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using MEC;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class ShrinkAndRun : FortunaFizzItem
@@ -48,17 +48,10 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
-            
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
 
-            Timing.CallDelayed(USE_DELAY, () => ActivateShrinkAndRun(ev));
+            ev.IsAllowed = false;
+
+            ActivateShrinkAndRun(ev);
         }
 
         private static void ActivateShrinkAndRun(UsingItemEventArgs ev)

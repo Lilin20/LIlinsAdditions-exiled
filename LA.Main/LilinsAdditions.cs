@@ -1,26 +1,21 @@
-﻿using Exiled.API.Features;
+﻿using System;
+using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using Exiled.CustomRoles.API.Features;
-using GockelsAIO_exiled.Handlers;
 using HarmonyLib;
+using LilinsAdditions.Features;
+using LilinsAdditions.Handlers;
 using MEC;
-using System;
-using System.Text;
-using Exiled.Events.EventArgs.Player;
-using RueI.API;
-using RueI.API.Elements;
-using RueI.API.Elements.Enums;
-using RueI.Utils;
-using UnityEngine;
+using RemoteAdmin;
 
-namespace GockelsAIO_exiled
+namespace LilinsAdditions
 {
     public class LilinsAdditions : Plugin<Config>
     {
         // Plugin Metadata
         public override string Name => "Lilin's Additions";
         public override string Author => "Lilin";
-        public override Version Version => new Version(1, 0, 0);
+        public override Version Version => new Version(1, 0, 5);
 
         // Singleton Instance
         public static LilinsAdditions Instance { get; private set; }
@@ -64,7 +59,7 @@ namespace GockelsAIO_exiled
             PlayerHandler = new PlayerHandler();
             ServerHandler = new ServerHandler();
             PMERHandler =  new PMERHandler();
-            _harmony = new Harmony("lilin.patches");
+            _harmony = new Harmony("lilins.patches");
         }
 
         private void LoadResources()

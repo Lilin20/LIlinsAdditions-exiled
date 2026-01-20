@@ -2,11 +2,11 @@
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using GockelsAIO_exiled.Handlers;
+using LilinsAdditions.Handlers;
 using ProjectMER.Features;
 using UnityEngine;
 
-namespace GockelsAIO_exiled
+namespace LilinsAdditions.Features
 {
     public class SchematicSpawner
     {

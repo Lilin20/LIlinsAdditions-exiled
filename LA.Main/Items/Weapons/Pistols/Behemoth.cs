@@ -6,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.Pistols
+namespace LilinsAdditions.Items.Weapons.Pistols
 {
     [CustomItem(ItemType.GunRevolver)]
     public class Behemoth : CustomWeapon

@@ -1,5 +1,4 @@
-﻿
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
@@ -8,7 +7,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.LMGs
+namespace LilinsAdditions.Items.Weapons.LMGs
 {
     [CustomItem(ItemType.GunLogicer)]
     public class GrenadeLauncher : CustomWeapon

@@ -6,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Firearms.Attachments;
 using PlayerStatsSystem;
 
-namespace GockelsAIO_exiled.Items.Weapons.Rifles
+namespace LilinsAdditions.Items.Weapons.Rifles
 {
     [CustomItem(ItemType.GunE11SR)]
     public class Sniper : CustomWeapon

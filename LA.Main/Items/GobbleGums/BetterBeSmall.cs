@@ -1,15 +1,13 @@
 ﻿using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
-using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class BetterBeSmall : FortunaFizzItem
     {
-        private const float USE_DELAY = 2f;
         private const float SCALE_REDUCTION = 0.2f;
         private const float MIN_SCALE = 0.4f;
         private const string BETTER_BE_SMALL_KEY = "BetterBeSmallUsed";
@@ -28,12 +26,14 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         protected override void SubscribeEvents()
         {
             Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
+            Exiled.Events.Handlers.Player.Dying += OnDying;
             base.SubscribeEvents();
         }
 
         protected override void UnsubscribeEvents()
         {
             Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
+            Exiled.Events.Handlers.Player.Dying -= OnDying;
             base.UnsubscribeEvents();
         }
 
@@ -55,16 +55,9 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
+            ev.IsAllowed = false;
             
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
-            
-            Timing.CallDelayed(USE_DELAY, () => ApplyScaleReduction(ev));
+            ApplyScaleReduction(ev);
         }
 
         private static void ApplyScaleReduction(UsingItemEventArgs ev)

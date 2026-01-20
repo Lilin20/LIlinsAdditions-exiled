@@ -8,7 +8,7 @@ using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.LMGs
+namespace LilinsAdditions.Items.Weapons.LMGs
 {
     [CustomItem(ItemType.GunLogicer)]
     public class ExplosiveLMG : CustomWeapon

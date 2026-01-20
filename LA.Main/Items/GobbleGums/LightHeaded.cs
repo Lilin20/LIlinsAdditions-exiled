@@ -6,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class LightHeaded : FortunaFizzItem
@@ -37,26 +37,19 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
             base.UnsubscribeEvents();
         }
-
+        
         private void OnUsingItem(UsingItemEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
+            ev.IsAllowed = false;
             
             if (ev.Player.Role is not FpcRole fpcRole)
                 return;
 
             var originalGravity = fpcRole.Gravity;
-            Timing.CallDelayed(USE_DELAY, () => ApplyReducedGravity(ev, fpcRole, originalGravity));
+            ApplyReducedGravity(ev, fpcRole, originalGravity);
         }
 
         private static void ApplyReducedGravity(UsingItemEventArgs ev, FpcRole fpcRole, Vector3 originalGravity)
@@ -74,9 +67,9 @@ namespace GockelsAIO_exiled.Items.GobbleGums
 
         private static void RestoreGravity(Player player, FpcRole fpcRole, Vector3 originalGravity)
         {
-            if (player == null || !player.IsAlive || player.Role is not FpcRole)
+            if (player == null || player.Role is not FpcRole)
                 return;
-
+            
             fpcRole.Gravity = originalGravity;
             Log.Debug($"[LightHeaded] {player.Nickname} gravity restored");
         }

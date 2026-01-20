@@ -1,14 +1,13 @@
-﻿using Exiled.API.Features;
+﻿using System.Collections.Generic;
+using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
+using Exiled.API.Features.Items;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using MEC;
-using System.Collections.Generic;
-using Exiled.API.Features.Items;
-using PlayerRoles.FirstPersonControl;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class CardiacOverdrive : FortunaFizzItem
@@ -62,14 +61,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
+            ev.IsAllowed = false;
             
             if (IsEffectActive(ev.Player))
             {
@@ -78,7 +70,7 @@ namespace GockelsAIO_exiled.Items.GobbleGums
                 return;
             }
 
-            Timing.CallDelayed(USE_DELAY, () => ActivateEffect(ev.Player, ev.Item));
+            ActivateEffect(ev.Player, ev.Item);
         }
 
         private void OnPlayerDied(DiedEventArgs ev)

@@ -1,9 +1,9 @@
 ﻿using System;
 using CommandSystem;
 using Exiled.API.Features;
-using GockelsAIO_exiled.Features;
+using LilinsAdditions.Features;
 
-namespace GockelsAIO_exiled.Commands
+namespace LilinsAdditions.Commands
 {
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     public class Points : ICommand

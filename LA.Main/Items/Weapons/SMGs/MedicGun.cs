@@ -5,7 +5,7 @@ using Exiled.Events.EventArgs.Player;
 using PlayerRoles;
 using PlayerHandlers = Exiled.Events.Handlers.Player;
 
-namespace GockelsAIO_exiled.Items.Weapons.SMGs
+namespace LilinsAdditions.Items.Weapons.SMGs
 {
     [CustomItem(ItemType.GunCrossvec)]
     public class MedicGun : CustomWeapon

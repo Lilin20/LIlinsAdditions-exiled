@@ -7,7 +7,7 @@ using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Firearms.Attachments;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.Shotguns
+namespace LilinsAdditions.Items.Weapons.Shotguns
 {
     [CustomItem(ItemType.GunShotgun)]
     public class BreachShotgun : CustomWeapon

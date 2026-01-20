@@ -1,5 +1,4 @@
-﻿
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
@@ -7,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.Pistols
+namespace LilinsAdditions.Items.Weapons.Pistols
 {
     [CustomItem(ItemType.GunCOM15)]
     public class PlaceSwap : CustomWeapon

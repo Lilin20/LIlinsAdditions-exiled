@@ -5,16 +5,13 @@ using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
-using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class AnywhereButHere : FortunaFizzItem
     {
-        private const float USE_DELAY = 2f;
-        
         private static readonly HashSet<RoomType> ForbiddenRoomTypes = new()
         {
             RoomType.Hcz079,
@@ -31,7 +28,8 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             RoomType.HczTesla,
             RoomType.EzShelter,
             RoomType.Pocket,
-            RoomType.HczCrossRoomWater
+            RoomType.HczCrossRoomWater,
+            RoomType.HczIncineratorWayside
         };
 
         public override uint Id { get; set; } = 801;
@@ -62,16 +60,9 @@ namespace GockelsAIO_exiled.Items.GobbleGums
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
+            ev.IsAllowed = false;
             
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
-            
-            Timing.CallDelayed(USE_DELAY, () => ExecuteTeleport(ev));
+            ExecuteTeleport(ev);
         }
 
         private static void ExecuteTeleport(UsingItemEventArgs ev)

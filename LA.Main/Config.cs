@@ -1,17 +1,17 @@
-﻿using Exiled.API.Enums;
+﻿using System.Collections.Generic;
+using Exiled.API.Enums;
 using Exiled.API.Interfaces;
-using GockelsAIO_exiled.Items.GobbleGums;
-using GockelsAIO_exiled.Items.SCPs;
-using GockelsAIO_exiled.Items.Weapons.LMGs;
-using GockelsAIO_exiled.Items.Weapons.Pistols;
-using GockelsAIO_exiled.Items.Weapons.Rifles;
-using GockelsAIO_exiled.Items.Weapons.Shotguns;
-using GockelsAIO_exiled.Items.Weapons.SMGs;
-using System.Collections.Generic;
+using LilinsAdditions.Items.GobbleGums;
+using LilinsAdditions.Items.SCPs;
+using LilinsAdditions.Items.Weapons.LMGs;
+using LilinsAdditions.Items.Weapons.Pistols;
+using LilinsAdditions.Items.Weapons.Rifles;
+using LilinsAdditions.Items.Weapons.Shotguns;
+using LilinsAdditions.Items.Weapons.SMGs;
 using UnityEngine;
-using static GockelsAIO_exiled.SchematicSpawner;
+using static LilinsAdditions.Features.SchematicSpawner;
 
-namespace GockelsAIO_exiled
+namespace LilinsAdditions
 {
     public class Config : IConfig
     {
@@ -216,6 +216,11 @@ namespace GockelsAIO_exiled
         public List<CardiacOverdrive> cardiacOverdrive { get; set; } = new()
         {
             new CardiacOverdrive()
+        };
+
+        public List<SpeedRoulette> speedRoulette { get; set; } = new()
+        {
+            new SpeedRoulette()
         };
     }
 }

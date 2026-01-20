@@ -1,14 +1,14 @@
-﻿using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
-using GockelsAIO_exiled.Features;
-using ProjectMER.Features.Objects;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AdminToys;
-using GockelsAIO_exiled.Items;
+using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
+using LilinsAdditions.Features;
+using LilinsAdditions.Items;
+using ProjectMER.Features.Objects;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Handlers
+namespace LilinsAdditions.Handlers
 {
     public class PMERHandler
     {
@@ -28,7 +28,7 @@ namespace GockelsAIO_exiled.Handlers
         {
             800, 801, 802, 803, 805, 806, 807, 808,
             809, 810, 811, 812, 813, 814, 815, 816,
-            817, 818, 819
+            817, 818, 819, 820
         };
         
         private Config CachedConfig => LilinsAdditions.Instance.Config;

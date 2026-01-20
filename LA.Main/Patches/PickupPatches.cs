@@ -1,4 +1,6 @@
-﻿using Exiled.API.Features;
+﻿using System.Reflection;
+using System.Text;
+using Exiled.API.Features;
 using Exiled.API.Features.Pools;
 using HarmonyLib;
 using Hints;
@@ -8,9 +10,8 @@ using RueI.API;
 using RueI.API.Elements;
 using RueI.Utils;
 using RueI.Utils.Enums;
-using System.Text;
 
-namespace GockelsAIO_exiled.Patches
+namespace LilinsAdditions.Patches
 {
     /// <summary>
     /// Harmony patches for pickup and hint system customizations.
@@ -77,13 +78,23 @@ namespace GockelsAIO_exiled.Patches
                 var sb = StringBuilderPool.Pool.Get();
                 try
                 {
-                    var content = BuildHintContent(sb, textHint.Text);
+                    var content = BuildHintContent(sb, GetTextHintContent(textHint));
                     ShowHintToPlayer(player, content, textHint.DurationScalar);
                 }
                 finally
                 {
                     StringBuilderPool.Pool.Return(sb);
                 }
+            }
+
+            private static string GetTextHintContent(TextHint textHint)
+            {
+                var textProperty = typeof(TextHint).GetProperty("Text", 
+                    BindingFlags.Instance |
+                    BindingFlags.Public | 
+                    BindingFlags.NonPublic);
+
+                return textProperty?.GetValue(textHint) as string ?? string.Empty;
             }
 
             private static string BuildHintContent(StringBuilder sb, string text)

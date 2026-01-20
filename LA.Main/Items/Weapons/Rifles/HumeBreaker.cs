@@ -4,7 +4,6 @@ using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
-using Exiled.API.Features.CustomStats;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Roles;
 using Exiled.API.Features.Spawn;
@@ -13,10 +12,9 @@ using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using InventorySystem.Items.Firearms.Attachments;
 using MEC;
-using PlayerStatsSystem;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Weapons.Rifles
+namespace LilinsAdditions.Items.Weapons.Rifles
 {
     [CustomItem(ItemType.GunE11SR)]
     public class HumeBreaker : CustomWeapon

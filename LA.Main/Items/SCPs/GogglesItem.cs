@@ -6,7 +6,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerHandler = Exiled.Events.Handlers.Player;
 
-namespace GockelsAIO_exiled.Items.SCPs
+namespace LilinsAdditions.Items.SCPs
 {
     public abstract class GogglesItem : CustomItem
     {

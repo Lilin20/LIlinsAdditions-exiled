@@ -8,7 +8,7 @@ using MEC;
 using PlayerRoles;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.GobbleGums
+namespace LilinsAdditions.Items.GobbleGums
 {
     [CustomItem(ItemType.AntiSCP207)]
     public class NeverSeen : FortunaFizzItem
@@ -42,17 +42,10 @@ namespace GockelsAIO_exiled.Items.GobbleGums
         {
             if (!Check(ev.Player.CurrentItem))
                 return;
-            
-            float cooldownEndTime = ev.Player.GetCooldownItem(ItemType.AntiSCP207);
-            if (cooldownEndTime > Time.timeSinceLevelLoad)
-            {
-                ev.IsAllowed = false;
-                return;
-            }
-            
-            ev.Player.SetCooldownItem(USE_DELAY, ItemType.AntiSCP207);
 
-            Timing.CallDelayed(USE_DELAY, () => RemoveFromScp096Targets(ev));
+            ev.IsAllowed = false;
+
+            RemoveFromScp096Targets(ev);
         }
 
         private static void RemoveFromScp096Targets(UsingItemEventArgs ev)

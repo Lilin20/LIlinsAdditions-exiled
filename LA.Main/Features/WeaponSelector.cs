@@ -5,7 +5,7 @@ using Exiled.CustomItems.API.Features;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled
+namespace LilinsAdditions.Features
 {
     public class WeaponSelector
     {
@@ -34,7 +34,7 @@ namespace GockelsAIO_exiled
                 .Where(p => !string.IsNullOrWhiteSpace(p.Name))
                 .Select(p => new WeightedCustomItem(p.Name, p.Weight))
                 .ToList();
-
+            
             WeightedCustomWeapons.AddRange(weightedItems);
         }
 

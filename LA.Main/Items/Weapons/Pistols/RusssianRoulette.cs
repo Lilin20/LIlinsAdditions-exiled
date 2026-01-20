@@ -3,14 +3,13 @@ using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using Exiled.Events.Handlers;
 using MEC;
 using PlayerRoles;
 using PlayerStatsSystem;
 using UnityEngine;
 using Player = Exiled.Events.Handlers.Player;
 
-namespace GockelsAIO_exiled.Items.Weapons.Pistols
+namespace LilinsAdditions.Items.Weapons.Pistols
 {
     [CustomItem(ItemType.GunRevolver)]
     public class RussianRoulette : CustomWeapon

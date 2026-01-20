@@ -1,4 +1,4 @@
-﻿namespace GockelsAIO_exiled.Helper
+﻿namespace LilinsAdditions.Helper
 {
     public class MysteryBoxPoolConfi()
     {

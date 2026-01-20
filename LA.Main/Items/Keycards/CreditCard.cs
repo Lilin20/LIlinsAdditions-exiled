@@ -3,7 +3,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.Keycards
+namespace LilinsAdditions.Items.Keycards
 {
     [CustomItem(ItemType.KeycardCustomSite02)]
     public class CreditCard : CustomKeycard

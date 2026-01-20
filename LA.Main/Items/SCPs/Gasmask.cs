@@ -6,7 +6,7 @@ using Exiled.API.Features.Spawn;
 using MEC;
 using UnityEngine;
 
-namespace GockelsAIO_exiled.Items.SCPs
+namespace LilinsAdditions.Items.SCPs
 {
     [CustomItem(ItemType.SCP268)]
     public class Gasmask : GogglesItem
