@@ -28,15 +28,15 @@ namespace LilinsAdditions.Patches
         /// <summary>
         /// Patches pickup freeze synchronization to respect kinematic state.
         /// </summary>
-        [HarmonyPatch(typeof(PickupStandardPhysics), nameof(PickupStandardPhysics.ServerSendFreeze), MethodType.Getter)]
-        internal static class PickupIsKinematicSyncPatch
-        {
-            [UsedImplicitly]
-            private static void Postfix(PickupStandardPhysics __instance, ref bool __result)
-            {
-                __result = __result || __instance.Rb.isKinematic;
-            }
-        }
+        //[HarmonyPatch(typeof(PickupStandardPhysics), nameof(PickupStandardPhysics.ServerSendFreeze), MethodType.Getter)]
+        //internal static class PickupIsKinematicSyncPatch
+        //{
+        //    [UsedImplicitly]
+        //    private static void Postfix(PickupStandardPhysics __instance, ref bool __result)
+        //    {
+        //        __result = __result || __instance.Rb.isKinematic;
+        //    }
+        //}
 
         #endregion
 

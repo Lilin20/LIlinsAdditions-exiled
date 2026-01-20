@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
 using Exiled.CustomItems.API.Features;
 using MEC;
+using Mirror;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace LilinsAdditions.Features
 {
@@ -45,20 +50,39 @@ namespace LilinsAdditions.Features
 
         private static IEnumerator<float> RunMysteryBoxAnimation(Vector3 position)
         {
+            Log.Debug($"Starting mystery box animation at position {position}"); 
+            
             Pickup currentPickup = null;
             float elapsed = 0f;
             float yOffset = 0f;
+            int iterationCount = 0;
 
             while (elapsed < AnimationDuration)
             {
+                iterationCount++;  
+                Log.Debug($"Animation iteration {iterationCount}: elapsed={elapsed:F2}, yOffset={yOffset:F3}");
+                
                 currentPickup = SpawnTemporaryPickup(position, yOffset, currentPickup);
+                
+                if (currentPickup == null)
+                {
+                    Log.Error($"Failed to spawn pickup in iteration {iterationCount}");
+                }
+                else
+                {
+                    Log.Debug($"Successfully spawned pickup {currentPickup.Serial} in iteration {iterationCount}");
+                }
+                
                 yOffset += YOffsetIncrement;
 
                 yield return Timing.WaitForSeconds(AnimationInterval);
                 elapsed += AnimationInterval;
+                Log.Debug($"After wait: elapsed={elapsed:F2}, remaining={AnimationDuration - elapsed:F2}");
             }
-
+            
+            Log.Debug($"Animation completed after {iterationCount} iterations, spawning final pickup");
             SpawnFinalPickup(position, yOffset, currentPickup);
+            Log.Debug("Mystery box animation finished");
         }
 
         private static Pickup SpawnTemporaryPickup(Vector3 basePosition, float yOffset, Pickup previousPickup)
@@ -99,7 +123,8 @@ namespace LilinsAdditions.Features
             pickup.Rigidbody.isKinematic = true;
             pickup.Rigidbody.useGravity = enableGravity;
             pickup.Rigidbody.detectCollisions = false;
-            pickup.PhysicsModule.ServerSendRpc(pickup.PhysicsModule.ServerWriteRigidbody);
+
+            
         }
 
         private static string GetWeightedRandomItem()
