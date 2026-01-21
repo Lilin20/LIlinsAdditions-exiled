@@ -1,81 +1,102 @@
-# **Lilin’s Additions**
+# Lilin's Additions - SCP:SL Plugin
 
-Hey everyone! 👋  
-Welcome to my newest project — **Lilin’s Additions**!
+A comprehensive plugin for SCP: Secret Laboratory that adds a point economy system, Mystery Boxes, Vending Machines, and various gameplay enhancements.
 
-I’ve made a few plugins before, but this one has been my main focus for quite some time. It actually started as a **private plugin** for my own server (just a small group of friends), but since we don’t play as actively anymore, I decided to release it publicly so my work doesn’t just sit and rot away. 😅  
+## Overview
 
-Before you go diving into the GitHub page — **yes, the code is messy**.  
-It was never meant for public release, but I’m actively cleaning it up and optimizing various parts as I go. This first version is more of a **test release**, so expect some bugs and rough edges that I’ll polish over time.
+Lilin's Additions is a feature-rich plugin built on the Exiled framework that introduces custom content systems including an integrated point economy, interactive world objects, and various gameplay mechanics. The plugin enhances gameplay with Mystery Boxes, Vending Machines, and utility systems.
 
----
+## Main Features
 
-## ⚠️ Disclaimer
-- This is a **test release** – features were removed, changed, or reworked for compatibility.  
-- Expect **bugs, issues, and unfinished features** – report them so I can fix things faster.  
-- The plugin currently **requires multiple dependencies** (sorry about that — I’ll try to reduce them later).  
+### 💰 Point Economy System
 
----
+Integrated economy with multiple features:
 
-## 🧩 Current Features
+- **Point Earning:** Players start with 400 points, earn 200 for kills, 100 over time
+- **Mystery Boxes:** Cost 800 points, spawn random items
+- **Vending Machines:** Cost 200 points, dispense consumables
+- **Credit Cards:** Drop from dead players containing their points
 
-```diff
-+ Vending Machines (inspired by Call of Duty Zombies)
-  Grab drinks that grant unique effects!
+### 🎁 Mystery Box System
 
-+ Mystery Boxes
-  Not microtransactions — real random loot boxes that give you custom-configurable weapons.
+Interactive world objects that provide randomized rewards:
 
-+ Point System
-  Earn points over time and for killing opposing teams!
+- Spawn in predefined locations across all zones 
+- Weighted random selection system
+- Animated opening with sound effects
+- Single-use objects that are consumed after interaction
 
-+ Custom Items
-  A bunch of new, fun items like the drinks and special weapons.
+### 🍬 Vending Machine System
 
-+ Custom Roles
-  Try new roles such as the Riot Shield Operator — block bullets and storm the facility!
+Strategic dispensers for consumable items:
 
-+ Secret Coins
-  Search hidden coins across the map to earn extra points.
+- Limited usage (10 uses before self-destruct)
+- Spawn in strategic locations
+- Usage tracking per machine
+- Audio feedback and visual effects
 
-+ Anti-Zombie Suicide (Void Protection)
-  Prevents zombies from dying by jumping into the void.
+### 🔧 Additional Features
 
-+ Anti-SCP Suicide (Custom Weapon Protection)
-  Stops SCPs from dying when hit by certain custom weapons.
+- **Hidden Coins:** Collectible objects worth 1500 points
+- **Random Guard Spawn:** Teleports guards to random rooms
+- **SCP-914 Teleport:** Special interactions with SCP-914
+- **Anti-SCP Suicide:** Prevents SCPs from killing themselves via void damage
+- **Credit Card Drops:** Players drop credit cards containing their points on death
 
-+ RueI Support for Hints
-  Better and cleaner hint display integration!
+## Configuration
 
-+ Custom Schematics
-  Includes vending machines, mystery boxes, and even a ceiling trap.
+The plugin uses a comprehensive config system with the following main sections:
 
-+ Ceiling Trap (disabled by default)
-  A crushing ceiling trap for Light Containment — deadly and fun.
+### Feature Toggles
+```csharp
+public bool EnableFortunaFizz { get; set; } = true;     // Vending Machines
+public bool EnableMysteryBox { get; set; } = true;      // Mystery Boxes
+public bool EnableHiddenCoins { get; set; } = false;    // Credit Cards
+public bool EnableRandomGuardSpawn { get; set; } = false;
+public bool Enable914Teleport { get; set; } = false;
+public bool EnableCreditCardDrop { get; set; } = false;
+public bool EnableAntiSCPSuicide { get; set; } = false;
 ```
 
----
+### Economy Settings
+- Starting points, kill rewards, time bonuses
+- Mystery Box and Vending Machine costs
+- Usage limits and spawn counts
 
-## ⚙️ Dependencies
-To install and run this plugin, you’ll need the following:
-- **PMER** *(LabAPI version recommended)*  
-- **AudioPlayerAPI**  
-- **RueI**  
-- **Harmony** *(used for a couple of patches)*  
+### Spawn Configuration
+- Predefined spawn locations for Mystery Boxes, Vending Machines, and Coins
+- Configurable maximum counts for each object type
+- Zone-specific placement rules
 
----
+## Commands
 
-## 📦 Installation Tips
+### Points Management
+Available to Remote Admin users:
 
-Before installing:
-1. **Backup your existing configs** — this plugin has a large and complex configuration file.  
-2. I highly recommend using **separate config files** for organization.  
-3. I’m working on a **custom config loader** to simplify setup in future versions.  
+```
+points (get|add|set|remove) <player> [amount]
+```
 
----
+Examples:
+- `points get PlayerName` - Show current points
+- `points add PlayerName 500` - Add 500 points
+- `points set PlayerName 1000` - Set to 1000 points
+- `points remove PlayerName 200` - Remove 200 points
 
-## ❤️ Final Notes
+### Point System Integration
 
-This is something I built out of passion, not perfection.  
-I'm sharing it because my own private server isn't that active anymore and i don*t want this plugin to be wasted.
-Feedback, suggestions, and bug reports are more than welcome!  
+- Points are tracked in `PlayerHandler.PlayerPoints` dictionary
+- Display via RueI HUD system for eligible players
+- Automatic cleanup when players leave or change roles
+- Persistent across rounds while players remain connected
+
+## Notes
+
+- All custom items are distributed through the Mystery Box and Vending Machine systems
+- Point display is shown to eligible players (ClassD, Scientists, MTF, CI)
+- The plugin includes comprehensive logging and error handling
+- Schematic spawning system handles world object placement
+- Audio system supports custom sound files for enhanced experience
+- Features are modular and can be enabled/disabled independently
+
+The plugin is designed to be highly configurable and modular, allowing server administrators to enable/disable specific features based on their server's needs.
