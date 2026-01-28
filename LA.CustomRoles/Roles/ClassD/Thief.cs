@@ -4,6 +4,7 @@ using LilinsAdditions.CustomRoles.Abilities.Active;
 using PlayerRoles;
 using System.Collections.Generic;
 using VVUP.CustomRoles.API;
+using YamlDotNet.Serialization;
 
 namespace LilinsAdditions.CustomRoles.Roles.ClassD
 {
@@ -29,5 +30,10 @@ namespace LilinsAdditions.CustomRoles.Roles.ClassD
         {
             Limit = 1
         };
+        
+        [YamlIgnore] 
+        public override float SpawnChance { get; set; } = 0;
+        [YamlIgnore] 
+        public override bool IgnoreSpawnSystem { get; set; } = true;
     }
 }

@@ -5,6 +5,7 @@ using LilinsAdditions.CustomRoles.Abilities.Active;
 using PlayerRoles;
 using System.Collections.Generic;
 using VVUP.CustomRoles.API;
+using YamlDotNet.Serialization;
 
 namespace LilinsAdditions.CustomRoles.Roles.Zombies
 {
@@ -31,5 +32,10 @@ namespace LilinsAdditions.CustomRoles.Roles.Zombies
         {
             Limit = 1,
         };
+        
+        [YamlIgnore] 
+        public override float SpawnChance { get; set; } = 0;
+        [YamlIgnore] 
+        public override bool IgnoreSpawnSystem { get; set; } = true;
     }
 }

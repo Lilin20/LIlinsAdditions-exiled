@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Exiled.API.Enums;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomRoles.API.Features;
 using LilinsAdditions.CustomRoles.Abilities.Active;
@@ -52,10 +53,10 @@ namespace LilinsAdditions.CustomRoles.Roles.NTF
             ItemType.GunCOM15.ToString(),
             ItemType.Medkit.ToString(),
             ItemType.ArmorHeavy.ToString(),
-            ItemType.Ammo9x19.ToString(),
-            ItemType.Ammo9x19.ToString(),
-            ItemType.Ammo9x19.ToString(),
-            ItemType.Ammo9x19.ToString(),
+        };
+        public override Dictionary<AmmoType, ushort> Ammo { get; set; } = new()
+        {
+            { AmmoType.Nato9, 60 },
         };
     }
 }
