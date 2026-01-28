@@ -43,6 +43,14 @@ Strategic dispensers for consumable items:
 - **Anti-SCP Suicide:** Prevents SCPs from killing themselves via void damage
 - **Credit Card Drops:** Players drop credit cards containing their points on death
 
+### Custom Roles
+
+Adds a handful of custom roles.
+> [!WARNING]
+> Custom Roles is a seperate plugin.
+> 
+> Custom Roles uses [Snivy's Ultimate Plugin Package](https://github.com/SnivyFilms/SnivysUltimatePackage) as a dependency. You will need to have `VVUP.Base` and `VVUP.CR` present to have this Custom Role plugin to load.
+
 ## Configuration
 
 The plugin uses a comprehensive config system with the following main sections:
