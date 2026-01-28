@@ -6,6 +6,7 @@ using MEC;
 using PlayerRoles;
 using System.Collections.Generic;
 using VVUP.CustomRoles.API;
+using YamlDotNet.Serialization;
 
 namespace LilinsAdditions.CustomRoles.Roles.ClassD
 {
@@ -19,7 +20,6 @@ namespace LilinsAdditions.CustomRoles.Roles.ClassD
         public override string Description { get; set; } = "You can open all doors for 3 minutes. And also dodge damage.";
         public override string CustomInfo { get; set; } = "SCP-181 - Lucky Man";
         public override RoleTypeId Role { get; set; } = RoleTypeId.ClassD;
-        public override List<CustomAbility> CustomAbilities { get; set; }
         public List<EffectType> GoodEffects { get; set; } = new List<EffectType> { EffectType.MovementBoost, EffectType.Vitality, EffectType.Invigorated };
         public string OpenAllDoorsHint { get; set; } = "You can now open every door.";
         public override SpawnProperties SpawnProperties { get; set; } = new()
@@ -28,6 +28,22 @@ namespace LilinsAdditions.CustomRoles.Roles.ClassD
         };
 
         public bool _canOpenWithoutPerms = true;
+        
+        public override List<CustomAbility>? CustomAbilities { get; set; } = new()
+        {
+            new RestrictedEscape
+            {
+                Name = "Restricted Escape [Passive]",
+                Description = "Restricts Escaping as SCP-181.",
+                EscapeTextUncuffed = "As SCP-181, you cannot escape.",
+                EscapeTextCuffed = "As SCP-181, you cannot escape.",
+            },
+        };
+        
+        [YamlIgnore] 
+        public override float SpawnChance { get; set; } = 0;
+        [YamlIgnore] 
+        public override bool IgnoreSpawnSystem { get; set; } = true;
 
         protected override void SubscribeEvents()
         {
@@ -45,11 +61,6 @@ namespace LilinsAdditions.CustomRoles.Roles.ClassD
             Exiled.Events.Handlers.Player.InteractingDoor -= OnDoorOpening;
             Exiled.Events.Handlers.Player.TriggeringTesla -= OnTeslaTrigger;
             base.UnsubscribeEvents();
-        }
-
-        public void OnEscape(EscapingEventArgs ev)
-        {
-            ev.IsAllowed = false;
         }
 
         public void OnHurt(HurtingEventArgs ev)
