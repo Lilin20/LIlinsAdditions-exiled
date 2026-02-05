@@ -7,6 +7,7 @@ using LilinsAdditions.CustomRoles.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Exiled.Loader;
 using VVUP.CustomRoles.API;
 
 namespace LilinsAdditions.CustomRoles
@@ -19,22 +20,28 @@ namespace LilinsAdditions.CustomRoles
         public override PluginPriority Priority => PluginPriority.Lowest;
         public static LilinsAdditionsCR Instance;
         public static PlayerHandlers PlayerHandlers;
-        public Dictionary<StartTeam, List<ICustomRole>> Roles { get; } = new();
 
         public override void OnEnabled()
         {
             Instance = this;
+            if (!Loader.Plugins.Any(plugin => plugin.Prefix == "VVUP.CR"))
+            {
+                Log.Error("LACR: VVUP Custom Roles Module is not present, disabling. You can find VVUP Custom Roles at https://github.com/SnivyFilms/SnivysUltimatePackage/releases");
+                base.OnDisabled();
+                return;
+            }
             PlayerHandlers = new PlayerHandlers();
 
             RegisterPlayerHandlers();
             LoadAudioClips();
 
-            HashSet<CustomRole> existingRoles = new HashSet<CustomRole>(CustomRole.Registered);
-            HashSet<CustomAbility> existingAbilities = new HashSet<CustomAbility>(CustomAbility.Registered);
+            //HashSet<CustomRole> existingRoles = new HashSet<CustomRole>(CustomRole.Registered);
+            //HashSet<CustomAbility> existingAbilities = new HashSet<CustomAbility>(CustomAbility.Registered);
             Config.riotOperator.Register();
             Config.kamikazeZombie.Register();
             Config.luckyMan.Register();
             Config.thief.Register();
+            /*
             foreach (CustomRole role in CustomRole.Registered)
             {
                 if (role.CustomAbilities is not null)
@@ -77,6 +84,7 @@ namespace LilinsAdditions.CustomRoles
 
             existingRoles.Clear();
             existingAbilities.Clear();
+            */
             base.OnEnabled();
         }
 
