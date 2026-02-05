@@ -17,7 +17,7 @@ namespace LilinsAdditions.Items.Weapons.Pistols
         public override float Damage { get; set; } = 1;
         public override string Name { get; set; } = "Entity Swapper";
         public override string Description { get; set; } = "Swap positions with your target.";
-        public override byte ClipSize { get; set; } = 5;
+        public override byte ClipSize { get; set; } = 3;
         public override float Weight { get; set; } = 0.5f;
         public override SpawnProperties SpawnProperties { get; set; }
 

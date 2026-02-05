@@ -4,6 +4,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Spawn;
+using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 using UnityEngine;
@@ -118,22 +119,35 @@ namespace LilinsAdditions.Items.GobbleGums
             NotifyPlayers(player1, player2);
         }
 
-        private List<ItemType> CaptureInventory(Player player)
+        private List<Item> CaptureInventory(Player player)
         {
-            return player.Items.Select(i => i.Type).ToList();
+            return player.Items.ToList();
         }
 
         private void ClearInventory(Player player)
         {
-            var items = player.Items.ToList();
-            foreach (var item in items)
-                item?.Destroy();
+            foreach (var item in player.Items.ToList())
+            {
+                if (CustomItem.TryGet(item, out var customItem))
+                    customItem?.TrackedSerials.Remove(item.Serial);
+                
+                item.Destroy();
+            }
         }
 
-        private void RestoreInventory(Player player, List<ItemType> itemTypes)
+        private void RestoreInventory(Player player, List<Item> items)
         {
-            foreach (var itemType in itemTypes)
-                player.AddItem(itemType);
+            foreach (var item in items)
+            {
+                if (CustomItem.TryGet(item, out var customItem))
+                {
+                    customItem?.Give(player, displayMessage: false);
+                }
+                else
+                {
+                    player.AddItem(item);
+                }
+            }
         }
 
         private void NotifyPlayers(Player player1, Player player2)

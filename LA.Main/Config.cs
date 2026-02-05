@@ -222,5 +222,10 @@ namespace LilinsAdditions
         {
             new SpeedRoulette()
         };
+
+        public List<BorrowedTime> borrowedTime { get; set; } = new()
+        {
+            new BorrowedTime()
+        };
     }
 }

@@ -118,13 +118,14 @@
     <Compile Include="Config.cs" />
     <Compile Include="Features\PointSystem.cs" />
     <Compile Include="Features\RoomFinderSystem.cs" />
+    <Compile Include="Features\SSS.cs" />
     <Compile Include="Items\FortunaFizzItem.cs" />
+    <Compile Include="Items\GobbleGums\BorrowedTime.cs" />
     <Compile Include="Items\GobbleGums\CardiacOverdrive.cs" />
     <Compile Include="Items\GobbleGums\InventorySwap.cs" />
     <Compile Include="Items\GobbleGums\Leech.cs" />
     <Compile Include="Items\GobbleGums\SpeedRoulette.cs" />
     <Compile Include="Items\Keycards\CreditCard.cs" />
-    <Compile Include="Items\Other\NavigationDevice.cs" />
     <Compile Include="LilinsAdditions.cs" />
     <Compile Include="Handlers\PlayerHandler.cs" />
     <Compile Include="Handlers\PMERHandler.cs" />
@@ -171,6 +172,9 @@
     <PackageReference Include="RueI">
       <Version>3.1.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Items\Other\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

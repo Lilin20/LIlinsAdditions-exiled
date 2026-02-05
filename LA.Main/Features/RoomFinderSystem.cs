@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
 using CommandSystem;
+using Exiled.API.Features.Toys;
 using MEC;
 using UnityEngine;
 
@@ -10,146 +11,259 @@ namespace RoomFinder
 {
     public class RoomFinderSystem
     {
-        private Dictionary<Player, RoomTracker> activeTrackers = new Dictionary<Player, RoomTracker>();
+        private const float UPDATE_INTERVAL = 0.5f;
+        private const float PLAYER_UPDATE_INTERVAL = 5f;
+        private const float HINT_DURATION = 1.5f;
 
-        public class RoomTracker
-        {
-            public Room TargetRoom { get; set; }
-            public CoroutineHandle CoroutineHandle { get; set; }
-        }
+        private readonly Dictionary<Player, RoomTracker> _activeTrackers = new();
+        private readonly Dictionary<Player, PlayerTracker> _activePlayerTrackers = new();
+        private readonly Dictionary<Player, CoordinateTracker> _activeCoordinateTrackers = new();  
+  
+        #region Coordinate Tracking
         
+        public class CoordinateTracker  
+        {  
+            public Vector3 TargetPosition { get; set; }  
+            public string TargetName { get; set; }  
+            public CoroutineHandle CoroutineHandle { get; set; }  
+        }
+
+        #endregion
+        
+        #region Room Tracking
+
         public void StartTracking(Player player, Room targetRoom)
         {
+            if (player == null || targetRoom == null) return;
+
             StopTracking(player);
 
             var tracker = new RoomTracker
             {
-                TargetRoom = targetRoom
+                TargetRoom = targetRoom,
+                CoroutineHandle = Timing.RunCoroutine(TrackingCoroutine(player, targetRoom))
             };
-            
-            tracker.CoroutineHandle = Timing.RunCoroutine(TrackingCoroutine(player, tracker));
-            activeTrackers[player] = tracker;
+
+            _activeTrackers[player] = tracker;
         }
-        
+
         public void StopTracking(Player player)
         {
-            if (activeTrackers.TryGetValue(player, out var tracker))
+            if (player == null) return;
+
+            if (_activeTrackers.TryGetValue(player, out var tracker))
             {
                 Timing.KillCoroutines(tracker.CoroutineHandle);
-                activeTrackers.Remove(player);
-                player.ShowHint("", 1);
+                _activeTrackers.Remove(player);
+                player.ShowHint(string.Empty, 1);
             }
         }
-        
-        private IEnumerator<float> TrackingCoroutine(Player player, RoomTracker tracker)
+
+        private IEnumerator<float> TrackingCoroutine(Player player, Room targetRoom)
         {
-            while (player.IsAlive && tracker.TargetRoom != null)
+            while (player?.IsAlive == true && targetRoom != null)
             {
-                Vector3 targetPos = tracker.TargetRoom.Position;
-                Vector3 playerPos = player.Position;
-                Vector3 direction = targetPos - playerPos;
-                float distance = direction.magnitude;
-                
-                if (player.CurrentRoom == tracker.TargetRoom)
+                if (player.CurrentRoom == targetRoom)
                 {
-                    player.ShowHint("<size=40><color=green>★ YOU ARE HERE ★</color></size>", 2f);
+                    player.ShowHint("<size=40><color=green>★ YOU ARE HERE ★</color></size>", HINT_DURATION);
                 }
                 else
                 {
-                    string arrow = GetDirectionalArrow(player, targetPos);
-                    string color = GetDistanceColor(distance);
-                    
-                    string hint = $"<size=35><color={color}>{arrow}</color></size>\n" +
-                                  $"<size=20>{GetRoomDisplayName(tracker.TargetRoom)}\n" +
-                                  $"{distance:F1}m</size>";
-                    
-                    player.ShowHint(hint, 1.5f);
+                    DisplayRoomTracking(player, targetRoom);
                 }
-                
-                yield return Timing.WaitForSeconds(0.5f);
+
+                yield return Timing.WaitForSeconds(UPDATE_INTERVAL);
             }
-            
-            activeTrackers.Remove(player);
-        }
-        
-        private string GetDirectionalArrow(Player player, Vector3 targetPos)
-        {
-            Vector3 direction = targetPos - player.Position;
-            float angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-            float viewerYaw = player.CameraTransform.rotation.eulerAngles.y;
-            float relative = Mathf.DeltaAngle(viewerYaw, angle);
-            
-            if (relative > -22.5f && relative <= 22.5f) return "▲"; // Forward
-            if (relative > 22.5f && relative <= 67.5f) return "◥";  // Forward-Right
-            if (relative > 67.5f && relative <= 112.5f) return "▶"; // Right
-            if (relative > 112.5f && relative <= 157.5f) return "◢"; // Back-Right
-            if (relative > 157.5f || relative <= -157.5f) return "▼"; // Back
-            if (relative > -157.5f && relative <= -112.5f) return "◣"; // Back-Left
-            if (relative > -112.5f && relative <= -67.5f) return "◀"; // Left
-            return "◤"; // Forward-Left
-        }
-        
-        private string GetDistanceColor(float distance)
-        {
-            if (distance < 10f) return "green";
-            if (distance < 25f) return "yellow";
-            if (distance < 50f) return "orange";
-            return "red";
-        }
-        
-        private string GetRoomDisplayName(Room room)
-        {
-            if (room == null) return "Unknown Room";
-            
-            string name = room.Type.ToString();
-            
-            name = name.Replace("Lcz", "LCZ ")
-                       .Replace("Hcz", "HCZ ")
-                       .Replace("Ez", "EZ ")
-                       .Replace("Surface", "Surface ");
-            
-            return name;
-        }
-        
-        public void ShowRoomMenu(Player player, int page = 0)
-        {
-            var rooms = Room.List.OrderBy(r => r.Type.ToString()).ToList();
-            int roomsPerPage = 10;
-            int totalPages = (int)Math.Ceiling(rooms.Count / (float)roomsPerPage);
-            page = Mathf.Clamp(page, 0, totalPages - 1);
 
-            var pageRooms = rooms.Skip(page * roomsPerPage).Take(roomsPerPage).ToList();
+            _activeTrackers.Remove(player);
+        }
 
-            string menu = $"<b>=== ROOM FINDER (Page {page + 1}/{totalPages}) ===</b>\n";
-            
-            for (int i = 0; i < pageRooms.Count; i++)
+        private void DisplayRoomTracking(Player player, Room targetRoom)
+        {
+            var distance = Vector3.Distance(player.Position, targetRoom.Position);
+            var arrow = DirectionHelper.GetDirectionalArrow(player, targetRoom.Position);
+            var color = DistanceHelper.GetDistanceColor(distance);
+
+            var hint = $"<size=35><color={color}>{arrow}</color></size>\n" +
+                      $"<size=20>{RoomHelper.GetDisplayName(targetRoom)}\n" +
+                      $"{distance:F1}m</size>";
+
+            player.ShowHint(hint, HINT_DURATION);
+        }
+
+        #endregion
+
+        #region Player Tracking
+
+        public void StartPlayerTracking(Player player, Player targetPlayer)
+        {
+            if (player == null || targetPlayer == null) return;
+
+            StopPlayerTracking(player);
+
+            var tracker = new PlayerTracker
             {
-                Room room = pageRooms[i];
-                int roomIndex = (page * roomsPerPage) + i;
-                menu += $"{roomIndex}: {GetRoomDisplayName(room)}\n";
+                TargetPlayer = targetPlayer,
+                CoroutineHandle = Timing.RunCoroutine(PlayerTrackingCoroutine(player, targetPlayer))
+            };
+
+            _activePlayerTrackers[player] = tracker;
+        }
+
+        public void StopPlayerTracking(Player player)
+        {
+            if (player == null) return;
+
+            if (_activePlayerTrackers.TryGetValue(player, out var tracker))
+            {
+                Timing.KillCoroutines(tracker.CoroutineHandle);
+                _activePlayerTrackers.Remove(player);
+                player.ShowHint(string.Empty, 1);
+            }
+        }
+
+        private IEnumerator<float> PlayerTrackingCoroutine(Player player, Player targetPlayer)
+        {
+            while (player?.IsAlive == true && targetPlayer?.IsAlive == true)
+            {
+                if (player == targetPlayer)
+                {
+                    player.ShowHint("<color=yellow>Why track yourself?</color>", HINT_DURATION);
+                }
+                else
+                {
+                    DisplayPlayerTracking(player, targetPlayer);
+                }
+
+                yield return Timing.WaitForSeconds(PLAYER_UPDATE_INTERVAL);
             }
 
-            menu += "\nUse: .findroom <number> to track a room";
-            menu += "\nUse: .stopfind to stop tracking";
-            
-            player.Broadcast(10, menu);
+            _activePlayerTrackers.Remove(player);
         }
+
+        private void DisplayPlayerTracking(Player player, Player targetPlayer)
+        {
+            var distance = Vector3.Distance(player.Position, targetPlayer.Position);
+            var arrow = DirectionHelper.GetDirectionalArrow(player, targetPlayer.Position);
+            var color = DistanceHelper.GetDistanceColor(distance);
+
+            var hint = $"<size=35><color={color}>{arrow}</color></size>\n" +
+                      $"<size=20>{targetPlayer.Nickname} ({targetPlayer.Role.Type})\n" +
+                      $"{distance:F1}m</size>";
+
+            player.ShowHint(hint, HINT_DURATION);
+        }
+
+        #endregion
         
+        #region Pocket Dimension Exit Tracking  
+  
+        public void FindPocketDimensionExit(Player player)
+        {
+            if (player == null) return;
+            
+            if (!player.IsInPocketDimension)
+            {
+                player.ShowHint("<color=red>You must be in the Pocket Dimension to use this command</color>", 3);
+                return;
+            }
+            
+            var teleports = Map.PocketDimensionTeleports;
+            if (teleports == null || teleports.Count == 0)
+            {
+                player.ShowHint("<color=red>No pocket dimension exits found</color>", 3);
+                return;
+            }
+            
+            var exitTeleport = teleports.FirstOrDefault(t => t._type == PocketDimensionTeleport.PDTeleportType.Exit);
+            if (exitTeleport == null)
+            {
+                player.ShowHint("<color=red>Pocket dimension exit not found</color>", 3);
+                return;
+            }
+            player.ShowHint("<color=green>Tracking: Pocket Dimension Exit</color>", 3);
+        }
+          
+        public void StartCoordinateTracking(Player player, Vector3 position, string name)  
+        {  
+            if (player == null) return;  
+          
+            StopTracking(player);  
+          
+            var tracker = new CoordinateTracker  
+            {  
+                TargetPosition = position,  
+                TargetName = name,  
+                CoroutineHandle = Timing.RunCoroutine(CoordinateTrackingCoroutine(player, position, name))  
+            };  
+          
+            _activeCoordinateTrackers[player] = tracker;  
+        }  
+          
+        public void StopCoordinateTracking(Player player)  
+        {  
+            if (player == null) return;  
+          
+            if (_activeCoordinateTrackers.TryGetValue(player, out var tracker))  
+            {  
+                Timing.KillCoroutines(tracker.CoroutineHandle);  
+                _activeCoordinateTrackers.Remove(player);  
+                player.ShowHint(string.Empty, 1);  
+            }  
+        }  
+          
+        private IEnumerator<float> CoordinateTrackingCoroutine(Player player, Vector3 targetPosition, string name)  
+        {  
+            while (player?.IsAlive == true)  
+            {  
+                var distance = Vector3.Distance(player.Position, targetPosition);  
+                  
+                if (distance < 2f)  
+                {  
+                    player.ShowHint($"<size=40><color=green>★ {name.ToUpper()} ★</color></size>", HINT_DURATION);  
+                }  
+                else  
+                {  
+                    var arrow = DirectionHelper.GetDirectionalArrow(player, targetPosition);  
+                    var color = DistanceHelper.GetDistanceColor(distance);  
+          
+                    var hint = $"<size=35><color={color}>{arrow}</color></size>\n" +  
+                              $"<size=20>{name}\n" +  
+                              $"{distance:F1}m</size>";  
+          
+                    player.ShowHint(hint, HINT_DURATION);  
+                }  
+          
+                yield return Timing.WaitForSeconds(UPDATE_INTERVAL);  
+            }  
+          
+            _activeCoordinateTrackers.Remove(player);  
+        }  
+          
+        #endregion
+
+        #region Room Menu & Search
+
         public void FindRoomByIndex(Player player, int index)
         {
+            if (player == null) return;
+
             var rooms = Room.List.OrderBy(r => r.Type.ToString()).ToList();
-            
+
             if (index < 0 || index >= rooms.Count)
             {
-                player.Broadcast(3, $"<color=red>Invalid room index. Use 0-{rooms.Count - 1}</color>");
+                player.Broadcast(3, $"<color=red>Invalid index. Use 0-{rooms.Count - 1}</color>");
                 return;
             }
 
             StartTracking(player, rooms[index]);
+            player.Broadcast(3, $"<color=green>Tracking: {RoomHelper.GetDisplayName(rooms[index])}</color>");
         }
-        
+
         public void FindNearestRoomByName(Player player, string roomName)
         {
+            if (player == null || string.IsNullOrWhiteSpace(roomName)) return;
+
             var matchingRooms = Room.List
                 .Where(r => r.Type.ToString().ToLower().Contains(roomName.ToLower()))
                 .OrderBy(r => Vector3.Distance(player.Position, r.Position))
@@ -160,117 +274,80 @@ namespace RoomFinder
                 player.Broadcast(3, $"<color=red>No rooms found matching '{roomName}'</color>");
                 return;
             }
-            
-            StartTracking(player, matchingRooms.First());
+
+            var nearestRoom = matchingRooms.First();
+            StartTracking(player, nearestRoom);
+            player.Broadcast(3, $"<color=green>Tracking: {RoomHelper.GetDisplayName(nearestRoom)}</color>");
+        }
+
+        #endregion
+
+        #region Tracker Classes
+
+        public class RoomTracker
+        {
+            public Room TargetRoom { get; set; }
+            public CoroutineHandle CoroutineHandle { get; set; }
+        }
+
+        public class PlayerTracker
+        {
+            public Player TargetPlayer { get; set; }
+            public CoroutineHandle CoroutineHandle { get; set; }
+        }
+
+        #endregion
+    }
+
+    #region Helper Classes
+
+    public static class DirectionHelper
+    {
+        public static string GetDirectionalArrow(Player player, Vector3 targetPos)
+        {
+            var direction = targetPos - player.Position;
+            var angle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+            var viewerYaw = player.CameraTransform.rotation.eulerAngles.y;
+            var relativeAngle = Mathf.DeltaAngle(viewerYaw, angle);
+
+            return relativeAngle switch
+            {
+                > -22.5f and <= 22.5f => "▲",      // Forward
+                > 22.5f and <= 67.5f => "◥",       // Forward-Right
+                > 67.5f and <= 112.5f => "▶",      // Right
+                > 112.5f and <= 157.5f => "◢",     // Back-Right
+                > 157.5f or <= -157.5f => "▼",     // Back
+                > -157.5f and <= -112.5f => "◣",   // Back-Left
+                > -112.5f and <= -67.5f => "◀",    // Left
+                _ => "◤"                            // Forward-Left
+            };
         }
     }
-    
-        [CommandHandler(typeof(RemoteAdminCommandHandler))]
-        [CommandHandler(typeof(GameConsoleCommandHandler))]
-        public class RoomFinderParent : ParentCommand
+
+    public static class DistanceHelper
+    {
+        public static string GetDistanceColor(float distance) => distance switch
         {
-            public static RoomFinderSystem RoomFinder = new RoomFinderSystem();
-            
-            public RoomFinderParent()
-            {
-                LoadGeneratedCommands();
-            }
-            
-            public override string Command { get; } = "roomfinder";
-            public override string[] Aliases { get; } = { "rf" };
-            public override string Description { get; } = "Room tracking system";
-            
-            public override void LoadGeneratedCommands()
-            {
-                RegisterCommand(new MenuCommand());
-                RegisterCommand(new FindCommand());
-                RegisterCommand(new StopCommand());
-            }
-            
-            protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
-            {
-                response = "Usage: roomfinder <menu|find|stop>";
-                return false;
-            }
-        }
-        
-        public class MenuCommand : ICommand
+            < 10f => "green",
+            < 25f => "yellow",
+            < 50f => "orange",
+            _ => "red"
+        };
+    }
+
+    public static class RoomHelper
+    {
+        public static string GetDisplayName(Room room)
         {
-            public string Command { get; } = "menu";
-            public string[] Aliases { get; } = { "m" };
-            public string Description { get; } = "Show room selection menu";
-            
-            public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
-            {
-                Player player = Player.Get(sender);
-                if (player == null)
-                {
-                    response = "This command can only be used by players.";
-                    return false;
-                }
-                
-                int page = arguments.Count > 0 && int.TryParse(arguments.At(0), out int p) ? p : 0;
-                RoomFinderParent.RoomFinder.ShowRoomMenu(player, page);
-                
-                response = "Room menu displayed.";
-                return true;
-            }
+            if (room == null) return "Unknown Room";
+
+            return room.Type.ToString()
+                .Replace("Lcz", "LCZ ")
+                .Replace("Hcz", "HCZ ")
+                .Replace("Ez", "EZ ")
+                .Replace("Surface", "Surface ");
         }
-        
-        public class FindCommand : ICommand
-        {
-            public string Command { get; } = "find";
-            public string[] Aliases { get; } = { "f" };
-            public string Description { get; } = "Find and track a room";
-            
-            public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
-            {
-                Player player = Player.Get(sender);
-                if (player == null)
-                {
-                    response = "This command can only be used by players.";
-                    return false;
-                }
-                
-                if (arguments.Count == 0)
-                {
-                    response = "Usage: find <room number or name>";
-                    return false;
-                }
-                
-                string target = arguments.At(0);
-                
-                if (int.TryParse(target, out int roomIndex))
-                {
-                    RoomFinderParent.RoomFinder.FindRoomByIndex(player, roomIndex);
-                }
-                else
-                {
-                    RoomFinderParent.RoomFinder.FindNearestRoomByName(player, target);
-                }
-                
-                response = "Room tracking started.";
-                return true;
-            }  
-        }
-        
-        public class StopCommand : ICommand
-        {
-            public string Command { get; } = "stop";
-            public string[] Aliases { get; } = { "s" };
-            public string Description { get; } = "Stop room tracking";
-            
-            public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
-            {
-                Player player = Player.Get(sender);
-                if (player == null)
-                {
-                    response = "This command can only be used by players.";
-                    return false;
-                }
-                RoomFinderParent.RoomFinder.StopTracking(player);
-                response = "Room tracking stopped.";
-                return true;
-            }
-        }
+    }
+
+    #endregion
 }

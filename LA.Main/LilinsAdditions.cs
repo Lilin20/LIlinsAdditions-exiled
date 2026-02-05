@@ -73,8 +73,6 @@ namespace LilinsAdditions
         {
             AudioClipStorage.LoadClip(Instance.Config.MysteryBoxMusicPath, "mysterybox");
             AudioClipStorage.LoadClip(Instance.Config.VendingMachineMusicPath, "gobblegum");
-            AudioClipStorage.LoadClip(Instance.Config.BurstSoundPath, "bombsound");
-            AudioClipStorage.LoadClip(Instance.Config.TrackingSoundPath, "trackingsound");
         }
 
         private void StartBackgroundTasks()
