@@ -12,7 +12,7 @@ namespace LilinsAdditions.Items.GobbleGums
     {
         private const string SPEED_MODIFIER_KEY = "SpeedModifierNet";
         
-        public override uint Id { get; set; } = 820;
+        public override uint Id { get; set; } = 821;
         public override string Name { get; set; } = "Speed Roulette";
         public override string Description { get; set; } = "50% chance for +10% speed, 50% chance for -20% speed.";
         public override float Weight { get; set; } = 0.5f;

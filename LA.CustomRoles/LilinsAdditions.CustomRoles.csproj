@@ -61,7 +61,7 @@
       <HintPath>D:\Stuff\Bilder\dependencies\AudioPlayerApi.dll</HintPath>
     </Reference>
     <Reference Include="ProjectMER">
-      <HintPath>D:\Stuff\Downloads\ProjectMER.dll</HintPath>
+      <HintPath>D:\Stuff\Desktop\Verweise\ProjectMER.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -95,8 +95,11 @@
       <HintPath Condition="'$(OS)' == 'Windows_NT'">$(EXILED_REFERENCES)/UnityEngine.PhysicsModule.dll</HintPath>
       <HintPath Condition="'$(OS)' != 'Windows_NT'">..\..\..\Exiled_Resources\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
+    <Reference Include="VVUP.Base">
+      <HintPath>D:\Stuff\Desktop\Verweise\VVUP.Base.dll</HintPath>
+    </Reference>
     <Reference Include="VVUP.CustomRoles">
-      <HintPath>D:\Stuff\Downloads\VVUP.CustomRoles.dll</HintPath>
+      <HintPath>D:\Stuff\Desktop\Verweise\VVUP.CustomRoles.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

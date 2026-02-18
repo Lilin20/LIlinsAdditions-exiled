@@ -6,6 +6,8 @@ using Exiled.API.Features.Items;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
+using HarmonyLib;
+using InventorySystem.Items.ThrowableProjectiles;
 using UnityEngine;
 
 namespace LilinsAdditions.Items.Weapons.LMGs
@@ -97,20 +99,31 @@ namespace LilinsAdditions.Items.Weapons.LMGs
         private static void ConfigureNanoRocket(ExplosiveGrenade grenade)
         {
             var projectileBase = grenade.Projectile.Base;
+            var type = typeof(ExplosionGrenade);
             
-            projectileBase._playerDamageOverDistance = 
-                projectileBase._playerDamageOverDistance.Multiply(PLAYER_DAMAGE_MULTIPLIER);
+            var playerDamageField = AccessTools.Field(type, nameof(ExplosionGrenade._playerDamageOverDistance));
+            var burnDurationField = AccessTools.Field(type, nameof(ExplosionGrenade._burnedDuration));
+            var concussedDurationField = AccessTools.Field(type, nameof(ExplosionGrenade._concussedDuration));
+            var deafenedDurationField = AccessTools.Field(type, nameof(ExplosionGrenade._deafenedDuration));
+            var shakeField = AccessTools.Field(type, nameof(ExplosionGrenade._shakeOverDistance));
+            var doorDamageField = AccessTools.Field(type, nameof(ExplosionGrenade._doorDamageOverDistance));
+            var effectDurationField = AccessTools.Field(type, nameof(ExplosionGrenade._effectDurationOverDistance));
             
-            projectileBase._burnedDuration = 0;
-            projectileBase._concussedDuration = 0;
-            projectileBase._deafenedDuration = 0;
+            var currentDamage = (float)playerDamageField.GetValue(projectileBase);
+            playerDamageField.SetValue(projectileBase, currentDamage * PLAYER_DAMAGE_MULTIPLIER);
             
-            projectileBase._shakeOverDistance = 
-                projectileBase._shakeOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
-            projectileBase._doorDamageOverDistance = 
-                projectileBase._doorDamageOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
-            projectileBase._effectDurationOverDistance = 
-                projectileBase._effectDurationOverDistance.Multiply(DISABLE_EFFECT_MULTIPLIER);
+            burnDurationField.SetValue(projectileBase, 0f);
+            concussedDurationField.SetValue(projectileBase, 0f);
+            deafenedDurationField.SetValue(projectileBase, 0f);
+            
+            var currentShake = (float)shakeField.GetValue(projectileBase);
+            shakeField.SetValue(projectileBase, currentShake * DISABLE_EFFECT_MULTIPLIER);
+            
+            var currentDoorDamage = (float)doorDamageField.GetValue(projectileBase);
+            doorDamageField.SetValue(projectileBase, currentDoorDamage * DISABLE_EFFECT_MULTIPLIER);
+            
+            var currentEffectDuration = (float)effectDurationField.GetValue(projectileBase);
+            effectDurationField.SetValue(projectileBase, currentEffectDuration * DISABLE_EFFECT_MULTIPLIER);
             
             grenade.FuseTime = NANO_ROCKET_FUSE_TIME;
         }

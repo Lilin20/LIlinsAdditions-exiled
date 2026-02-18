@@ -167,7 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ExMod.Exiled">
-      <Version>9.12.5</Version>
+      <Version>9.13.1</Version>
     </PackageReference>
     <PackageReference Include="RueI">
       <Version>3.1.2</Version>

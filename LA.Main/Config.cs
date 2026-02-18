@@ -45,7 +45,6 @@ namespace LilinsAdditions
         public int MaxCoinCount { get; set; } = 2;
         public List<Helper.MysteryBoxPoolConfi> MysteryBoxItemPool { get; set; } = new()
         {
-            new() {Name = "Prototype LMG - Nano Rockets", Weight = 1},
             new() {Name = "Grenade Launcher", Weight = 2},
             new() {Name = "Behemoth 50.cal", Weight = 3},
             new() {Name = "Nullifier", Weight = 10},

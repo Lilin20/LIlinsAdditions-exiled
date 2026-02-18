@@ -5,6 +5,7 @@ using Exiled.Events.EventArgs.Player;
 using MEC;
 using PlayerRoles;
 using System.Collections.Generic;
+using VVUP.CustomRoles.Abilities.Passive;
 using VVUP.CustomRoles.API;
 using YamlDotNet.Serialization;
 

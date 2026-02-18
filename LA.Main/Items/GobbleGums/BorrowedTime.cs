@@ -113,7 +113,7 @@ namespace LilinsAdditions.Items.GobbleGums
             
             if (grenade == null)
             {
-                Log.Error($"[WhereIsWaldo] Failed to create explosion grenade projectile");
+                Log.Error($"[BorrowedTime] Failed to create explosion grenade projectile");
                 return;
             }
             

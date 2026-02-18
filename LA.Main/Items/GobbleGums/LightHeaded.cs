@@ -58,11 +58,12 @@ namespace LilinsAdditions.Items.GobbleGums
             ApplyReducedGravity(ev, fpcRole, originalGravity);
         }
 
-        private void OnDied(DiedEventArgs ev)  
+        private void OnDied(DiedEventArgs ev)
         {
-            if (ActivePlayers.TryGetValue(ev.Player, out Vector3 originalGravity))
+            if (ActivePlayers.TryGetValue(ev.Player, out var originalGravity))
             {
                 ActivePlayers.Remove(ev.Player);
+                // Restore using the role at death time (still FpcRole here)
                 if (ev.Player.Role is FpcRole fpcRole)
                 {
                     fpcRole.Gravity = originalGravity;
@@ -73,9 +74,15 @@ namespace LilinsAdditions.Items.GobbleGums
 
         private void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            if (ActivePlayers.Remove(ev.Player))
+            if (ActivePlayers.TryGetValue(ev.Player, out var originalGravity))
             {
-                Log.Debug($"[LightHeaded] {ev.Player.Nickname} removed from tracking due to role change");
+                ActivePlayers.Remove(ev.Player);
+                // Restore if the role we’re coming from was FpcRole
+                if (ev.Player.Role is FpcRole fpcRole)
+                {
+                    fpcRole.Gravity = originalGravity;
+                    Log.Debug($"[LightHeaded] {ev.Player.Nickname} gravity restored on role change");
+                }
             }
         }
 
