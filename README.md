@@ -51,6 +51,18 @@ Adds a handful of custom roles.
 > 
 > Custom Roles uses [Snivy's Ultimate Plugin Package](https://github.com/SnivyFilms/SnivysUltimatePackage) as a dependency. You will need to have `VVUP.Base` and `VVUP.CR` present to have this Custom Role plugin to load.
 
+## Installation
+In order to install this plugin you have to install the dependencies first.
+
+1. Install [RueI](https://github.com/pawslee/RueI).
+2. Install [AudioPlayerAPI](https://github.com/Killers0992/AudioPlayerApi)
+3. Install [ProjectMER](https://github.com/Michal78900/ProjectMER)
+4. Put 0Harmony.dll into the "Exiled/Plugins/dependencies" folder (also needed in the LabAPI dependencies folder for RueI). 
+5. Put my plugin into the Exiled plugins folder.
+6. Boot up the Server to let the config files and directories create.
+7. Unpack the Audio.zip somewhere on your device (you will have to specify the path to the sounds yourself).
+8. Unpack the Schematics.zip into the Schematics folder from ProjectMER.
+
 ## Configuration
 
 The plugin uses a comprehensive config system with the following main sections:
