@@ -1,8 +1,7 @@
-﻿namespace LilinsAdditions.Helper
+﻿namespace LilinsAdditions.Main.Helper;
+
+public class MysteryBoxPoolConfig
 {
-    public class MysteryBoxPoolConfi()
-    {
-        public string Name { get; set; }
-        public int Weight { get; set; }
-    }
+    public string Name { get; set; }
+    public int Weight { get; set; }
 }

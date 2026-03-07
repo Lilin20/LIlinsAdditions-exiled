@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Exiled.CustomItems.API.Features;
 
-namespace LilinsAdditions.Items;
+namespace LilinsAdditions.Main.Items;
 
 public abstract class FortunaFizzItem : CustomItem
 {

@@ -3,7 +3,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 
-namespace LilinsAdditions.Items.Weapons.LMGs;
+namespace LilinsAdditions.Main.Items.Weapons.LMGs;
 
 [CustomItem(ItemType.GunLogicer)]
 public class ExplosiveLMG : CustomWeapon

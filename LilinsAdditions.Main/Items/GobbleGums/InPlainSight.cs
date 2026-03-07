@@ -6,7 +6,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
 using MEC;
 
-namespace LilinsAdditions.Items.GobbleGums;
+namespace LilinsAdditions.Main.Items.GobbleGums;
 
 [CustomItem(ItemType.AntiSCP207)]
 public class InPlainSight : FortunaFizzItem

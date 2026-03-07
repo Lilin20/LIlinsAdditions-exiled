@@ -4,95 +4,92 @@ using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Spawn;
 using Exiled.Events.EventArgs.Player;
-using MEC;
 using PlayerRoles;
-using UnityEngine;
 
-namespace LilinsAdditions.Items.GobbleGums
+namespace LilinsAdditions.Main.Items.GobbleGums;
+
+[CustomItem(ItemType.AntiSCP207)]
+public class IDontWantToBeHere : FortunaFizzItem
 {
-    [CustomItem(ItemType.AntiSCP207)]
-    public class IDontWantToBeHere : FortunaFizzItem
+    private const float USE_DELAY = 2f;
+    private const float INVISIBLE_DURATION = 15f;
+    private const byte POISONED_INTENSITY = 1;
+    private const float POISONED_DURATION = 10f;
+    private const byte SILENT_WALK_INTENSITY = 255;
+    private const float SILENT_WALK_DURATION = 15f;
+
+    public IDontWantToBeHere()
     {
-        private const float USE_DELAY = 2f;
-        private const float INVISIBLE_DURATION = 15f;
-        private const byte POISONED_INTENSITY = 1;
-        private const float POISONED_DURATION = 10f;
-        private const byte SILENT_WALK_INTENSITY = 255;
-        private const float SILENT_WALK_DURATION = 15f;
+        Buyable = true;
+    }
 
-        public override uint Id { get; set; } = 809;
-        public override string Name { get; set; } = "I Dont Want To Be Here";
-        public override string Description { get; set; } = "Gets you out of certain dimensions.";
-        public override float Weight { get; set; } = 0.5f;
-        public override SpawnProperties SpawnProperties { get; set; }
+    public override uint Id { get; set; } = 809;
+    public override string Name { get; set; } = "I Dont Want To Be Here";
+    public override string Description { get; set; } = "Gets you out of certain dimensions.";
+    public override float Weight { get; set; } = 0.5f;
+    public override SpawnProperties SpawnProperties { get; set; }
 
-        public IDontWantToBeHere()
+    protected override void SubscribeEvents()
+    {
+        Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
+        base.SubscribeEvents();
+    }
+
+    protected override void UnsubscribeEvents()
+    {
+        Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
+        base.UnsubscribeEvents();
+    }
+
+    private void OnUsingItem(UsingItemEventArgs ev)
+    {
+        if (!Check(ev.Player.CurrentItem))
+            return;
+
+        ev.IsAllowed = false;
+
+        ExecutePocketEscape(ev);
+    }
+
+    private static void ExecutePocketEscape(UsingItemEventArgs ev)
+    {
+        if (ev.Player == null || !ev.Player.IsAlive)
+            return;
+
+        if (IsPlayerInPocketDimension(ev.Player))
         {
-            Buyable = true;
+            ApplyEscapeEffects(ev.Player);
+            TeleportToScp106(ev.Player);
         }
 
-        protected override void SubscribeEvents()
+        ev.Item?.Destroy();
+    }
+
+    private static bool IsPlayerInPocketDimension(Player player)
+    {
+        var pocketRoom = Room.Get(RoomType.Pocket);
+        return pocketRoom != null && pocketRoom.Players.Contains(player);
+    }
+
+    private static void ApplyEscapeEffects(Player player)
+    {
+        player.EnableEffect(EffectType.Invisible, INVISIBLE_DURATION, false);
+        player.EnableEffect(EffectType.Poisoned, POISONED_INTENSITY, POISONED_DURATION, false);
+        player.EnableEffect(EffectType.SilentWalk, SILENT_WALK_INTENSITY, SILENT_WALK_DURATION, false);
+    }
+
+    private static void TeleportToScp106(Player player)
+    {
+        var scp106 = Player.List.FirstOrDefault(p => p.Role.Type == RoleTypeId.Scp106);
+
+        if (scp106 != null)
         {
-            Exiled.Events.Handlers.Player.UsingItem += OnUsingItem;
-            base.SubscribeEvents();
+            player.Teleport(scp106);
+            Log.Debug($"[IDontWantToBeHere] {player.Nickname} escaped Pocket Dimension to SCP-106");
         }
-
-        protected override void UnsubscribeEvents()
+        else
         {
-            Exiled.Events.Handlers.Player.UsingItem -= OnUsingItem;
-            base.UnsubscribeEvents();
-        }
-
-        private void OnUsingItem(UsingItemEventArgs ev)
-        {
-            if (!Check(ev.Player.CurrentItem))
-                return;
-
-            ev.IsAllowed = false;
-
-            ExecutePocketEscape(ev);
-        }
-
-        private static void ExecutePocketEscape(UsingItemEventArgs ev)
-        {
-            if (ev.Player == null || !ev.Player.IsAlive)
-                return;
-
-            if (IsPlayerInPocketDimension(ev.Player))
-            {
-                ApplyEscapeEffects(ev.Player);
-                TeleportToScp106(ev.Player);
-            }
-
-            ev.Item?.Destroy();
-        }
-
-        private static bool IsPlayerInPocketDimension(Player player)
-        {
-            var pocketRoom = Room.Get(RoomType.Pocket);
-            return pocketRoom != null && pocketRoom.Players.Contains(player);
-        }
-
-        private static void ApplyEscapeEffects(Player player)
-        {
-            player.EnableEffect(EffectType.Invisible, INVISIBLE_DURATION, addDurationIfActive: false);
-            player.EnableEffect(EffectType.Poisoned, POISONED_INTENSITY, POISONED_DURATION, addDurationIfActive: false);
-            player.EnableEffect(EffectType.SilentWalk, SILENT_WALK_INTENSITY, SILENT_WALK_DURATION, addDurationIfActive: false);
-        }
-
-        private static void TeleportToScp106(Player player)
-        {
-            var scp106 = Player.List.FirstOrDefault(p => p.Role.Type == RoleTypeId.Scp106);
-            
-            if (scp106 != null)
-            {
-                player.Teleport(scp106);
-                Log.Debug($"[IDontWantToBeHere] {player.Nickname} escaped Pocket Dimension to SCP-106");
-            }
-            else
-            {
-                Log.Debug($"[IDontWantToBeHere] {player.Nickname} escaped Pocket Dimension but no SCP-106 found");
-            }
+            Log.Debug($"[IDontWantToBeHere] {player.Nickname} escaped Pocket Dimension but no SCP-106 found");
         }
     }
 }

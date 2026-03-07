@@ -8,7 +8,7 @@ using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using UnityEngine;
 
-namespace LilinsAdditions.Items.GobbleGums;
+namespace LilinsAdditions.Main.Items.GobbleGums;
 
 [CustomItem(ItemType.AntiSCP207)]
 public class InventorySwap : FortunaFizzItem

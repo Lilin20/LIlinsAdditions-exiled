@@ -8,7 +8,7 @@ using Exiled.Events.EventArgs.Player;
 using PlayerRoles;
 using UnityEngine;
 
-namespace LilinsAdditions.Items.GobbleGums;
+namespace LilinsAdditions.Main.Items.GobbleGums;
 
 [CustomItem(ItemType.AntiSCP207)]
 public class Switcheroo : FortunaFizzItem
@@ -44,7 +44,7 @@ public class Switcheroo : FortunaFizzItem
     public override float Weight { get; set; } = 0.5f;
     public string GroundedMessage { get; set; } = "You must be on the ground to use Switcheroo!";
     public string ScpNearbyMessage { get; set; } = "You cannot use Switcheroo while an SCP is nearby!";
-    public float ScpDetectionRange { get; set; } = 15f;
+    public float ScpDetectionRange { get; set; } = 20f;
     public override SpawnProperties SpawnProperties { get; set; }
 
     protected override void SubscribeEvents()
