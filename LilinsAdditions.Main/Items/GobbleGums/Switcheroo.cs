@@ -50,6 +50,9 @@ public class Switcheroo : FortunaFizzItem
     public string LczDeconMessage { get; set; } =
         "You cannot use Switcherooo when you are in the LCZ while its being decontaminated!";
 
+    public string LczDeconLastMinute { get; set; } =
+        "You cannot use Switcherooo while the LCZ decontamination is happening in 1 minute!";
+
     public float ScpDetectionRange { get; set; } = 20f;
     public override SpawnProperties SpawnProperties { get; set; }
 
@@ -95,6 +98,12 @@ public class Switcheroo : FortunaFizzItem
         if (Warhead.IsInProgress)
         {
             ev.Player.ShowHint(WarheadActiveMessage);
+            return;
+        }
+
+        if (Map.DecontaminationState == DecontaminationState.Remain1Minute)
+        {
+            ev.Player.ShowHint(LczDeconLastMinute);
             return;
         }
 
