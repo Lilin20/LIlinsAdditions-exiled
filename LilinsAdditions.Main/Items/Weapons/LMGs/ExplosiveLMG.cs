@@ -19,6 +19,7 @@ public class ExplosiveLMG : CustomWeapon
     public override string Description { get; set; } = "Shoots nano rockets.";
     public override byte ClipSize { get; set; } = 200;
     public override float Weight { get; set; } = 0.5f;
+    public override bool FriendlyFire { get; set; } = false;
     public override SpawnProperties SpawnProperties { get; set; }
 
     protected override void SubscribeEvents()

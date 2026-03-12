@@ -112,7 +112,6 @@
         <Compile Include="Items\Weapons\LMGs\ExplosiveLMG.cs"/>
         <Compile Include="Items\Weapons\LMGs\GrenadeLauncher.cs"/>
         <Compile Include="Items\Weapons\Pistols\Behemoth.cs"/>
-        <Compile Include="Items\Weapons\Pistols\ChainLightningGun.cs"/>
         <Compile Include="Items\Weapons\Pistols\HackGun.cs"/>
         <Compile Include="Items\Weapons\Pistols\PlaceSwap.cs"/>
         <Compile Include="Items\Weapons\Pistols\RusssianRoulette.cs"/>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
 using Exiled.API.Features.Roles;
@@ -44,6 +45,11 @@ public class Switcheroo : FortunaFizzItem
     public override float Weight { get; set; } = 0.5f;
     public string GroundedMessage { get; set; } = "You must be on the ground to use Switcheroo!";
     public string ScpNearbyMessage { get; set; } = "You cannot use Switcheroo while an SCP is nearby!";
+    public string WarheadActiveMessage { get; set; } = "You cannot use Switcherooo while the Warhead is active!";
+
+    public string LczDeconMessage { get; set; } =
+        "You cannot use Switcherooo when you are in the LCZ while its being decontaminated!";
+
     public float ScpDetectionRange { get; set; } = 20f;
     public override SpawnProperties SpawnProperties { get; set; }
 
@@ -80,11 +86,21 @@ public class Switcheroo : FortunaFizzItem
             return;
         }
 
-        IsOnRailing(ev.Player);
-
         if (IsScpNearby(ev.Player))
         {
             ev.Player.ShowHint(ScpNearbyMessage);
+            return;
+        }
+
+        if (Warhead.IsInProgress)
+        {
+            ev.Player.ShowHint(WarheadActiveMessage);
+            return;
+        }
+
+        if (Map.IsLczDecontaminated && ev.Player.Zone == ZoneType.LightContainment)
+        {
+            ev.Player.ShowHint(LczDeconMessage);
             return;
         }
 
@@ -94,17 +110,6 @@ public class Switcheroo : FortunaFizzItem
 
         SwapPlayerPositions(ev.Player, targetPlayer);
         ev.Item?.Destroy();
-    }
-
-    private void IsOnRailing(Player player)
-    {
-        var rayOrigin = player.Position + Vector3.up * 0.1f;
-        var layerMask = ~((1 << 2) | (1 << 13));
-
-        var allHits = Physics.SphereCastAll(rayOrigin, 1f, Vector3.down, 6f, layerMask);
-
-        Log.Info($"SphereCastAll found {allHits.Length} hits:");
-        foreach (var hit in allHits) Log.Info($"- {hit.collider.gameObject.name} | Distance: {hit.distance}");
     }
 
     private bool IsScpNearby(Player player)

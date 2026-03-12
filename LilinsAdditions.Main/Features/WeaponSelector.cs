@@ -88,9 +88,11 @@ public class WeaponSelector
 
         var itemName = GetWeightedRandomItem();
         var spawnPosition = basePosition + Vector3.up * yOffset;
-
-        if (CustomItem.TrySpawn(itemName, spawnPosition, out var finalPickup))
+        
+        if (WeightedCustomWeapons.Any(w => w.Name == itemName) && CustomItem.TrySpawn(itemName, spawnPosition, out var finalPickup))
+        {
             ConfigurePickupPhysics(finalPickup, false);
+        }
     }
 
     private static void ConfigurePickupPhysics(Pickup pickup, bool enableGravity)
