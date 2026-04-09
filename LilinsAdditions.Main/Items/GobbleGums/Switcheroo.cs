@@ -101,7 +101,7 @@ public class Switcheroo : FortunaFizzItem
             return;
         }
 
-        if (Map.DecontaminationState == DecontaminationState.Remain1Minute)
+        if (Map.DecontaminationState == DecontaminationState.Remain1Minute && ev.Player.Zone == ZoneType.LightContainment)
         {
             ev.Player.ShowHint(LczDeconLastMinute);
             return;

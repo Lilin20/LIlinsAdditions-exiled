@@ -139,7 +139,7 @@ public class Gasmask : GogglesItem
                 yield break;
 
             if (state.CurrentDamage > 0)
-                player.Health -= state.CurrentDamage;
+                player.Hurt(state.CurrentDamage, DamageType.PocketDimension);
 
             state.CurrentDamage = Mathf.Min(state.CurrentDamage + DAMAGE_INCREMENT, MAX_DAMAGE);
 
