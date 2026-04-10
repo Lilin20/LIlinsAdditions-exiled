@@ -93,6 +93,8 @@ public class Gasmask : GogglesItem
             return;
         }
 
+        _activePlayers[player] = state;
+
         TeleportPlayerToRoom(player, larryRoom, DimensionPosition, DimensionRotation);
         state.DamageCoroutine = Timing.RunCoroutine(ApplyDamageOverTime(player));
 
@@ -130,18 +132,39 @@ public class Gasmask : GogglesItem
 
     private IEnumerator<float> ApplyDamageOverTime(Player player)
     {
+        Log.Debug($"[SCP-1499] ApplyDamageOverTime started for {player.Nickname}");
+
         if (!_activePlayers.TryGetValue(player, out var state))
+        {
+            Log.Debug(
+                $"[SCP-1499] ApplyDamageOverTime: player {player.Nickname} not found in _activePlayers, yielding break");
             yield break;
+        }
 
         while (true)
         {
+            Log.Debug(
+                $"[SCP-1499] Damage tick for {player.Nickname} — IsAlive: {player?.IsAlive}, InDict: {_activePlayers.ContainsKey(player)}, Damage: {state.CurrentDamage}");
+
             if (player == null || !player.IsAlive || !_activePlayers.ContainsKey(player))
+            {
+                Log.Debug(
+                    $"[SCP-1499] ApplyDamageOverTime: exiting loop for {player?.Nickname} (null={player == null}, alive={player?.IsAlive}, inDict={_activePlayers.ContainsKey(player)})");
                 yield break;
+            }
 
             if (state.CurrentDamage > 0)
-                player.Hurt(state.CurrentDamage, DamageType.PocketDimension);
+            {
+                Log.Debug($"[SCP-1499] Hurting {player.Nickname} for {state.CurrentDamage}");
+                player.Hurt(state.CurrentDamage);
+            }
+            else
+            {
+                Log.Debug($"[SCP-1499] Skipping hurt for {player.Nickname}, damage is {state.CurrentDamage} (not > 0)");
+            }
 
             state.CurrentDamage = Mathf.Min(state.CurrentDamage + DAMAGE_INCREMENT, MAX_DAMAGE);
+            Log.Debug($"[SCP-1499] New damage value for {player.Nickname}: {state.CurrentDamage}");
 
             yield return Timing.WaitForSeconds(DAMAGE_INTERVAL);
         }

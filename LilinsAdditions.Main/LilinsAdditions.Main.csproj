@@ -125,7 +125,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AudioPlayerApi" Version="1.1.2"/>
-        <PackageReference Include="ExMod.Exiled" Version="9.13.1"/>
+        <PackageReference Include="ExMod.Exiled" Version="9.13.3"/>
         <PackageReference Include="RueI" Version="3.1.2"/>
     </ItemGroup>
     <ItemGroup>
