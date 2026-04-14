@@ -110,6 +110,7 @@ public class GrenadeLauncher : CustomWeapon
             return;
         }
 
+        grenadePickup.PreviousOwner = player;
         grenadePickup.FuseTime = EXPLODE_FUSE_TIME;
         grenadePickup.Explode();
 

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Exiled.API.Features;
 using Exiled.API.Features.Pools;
 using HarmonyLib;
@@ -22,12 +21,12 @@ public static class PickupPatches
     private const int HINT_WIDTH_PIXELS = 3000;
     private const float HINT_POSITION = 300f;
     private const int MAX_LINE_LENGTH = 80;
-    private const string HINT_TAG = "test";
+    private const string HINT_TAG = "LA";
 
     #region Custom Hint Framework Patch
 
     /// <summary>
-    ///     Intercepts and customizes hint display using RueI framework.
+    ///     Replaces Exiled Hints with RueI Hints.
     /// </summary>
     [HarmonyPatch(typeof(HintDisplay), nameof(HintDisplay.Show))]
     [HarmonyPriority(Priority.First)]
@@ -42,7 +41,27 @@ public static class PickupPatches
             if (hint is not TextHint textHint)
                 return true;
 
-            DisplayCustomHint(player, textHint);
+            var sb = StringBuilderPool.Pool.Get();
+            try
+            {
+                var content = BuildHintContent(sb, textHint?.Text ?? string.Empty);
+
+                var display = RueDisplay.Get(player);
+                display.Remove(new Tag(HINT_TAG));
+
+                var element = new BasicElement(HINT_POSITION, content)
+                {
+                    ResolutionBasedAlign = true,
+                    VerticalAlign = VerticalAlign.Up
+                };
+
+                display.Show(new Tag(HINT_TAG), element, textHint.DurationScalar);
+            }
+            finally
+            {
+                StringBuilderPool.Pool.Return(sb);
+            }
+
             return false;
         }
 
@@ -57,30 +76,6 @@ public static class PickupPatches
             return player != null;
         }
 
-        private static void DisplayCustomHint(Player player, TextHint textHint)
-        {
-            var sb = StringBuilderPool.Pool.Get();
-            try
-            {
-                var content = BuildHintContent(sb, GetTextHintContent(textHint));
-                ShowHintToPlayer(player, content, textHint.DurationScalar);
-            }
-            finally
-            {
-                StringBuilderPool.Pool.Return(sb);
-            }
-        }
-
-        private static string GetTextHintContent(TextHint textHint)
-        {
-            var textProperty = typeof(TextHint).GetProperty("Text",
-                BindingFlags.Instance |
-                BindingFlags.Public |
-                BindingFlags.NonPublic);
-
-            return textProperty?.GetValue(textHint) as string ?? string.Empty;
-        }
-
         private static string BuildHintContent(StringBuilder sb, string text)
         {
             sb.SetWidth(HINT_WIDTH_PIXELS);
@@ -90,20 +85,6 @@ public static class PickupPatches
             sb.Append($"\n{wrappedText}\n");
 
             return sb.ToString();
-        }
-
-        private static void ShowHintToPlayer(Player player, string content, float duration)
-        {
-            var display = RueDisplay.Get(player);
-            display.Remove(new Tag(HINT_TAG));
-
-            var element = new BasicElement(HINT_POSITION, content)
-            {
-                ResolutionBasedAlign = true,
-                VerticalAlign = VerticalAlign.Up
-            };
-
-            display.Show(new Tag(HINT_TAG), element, duration);
         }
 
         private static string WrapText(string text, int maxLineLength)
