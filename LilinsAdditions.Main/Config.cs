@@ -36,6 +36,8 @@ public class Config : IConfig
     public int PointsForMysteryBox { get; set; } = 800;
     public int PointsForVendingMachine { get; set; } = 200;
     public int PointsForCoin { get; set; } = 1500;
+    public float PointsHintHorizontalPosition { get; set; } = 500f;
+    public int PointsVerticalAlignsIndex { get; set; } = 1;
     public string MysteryBoxMissingPointsText { get; set; } = "<color=red>You need 800 Points to open the box!</color>";
     public string VendingMachineMissingPointsText { get; set; } = "<color=red>You need 200 points!</color>";
     public int VendingMachineUsageLimit { get; set; } = 10;

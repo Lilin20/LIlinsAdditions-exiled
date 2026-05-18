@@ -102,12 +102,19 @@ public class PlayerHandler
         };
     }
 
+    private static readonly List<VerticalAlign> VerticalAligns = new()
+    {
+        VerticalAlign.Up,
+        VerticalAlign.Center,
+        VerticalAlign.Down
+    };
+
     private static DynamicElement CreatePointDisplayElement(Player player)
     {
-        return new DynamicElement(500f, _ => GetContent(player))
+        return new DynamicElement(LilinsAdditions.Instance.Config.PointsHintHorizontalPosition, _ => GetContent(player))
         {
             UpdateInterval = TimeSpan.FromSeconds(1),
-            VerticalAlign = VerticalAlign.Center,
+            VerticalAlign = VerticalAligns[LilinsAdditions.Instance.Config.PointsVerticalAlignsIndex],
             ResolutionBasedAlign = true,
             ZIndex = 100
         };
