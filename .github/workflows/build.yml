@@ -26,7 +26,7 @@ jobs:
           unzip -q references.zip -d Verweise
       - name: Download ProjectMER
         run: |
-          PMER_URL=$(curl -s https://github.com/Michal78900/ProjectMER/releases/latest \
+          PMER_URL=$(curl -s https://api.github.com/repos/Michal78900/ProjectMER/releases/latest \
             | grep "browser_download_url.*ProjectMER\.dll" \
             | cut -d '"' -f 4)
           curl -L "$PMER_URL" -o Verweise/ProjectMER.dll
