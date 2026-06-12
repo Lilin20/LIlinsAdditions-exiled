@@ -15,7 +15,7 @@ jobs:
       - name: Setup Mono & NuGet
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y mono-complete
+          sudo apt-get install -y mono-complete msbuild
           curl -L https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -o /usr/local/bin/nuget.exe
           echo '#!/bin/bash' | sudo tee /usr/local/bin/nuget
           echo 'mono /usr/local/bin/nuget.exe "$@"' | sudo tee -a /usr/local/bin/nuget
