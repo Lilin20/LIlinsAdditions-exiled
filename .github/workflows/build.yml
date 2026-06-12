@@ -30,8 +30,6 @@ jobs:
             | grep "browser_download_url.*ProjectMER\.dll" \
             | cut -d '"' -f 4)
           curl -L "$PMER_URL" -o Verweise/ProjectMER.dll
-      - name: Restore NuGet packages
-        run: nuget restore LilinsAdditions.Main/LilinsAdditions.Main.csproj
       - name: Build (Release)
         run: |
           msbuild LilinsAdditions.Main/LilinsAdditions.Main.csproj \
