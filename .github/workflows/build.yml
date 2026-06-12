@@ -1,0 +1,41 @@
+name: Build Plugin
+on:
+  push:
+    branches: [ "master" ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@4
+        with:
+          dotnet-version: '4.8.x'
+      - name: Download SL References
+        run: |
+          curl -L https://exmod-team.github.io/SL-References/Dev.zip -o references.zip
+          unzip -q referencess.zip -d Verweise
+      - name: Download ProjectMER
+        run: |
+          PMER_URL=$(curl -s https://github.com/Michal78900/ProjectMER/releases/latest \
+            | grep "browser_download_url.*ProjectMER\.dll" \
+            | cut -d '"' -f 4)
+          curl -L "$PMER_URL" -o Verweise/ProjectMER.dll
+      - name: Restore NuGet packages
+        run: nuget restore LilinsAdditions.Main/LilinsAdditions.Main.csproj
+      - name: Build (Release)
+        run: |
+          msbuild LilinsAdditions.Main/LilinsAdditions.Main.csproj \
+            /p:Configuration=Release
+            /p:Platform=AnyCPU \
+            /p:ReferencePath="${GITHUB_WORKSPACE}/Verweise"
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LilinsAdditions
+          path: LilinsAdditions.Main/bin/Releases/LilinsAdditions.Main.dll
