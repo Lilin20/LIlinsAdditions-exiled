@@ -12,10 +12,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '4.8.x'
+      - name: Setup Mono & MSBuild
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y mono-complete nuget
       - name: Download SL References
         run: |
           curl -L https://exmod-team.github.io/SL-References/Dev.zip -o references.zip
